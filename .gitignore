@@ -10,7 +10,7 @@ env/
 .mypy_cache/
 
 # --- Environment Variables ---
-.env
+.env*
 
 # --- Operating System Files ---
 .DS_Store
