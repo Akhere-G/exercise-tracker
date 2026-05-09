@@ -1,0 +1,107 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+:root {
+  --bg-canvas: #f9fafb;
+  --bg-surface: #ffffff;
+  --bg-surface-muted: #f3f4f6;
+  --border-surface: #e5e7eb;
+  
+  --txt-primary: #111827;
+  --txt-secondary: #4b5563;
+  --txt-inverse: #ffffff;
+
+  --brand-primary: #065f46;   
+  --brand-secondary: #10b981; 
+  --brand-accent: #34d399;
+}
+
+@theme {
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-accent: var(--brand-accent);
+
+  --color-canvas: var(--bg-canvas);
+  --color-surface: var(--bg-surface);
+  --color-surface-muted: var(--bg-surface-muted);
+  --color-surface-border: var(--border-surface);
+
+  --color-text-primary: var(--txt-primary);
+  --color-text-secondary: var(--txt-secondary);
+  --color-text-inverse: var(--txt-inverse);
+
+  --color-success: #059669;
+  --color-error: #dc2626;
+  --color-warning: #d97706;
+  --color-info: #2563eb;
+
+  --font-sans: 'Outfit', sans-serif;
+}
+
+@variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  .dark {
+    --bg-canvas: #09090b;     
+    --bg-surface: #18181b;     
+    --bg-surface-muted: #27272a;
+    --border-surface: #3f3f46;  
+
+    --txt-primary: #f8fafc;
+    --txt-secondary: #a1a1aa;
+    
+    --brand-primary: #10b981;   
+    --brand-secondary: #34d399;
+  }
+
+  body {
+    @apply bg-canvas text-text-primary antialiased selection:bg-brand-primary/30;
+  }
+
+  input, select, textarea {
+    @apply w-full px-4 py-2.5 rounded-xl border border-surface-border bg-surface transition-all outline-none text-text-primary focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary;
+  }
+
+  h1, h2, h3 {
+    @apply font-bold tracking-tight text-text-primary;
+  }
+
+  a {
+    @apply text-brand-primary hover:text-brand-secondary transition-colors font-medium;
+  }
+
+  button, .btn {
+    @apply px-5 py-2.5 rounded-xl font-bold transition-all cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-surface border border-surface-border rounded-2xl shadow-sm p-5 hover:shadow-md transition-shadow;
+  }
+
+  .btn-primary {
+    @apply bg-brand-primary text-text-inverse hover:brightness-110 shadow-md shadow-brand-primary/10;
+  }
+
+  .btn-secondary {
+    @apply bg-surface-muted text-text-primary hover:bg-surface-border;
+  }
+
+  .title {
+    @apply text-2xl font-extrabold;
+  }
+
+  .form-input {
+    @apply w-full p-3 rounded-xl border border-surface-border bg-surface text-text-primary transition-all placeholder:text-text-secondary/40;
+  }
+
+  .errorMessage {
+    @apply mt-4 text-sm font-medium text-error bg-error/5 p-3 rounded-xl border border-error/20;
+  }
+
+  .container { 
+    @apply w-full max-w-5xl mx-auto py-8 px-4;
+  }
+}
+
