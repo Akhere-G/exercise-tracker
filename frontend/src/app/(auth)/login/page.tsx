@@ -13,6 +13,7 @@ import { useForm } from "react-hook-form";
 import { loginAction } from "../../actions/auth";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
@@ -23,11 +24,15 @@ export default function Login() {
 
   const onSubmit = async (formState: LoginSchema) => {
     try {
-      const response = await loginAction(formState);
+      const formattedData = {
+        ...formState,
+        email: formState.email.toLowerCase(),
+      };
+      const response = await loginAction(formattedData);
       if (response?.error) {
         setErrorMessage(response.error);
       } else {
-        router.push("/");
+        router.push("/routines");
       }
     } catch (err) {
       setErrorMessage("Sorry... Somthing went wrong.");
@@ -58,6 +63,7 @@ export default function Login() {
               error={formState.errors.password?.message}
             />
             <Button>Login</Button>
+            <Link href="/register">Create account?</Link>
           </form>
         </CardContent>
       </Card>

@@ -4,7 +4,7 @@ import re
 
 class UserBase(BaseModel):
     username: str
-    email: EmailStr
+    email: EmailStr = Field(description="Email is required")
 
 
 class User(BaseModel):
