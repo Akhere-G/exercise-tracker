@@ -1,15 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from app.schemas.user import User, UserCreate, UserLogin, Token
+from fastapi import APIRouter, Depends, HTTPException, status, Response
+from app.schemas.user import User, UserCreate, UserLogin
 from app.database import get_db
 from sqlalchemy.orm import Session
 from app.services import user as user_service
 from typing import Annotated
 from fastapi.security import OAuth2PasswordRequestForm
 
-router = APIRouter(prefix="/auth", tags=["Users"])
+router = APIRouter(prefix="/api/auth", tags=["Users"])
 
 
-@router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
     exisiting_user = user_service.get_user_by_email(db, email=user_in.email)
     if exisiting_user:
@@ -36,9 +36,15 @@ def login(
     return user_service.get_access_token(user.email)
 
 
-@router.post("/login", response_model=Token, status_code=status.HTTP_200_OK)
+@router.post("/login", status_code=status.HTTP_200_OK)
 def login_user(user_in: UserLogin, db: Session = Depends(get_db)):
     exisiting_user = user_service.get_user_by_email(db, email=user_in.email)
+    if not exisiting_user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Doesn't exist",
+        )
+
     if not exisiting_user or not user_service.check_password_hash(
         user_in.password, exisiting_user.password_hash
     ):
