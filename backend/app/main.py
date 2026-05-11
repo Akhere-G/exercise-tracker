@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import users
 from app.database import engine, Base
 from app.models.user import User
+import os
 
 Base.metadata.create_all(bind=engine)
 
@@ -16,7 +17,10 @@ def create_app() -> FastAPI:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins=[
+            "http://127.0.0.1:8000",
+            os.getenv("FRONTEND_ORIGIN", "http://localhost:3000"),
+        ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
