@@ -1,6 +1,6 @@
 "use server";
 
-import { LoginSchema, RegisterSchema, Token } from "@/src/auth/schema";
+import { LoginSchema, RegisterSchema, Token } from "@/src/features/auth/schema";
 import { api } from "@/src/lib/axios";
 import { isAxiosError } from "axios";
 import { cookies } from "next/headers";

@@ -1,5 +1,5 @@
 "use client";
-import { RegisterSchema, registerSchema } from "@/src/auth/schema";
+import { RegisterSchema, registerSchema } from "@/src/features/auth/schema";
 import {
   Card,
   CardContent,
@@ -13,8 +13,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { registerAction } from "../../actions/auth";
-import { getValidationErrors, isValidationError } from "@/src/auth/utils";
+import { registerAction } from "../../../features/auth/api";
+import {
+  getValidationErrors,
+  isValidationError,
+} from "@/src/features/auth/utils";
 
 export default function Register() {
   const [errorMessages, setErrorMessage] = useState<Record<string, string>>({

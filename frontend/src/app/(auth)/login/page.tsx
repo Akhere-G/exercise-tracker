@@ -1,5 +1,5 @@
 "use client";
-import { LoginSchema, loginSchema } from "@/src/auth/schema";
+import { LoginSchema, loginSchema } from "@/src/features/auth/schema";
 import {
   Card,
   CardContent,
@@ -10,7 +10,7 @@ import { Button } from "@/src/components/ui/button";
 import { FormInput } from "@/src/components/ui/formInput";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { loginAction } from "../../actions/auth";
+import { loginAction } from "../../../features/auth/api";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
