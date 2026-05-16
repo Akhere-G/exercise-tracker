@@ -19,3 +19,22 @@ export function keysToCamel(obj: any): any {
   }
   return obj;
 }
+
+export function camelToSnake(str: string): string {
+  return str.replace(/[A-Z]/g, (match) => `_${match.toLowerCase()}`);
+}
+
+export function keysToSnake(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map((v) => keysToSnake(v));
+  } else if (obj !== null && obj.constructor === Object) {
+    return Object.keys(obj).reduce(
+      (result, key) => ({
+        ...result,
+        [camelToSnake(key)]: keysToSnake(obj[key]),
+      }),
+      {},
+    );
+  }
+  return obj;
+}
