@@ -7,7 +7,7 @@ from alembic import context
 from dotenv import load_dotenv
 import os
 from app.database import Base
-from app.models import User, Exercise, Muscle, ExerciseMuscle
+from app.models import User, Exercise, Muscle, ExerciseMuscle, Routine, RoutineItem
 
 load_dotenv()
 
