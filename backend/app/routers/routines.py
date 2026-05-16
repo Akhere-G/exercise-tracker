@@ -5,11 +5,13 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.schemas.routine import RoutineCreate, Routine, RoutineUpdate
 from ..models import User
+from typing import List
+
 
 router = APIRouter(prefix="/api/routines", tags=["Routines"])
 
 
-@router.get("")
+@router.get("", response_model=List[Routine])
 def get_routines(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Session = Depends(get_db),
@@ -17,7 +19,7 @@ def get_routines(
     return routine_service.get_routines(user.id, db)
 
 
-@router.get("/{routine_id}")
+@router.get("/{routine_id}", response_model=Routine)
 def get_routine(
     user: Annotated[User, Depends(user_service.get_current_user)],
     routine_id: int,

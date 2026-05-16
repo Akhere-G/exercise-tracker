@@ -1,6 +1,7 @@
 from datetime import time
 from typing import List, Optional
 from pydantic import BaseModel
+from .exercise import Exercise
 
 
 class RoutineItemCreate(BaseModel):
@@ -12,6 +13,7 @@ class RoutineItemCreate(BaseModel):
 
 class RoutineItem(RoutineItemCreate):
     routine_id: int
+    exercise: Exercise
 
 
 class RoutineBase(BaseModel):
