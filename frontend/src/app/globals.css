@@ -135,6 +135,14 @@
   .container {
     @apply w-full max-w-5xl mx-auto py-8 px-4;
   }
+
+  .backdrop {
+    @apply fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4
+  }
+
+  .modal { 
+    @apply bg-card border border-border rounded-2xl max-w-md w-full max-h-[80vh] flex flex-col shadow-xl
+  }
 }
 
 @theme inline {

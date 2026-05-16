@@ -1,7 +1,6 @@
 import axios from "axios";
-import { cookies } from "next/headers";
 
-const baseURL = process.env.BASE_URL;
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL;
 
 export const api = axios.create({
   withCredentials: true,
@@ -9,18 +8,18 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use(async (config) => {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("access_token")?.value;
+  if (typeof window === "undefined") {
+    try {
+      const { cookies } = await import("next/headers");
+      const cookieStore = await cookies();
+      const token = cookieStore.get("access_token")?.value;
 
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch {
+      console.warn("Skipped server-side cookie parsing.");
     }
-  } catch {
-    console.warn(
-      "Axios interceptor skipped cookie extraction outside request context.",
-    );
   }
-
   return config;
 });
