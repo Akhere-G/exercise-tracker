@@ -4,7 +4,6 @@ import RoutineCard from "./components/RoutineCard";
 export default async function Routines() {
   const routines = await routinesApi.getAll();
 
-  console.log(routines);
   return (
     <div className="container">
       <h2>Routines</h2>

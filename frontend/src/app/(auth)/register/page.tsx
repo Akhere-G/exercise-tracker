@@ -43,15 +43,12 @@ export default function Register() {
         ...formState,
         email: formState.email.toLowerCase(),
       };
-      console.log("submitting!");
 
       const response = await registerAction(formattedData);
-      console.log("response!");
 
       if (response?.error) {
         if (isValidationError(response)) {
           const errors = getValidationErrors(response.error);
-          console.log("errors!", errors);
           setErrorMessage(errors);
         } else {
           setErrorMessage({
@@ -61,13 +58,11 @@ export default function Register() {
       } else {
         router.push("/routines");
       }
-    } catch (err) {
+    } catch {
       setErrorMessage((prev) => ({
         ...prev,
         general: "Sorry... Somthing went wrong.",
       }));
-
-      console.log("error " + err);
     }
   };
   return (
