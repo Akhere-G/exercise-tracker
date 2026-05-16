@@ -12,6 +12,9 @@ class ExerciseMuscle(Base, AuditMixin):
         primary_key=True,
     )
     muscle_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("muscles.id", ondelete="cascade"), primary_key=True
+        Integer,
+        ForeignKey("muscles.id", ondelete="cascade"),
+        primary_key=True,
+        index=True,
     )
     contribution_type: Mapped[str] = mapped_column(String(10))
