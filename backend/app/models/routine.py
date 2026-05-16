@@ -16,7 +16,10 @@ class Routine(Base, AuditMixin):
     start_time: Mapped[Optional[time]] = mapped_column(Time)
 
     routine_items: Mapped[List["RoutineItem"]] = relationship(
-        "RoutineItem", back_populates="routine", cascade="all, delete-orphan"
+        "RoutineItem",
+        back_populates="routine",
+        cascade="all, delete-orphan",
+        lazy="selectin",
     )
 
 

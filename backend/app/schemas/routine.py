@@ -27,4 +27,11 @@ class RoutineCreate(RoutineBase):
 class Routine(RoutineBase):
     id: int
     user_id: int
-    routine_items: List[RoutineItem]
+    routine_items: List[RoutineItem] = []
+
+
+class RoutineUpdate(BaseModel):
+    name: Optional[str] = None
+    day: Optional[str] = None
+    start_time: Optional[time] = None
+    routine_items: Optional[List[RoutineItemCreate]] = None
