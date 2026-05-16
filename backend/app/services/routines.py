@@ -1,17 +1,31 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import select
-from app.models import Routine, RoutineItem
+from app.models import Routine, RoutineItem, Exercise
 from app.schemas.routine import RoutineCreate, RoutineUpdate
 
 
 def get_routines(user_id: int, db: Session):
-    stmt = select(Routine).where(Routine.user_id == user_id).order_by(Routine.day)
+    stmt = (
+        select(Routine)
+        .options(
+            selectinload(Routine.routine_items)
+            .selectinload(RoutineItem.exercise)
+            .selectinload(Exercise.muscles),
+        )
+        .where(Routine.user_id == user_id)
+        .order_by(Routine.day)
+    )
     return db.execute(stmt).scalars().all()
 
 
 def get_routine(user_id: int, db: Session, routine_id: int):
     stmt = (
         select(Routine)
+        .options(
+            selectinload(Routine.routine_items)
+            .selectinload(RoutineItem.exercise)
+            .selectinload(Exercise.muscles),
+        )
         .where(Routine.user_id == user_id)
         .where(Routine.id == routine_id)
     )

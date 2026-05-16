@@ -7,9 +7,11 @@ export default async function Routines() {
   return (
     <div className="container">
       <h2>Routines</h2>
-      {routines.map((routine) => (
-        <RoutineCard key={routine.id} routine={routine} />
-      ))}
+      <div className="flex flex-col gap-4 mt-4">
+        {routines.map((routine) => (
+          <RoutineCard key={routine.id} routine={routine} />
+        ))}
+      </div>
     </div>
   );
 }
