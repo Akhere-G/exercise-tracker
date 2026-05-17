@@ -5,6 +5,8 @@ import { keysToCamel } from "@/src/lib/apiUtils";
 
 interface GetAllExercisesProps {
   search?: string;
+  equipment?: string;
+  muscle?: string;
   page?: number;
 }
 export const getAllExercises = async (

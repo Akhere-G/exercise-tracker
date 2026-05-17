@@ -13,6 +13,17 @@ import { getAllExercises } from "@/src/features/exercises/api";
 import { Button } from "@/src/components/ui/button";
 import { RoutineItemSchema } from "@/src/features/routines/schema";
 import { Input } from "@/src/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/src/components/ui/select";
+import {
+  equipmentOptions,
+  muscleGroupOptions,
+} from "@/src/features/exercises/constants";
 
 interface ExercisePickerModalProps {
   isOpen: boolean;
@@ -31,6 +42,8 @@ export function ExercisePickerModal({
   onSelect,
   addedExercises,
 }: ExercisePickerModalProps) {
+  const [equipment, setEquipment] = useState("");
+  const [muscle, setMuscle] = useState("");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -67,7 +80,7 @@ export function ExercisePickerModal({
       setHasMore(true);
     }
     resetPage();
-  }, [deferredQuery]);
+  }, [deferredQuery, equipment, muscle]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -77,6 +90,8 @@ export function ExercisePickerModal({
       try {
         const fetchedExercises = await getAllExercises({
           search: deferredQuery,
+          equipment,
+          muscle,
           page,
         });
 
@@ -94,7 +109,7 @@ export function ExercisePickerModal({
       }
     }
     fetchExercises();
-  }, [isOpen, deferredQuery, page]);
+  }, [isOpen, deferredQuery, page, equipment, muscle]);
 
   useEffect(() => {
     function getFormattedExercises() {
@@ -135,20 +150,54 @@ export function ExercisePickerModal({
 
   return (
     <div className="backdrop">
-      <div className="modal">
-        <div className="p-5 border-b border-border flex justify-between items-center gap-2">
+      <div className="modal relative">
+        <div className="flex items-baseline justify-between gap-4 p-4">
+          <p>Add Exercises</p>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground w-min "
+          >
+            ✕
+          </button>
+        </div>
+        <div className="p-5 pt-0  flex justify-between items-center gap-2">
           <Input
             placeholder="Search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-muted-foreground hover:text-foreground"
+        </div>
+
+        <div className="flex px-5 gap-4">
+          <Select
+            value={equipment}
+            onValueChange={(value) => setEquipment(value)}
           >
-            ✕
-          </button>
+            <SelectTrigger className="flex-1 w-full">
+              <SelectValue placeholder="Equipment" />
+            </SelectTrigger>
+            <SelectContent>
+              {equipmentOptions.map(({ title, value }) => (
+                <SelectItem key={title} value={value}>
+                  {title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={muscle} onValueChange={(value) => setMuscle(value)}>
+            <SelectTrigger className="flex-1 w-full">
+              <SelectValue placeholder="Muscle" />
+            </SelectTrigger>
+            <SelectContent>
+              {muscleGroupOptions.map(({ title, value }) => (
+                <SelectItem key={title} value={value}>
+                  {title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="p-4 overflow-y-auto flex flex-col gap-2 max-h-[60vh]">
@@ -189,7 +238,6 @@ export function ExercisePickerModal({
             </p>
           )}
         </div>
-
         <div
           className="p-4"
           onClick={() => onSelect(formattedExercises.filter((e) => e.selected))}

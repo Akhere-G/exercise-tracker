@@ -17,10 +17,8 @@ def get_exercises(
     db: Session = Depends(get_db),
     search: Optional[str] = None,
     equipment: Optional[str] = None,
-    muscle_group: Optional[str] = None,
+    muscle: Optional[str] = None,
     page: int = 1,
     limit: int = 10,
 ):
-    return exercise_service.get_exercises(
-        db, search, equipment, muscle_group, page, limit
-    )
+    return exercise_service.get_exercises(db, search, equipment, muscle, page, limit)

@@ -1,4 +1,3 @@
-// page.tsx
 "use client";
 
 import {
@@ -13,7 +12,7 @@ import {
   getValidationErrors,
   isValidationError,
 } from "@/src/features/auth/utils";
-import { routinesApi } from "@/src/features/routines/api";
+import { createRoutine } from "@/src/features/routines/api";
 import { RoutineSchema, routineSchema } from "@/src/features/routines/schema";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useState } from "react";
@@ -21,6 +20,7 @@ import { useForm, useFieldArray } from "react-hook-form";
 import { Exercise } from "@/src/features/exercises/types";
 import { RoutineItemsTable } from "../components/RoutineItemsTable";
 import { ExercisePickerModal } from "../components/ExercisePickerModal";
+import { useRouter } from "next/navigation";
 
 export default function ActiveWorkout() {
   const [errorMessages, setErrorMessages] = useState<Record<string, string>>(
@@ -28,6 +28,7 @@ export default function ActiveWorkout() {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const router = useRouter();
   const { register, formState, handleSubmit, setValue, watch, control } =
     useForm<RoutineSchema>({
       resolver: yupResolver(routineSchema),
@@ -56,7 +57,8 @@ export default function ActiveWorkout() {
   const onSubmit = async (data: RoutineSchema) => {
     try {
       setErrorMessages({});
-      await routinesApi.create(data);
+      await createRoutine(data);
+      router.push("/routines");
     } catch (err) {
       if (isValidationError(err)) {
         setErrorMessages(getValidationErrors(err.error));
@@ -68,7 +70,6 @@ export default function ActiveWorkout() {
 
   const handleAddExerciseToForm = (exercises: Exercise[]) => {
     for (const exercise of exercises) {
-      console.log(fields, exercise);
       if (fields.some((e) => e.exerciseId === exercise.id)) {
         // TODO: add toast error message
         continue;
