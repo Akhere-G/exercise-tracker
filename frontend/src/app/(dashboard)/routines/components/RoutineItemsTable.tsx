@@ -7,6 +7,7 @@ import {
   RoutineSchema,
 } from "@/src/features/routines/schema";
 import { Input } from "@/src/components/ui/input";
+import { Trash2 } from "lucide-react";
 
 interface RoutineItemsTableProps {
   fields: RoutineItemSchema[];
@@ -23,11 +24,11 @@ export function RoutineItemsTable({
 }: RoutineItemsTableProps) {
   return (
     <div className="flex flex-col gap-2 my-4">
-      <div className="grid grid-cols-12 gap-4 items-center px-4 py-2 text-xs font-semibold text-muted-foreground uppercase border-b border-border tracking-wider">
+      <div className="grid grid-cols-12 gap-2 items-center px-4 py-2 text-xs font-semibold text-muted-foreground uppercase border-b border-border tracking-wider">
         <div className="col-span-6">Exercise</div>
         <div className="col-span-2 text-center">Sets</div>
         <div className="col-span-2 text-center">Reps</div>
-        <div className="col-span-2 text-right">Actions</div>
+        <div className="col-span-1 text-right"></div>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -37,10 +38,10 @@ export function RoutineItemsTable({
         {fields.map((field, index) => (
           <div
             key={field.exerciseId}
-            className="grid grid-cols-12 gap-4 items-center card-custom p-3 bg-muted/20"
+            className="grid grid-cols-12 gap-2 items-center card-custom p-3 bg-muted/20"
           >
-            <div className="col-span-6 flex items-start gap-3 min-w-0">
-              <span className="font-mono text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded mt-0.5">
+            <div className="col-span-6 flex items-start gap-2 min-w-0">
+              <span className="hidden md:block font-mono text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded mt-0.5">
                 {index + 1}
               </span>
               <div className="flex flex-col min-w-0">
@@ -58,7 +59,7 @@ export function RoutineItemsTable({
               <Input
                 type="number"
                 placeholder="Sets"
-                className={` text-center ${
+                className={` text-center text-xs ${
                   errors.routineItems?.[index]?.targetSets?.message
                     ? "border border-error!"
                     : ""
@@ -71,7 +72,7 @@ export function RoutineItemsTable({
               <Input
                 type="number"
                 placeholder="Reps"
-                className={` text-center ${
+                className={` text-center text-xs ${
                   errors.routineItems?.[index]?.targetReps?.message
                     ? "border border-error!"
                     : ""
@@ -85,9 +86,10 @@ export function RoutineItemsTable({
                 type="button"
                 variant="destructive"
                 size="sm"
+                title="delete"
                 onClick={() => remove(index)}
               >
-                Remove
+                <Trash2 />
               </Button>
             </div>
           </div>
