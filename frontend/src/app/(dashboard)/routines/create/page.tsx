@@ -114,17 +114,18 @@ export default function ActiveWorkout() {
               error={formState.errors.startTime?.message}
             />
 
-            <div className="flex gap-4 justify-between">
+            <div className="grid grid-cols-7 content-center items-center justify-center gap-4">
               {days.map((day) => (
-                <Button
-                  className="w-15 h-15 rounded-full"
-                  key={day.value}
-                  type="button"
-                  onClick={() => setValue("day", day.value)}
-                  variant={values.day === day.value ? "default" : "ghost"}
-                >
-                  {day.title}
-                </Button>
+                <div key={day.value} className="flex justify-center">
+                  <Button
+                    className="w-10 h-10 md:w-15 md:h-15 rounded-full items-center"
+                    type="button"
+                    onClick={() => setValue("day", day.value)}
+                    variant={values.day === day.value ? "default" : "ghost"}
+                  >
+                    {day.title}
+                  </Button>
+                </div>
               ))}
             </div>
 
