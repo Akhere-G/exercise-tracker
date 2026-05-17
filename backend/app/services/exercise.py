@@ -8,7 +8,7 @@ def get_exercises(
     db: Session,
     search: Optional[str] = None,
     equipment: Optional[str] = None,
-    muscle_group: Optional[str] = None,
+    muscle: Optional[str] = None,
     page: int = 1,
     limit: int = 10,
 ):
@@ -17,14 +17,14 @@ def get_exercises(
     if search:
         stmt = stmt.where(Exercise.name.ilike(f"%{search.strip()}%"))
 
-    if equipment:
+    if equipment and not equipment == "all":
         stmt = stmt.where(Exercise.equipment.ilike(f"%{equipment.strip()}%"))
 
-    if muscle_group:
+    if muscle and not muscle == "all":
         stmt = (
             stmt.join(ExerciseMuscle)
             .join(Muscle)
-            .where(Muscle.name.ilike(f"%{muscle_group}%"))
+            .where(Muscle.name.ilike(f"%{muscle}%"))
         )
 
         stmt = stmt.distinct()

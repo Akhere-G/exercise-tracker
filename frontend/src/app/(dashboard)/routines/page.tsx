@@ -1,9 +1,9 @@
-import { routinesApi } from "@/src/features/routines/api";
+import { getAllRoutines } from "@/src/features/routines/api";
 import RoutineCard from "./components/RoutineCard";
 import Link from "next/link";
 
 export default async function Routines() {
-  const routines = await routinesApi.getAll();
+  const routines = await getAllRoutines();
 
   return (
     <div className="container flex flex-col gap-4">
