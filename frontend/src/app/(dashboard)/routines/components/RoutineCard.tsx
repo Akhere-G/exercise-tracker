@@ -1,9 +1,9 @@
 import { Card } from "@/src/components/card";
-import { Button, buttonVariants } from "@/src/components/ui/button";
+import { buttonVariants } from "@/src/components/ui/button";
 import { Routine } from "@/src/features/routines/types";
-import { MoreVertical } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import RoutineModal from "../RoutineModal";
 
 export default function RoutineCard({ routine }: { routine: Routine }) {
   const { id, name, routineItems } = routine;
@@ -11,11 +11,9 @@ export default function RoutineCard({ routine }: { routine: Routine }) {
   return (
     <Card className="p-4">
       <header className="flex items-center gap-2 justify-between w-full">
-        <h3>{name}</h3>
+        <h3 className="truncate">{name}</h3>
 
-        <button>
-          <MoreVertical size={16} />
-        </button>
+        <RoutineModal routine={routine} />
       </header>
 
       <div className="flex gap-2">

@@ -29,3 +29,32 @@ export const createRoutine = async (
     throw err;
   }
 };
+
+export const editRoutine = async (
+  routine: Partial<RoutineSchema>,
+  routineId: number,
+): Promise<Routine> => {
+  try {
+    const cleanedRoutine = {
+      ...routine,
+      day: routine.day?.toString(),
+      routineItems: routine.routineItems?.map((item) => {
+        const { exercise, ...pureItemFields } = item;
+        return pureItemFields;
+      }),
+    };
+
+    const response = await api.patch<Routine>(
+      `/routines/${routineId}`,
+      keysToSnake(cleanedRoutine),
+    );
+
+    return keysToCamel(response.data);
+  } catch (err) {
+    if (isValidationError(err)) {
+      throw err;
+    }
+
+    throw err;
+  }
+};

@@ -133,7 +133,7 @@
   }
 
   .container {
-    @apply w-full max-w-5xl md:mx-auto py-8 px-2 md:px-4;
+    @apply w-full max-w-5xl mx-auto py-8 px-2 md:px-4;
   }
 
   .backdrop {

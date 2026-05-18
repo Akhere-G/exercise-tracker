@@ -34,6 +34,6 @@ class Routine(RoutineBase):
 
 class RoutineUpdate(BaseModel):
     name: Optional[str] = None
-    day: Optional[str] = None
+    day: Optional[int] = None
     start_time: Optional[time] = None
     routine_items: Optional[List[RoutineItemCreate]] = None
