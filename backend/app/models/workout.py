@@ -1,5 +1,5 @@
 from app.database import Base
-from audit_mixin import AuditMixin
+from .audit_mixin import AuditMixin
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import Integer, Float, DateTime, ForeignKey
 from datetime import datetime
