@@ -58,3 +58,7 @@ export const editRoutine = async (
     throw err;
   }
 };
+
+export const deleteRoutine = async (routineId: number) => {
+  await api.delete(`/routines/${routineId}`);
+};

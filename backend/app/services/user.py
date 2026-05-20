@@ -78,16 +78,22 @@ def get_user_by_email(db: Session, email: str):
 
 
 def create_user(db: Session, user_in: UserCreate):
-    hashed_password = get_password_hash(user_in.password)
+    try:
+        hashed_password = get_password_hash(user_in.password)
 
-    user = User(
-        username=user_in.username, email=user_in.email, password_hash=hashed_password
-    )
+        user = User(
+            username=user_in.username,
+            email=user_in.email,
+            password_hash=hashed_password,
+        )
 
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+        return user
+    except:
+        db.rollback()
+        raise
 
 
 def get_access_token(email: str):

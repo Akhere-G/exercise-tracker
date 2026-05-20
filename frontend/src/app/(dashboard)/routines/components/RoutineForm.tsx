@@ -28,7 +28,7 @@ export default function RoutineForm({
 }: {
   submitAction: (data: RoutineSchema) => Promise<unknown>;
   sumbitText: string;
-  initalData: Routine;
+  initalData?: Routine;
 }) {
   const [errorMessages, setErrorMessages] = useState<Record<string, string>>(
     {},

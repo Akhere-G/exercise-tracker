@@ -4,7 +4,7 @@ from app.models import Routine, RoutineItem, Exercise
 from app.schemas.routine import RoutineCreate, RoutineUpdate
 
 
-def get_routines(user_id: int, db: Session):
+def get_routines(db: Session, user_id: int):
     stmt = (
         select(Routine)
         .options(
@@ -18,7 +18,7 @@ def get_routines(user_id: int, db: Session):
     return db.execute(stmt).scalars().all()
 
 
-def get_routine(user_id: int, db: Session, routine_id: int):
+def get_routine(db: Session, user_id: int, routine_id: int):
     stmt = (
         select(Routine)
         .options(
@@ -32,7 +32,7 @@ def get_routine(user_id: int, db: Session, routine_id: int):
     return db.execute(stmt).scalars().one_or_none()
 
 
-def create_routine(user_id: int, db: Session, routine: RoutineCreate):
+def create_routine(db: Session, user_id: int, routine: RoutineCreate):
     try:
         new_routine = Routine(
             name=routine.name,
@@ -63,13 +63,13 @@ def create_routine(user_id: int, db: Session, routine: RoutineCreate):
 
 
 def update_routine(
+    db: Session,
     user_id: int,
     routine_id: int,
-    db: Session,
     routine_data: RoutineUpdate,
 ):
     try:
-        old_routine = get_routine(user_id, db, routine_id)
+        old_routine = get_routine(db, user_id, routine_id)
 
         if not old_routine:
             return old_routine
@@ -101,17 +101,21 @@ def update_routine(
 
 
 def delete_routine(
+    db: Session,
     user_id: int,
     routine_id: int,
-    db: Session,
 ):
-    routine = get_routine(user_id, db, routine_id)
+    try:
+        routine = get_routine(db, user_id, routine_id)
 
-    if not routine:
-        return routine
+        if not routine:
+            return routine
 
-    db.delete(routine)
+        db.delete(routine)
 
-    db.commit()
+        db.commit()
 
-    return routine_id
+        return routine_id
+    except:
+        db.rollback()
+        raise
