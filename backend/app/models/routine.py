@@ -11,7 +11,9 @@ class Routine(Base, AuditMixin):
     __tablename__ = "routines"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(255))
-    user_id: Mapped[int] = mapped_column(Integer)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE")
+    )
     day: Mapped[int] = mapped_column(Integer)
     start_time: Mapped[Optional[time]] = mapped_column(Time)
 
