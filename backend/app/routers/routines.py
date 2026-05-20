@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from ..services import user as user_service, routines as routine_service
+from ..services import routine as routine_service, user as user_service
 from typing import Annotated
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -16,7 +16,7 @@ def get_routines(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Session = Depends(get_db),
 ):
-    return routine_service.get_routines(user.id, db)
+    return routine_service.get_routines(db, user.id)
 
 
 @router.get("/{routine_id}", response_model=Routine)
@@ -25,7 +25,7 @@ def get_routine(
     routine_id: int,
     db: Session = Depends(get_db),
 ):
-    routine = routine_service.get_routine(user.id, db, routine_id)
+    routine = routine_service.get_routine(db, user.id, routine_id)
     if not routine:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="Routine not found"
@@ -40,8 +40,8 @@ def create_routine(
     db: Session = Depends(get_db),
 ):
     new_routine = routine_service.create_routine(
-        user.id,
         db,
+        user.id,
         routine,
     )
 
@@ -56,9 +56,9 @@ def update_routine(
     db: Session = Depends(get_db),
 ):
     new_routine = routine_service.update_routine(
+        db,
         user.id,
         routine_id,
-        db,
         routine,
     )
 
@@ -77,9 +77,9 @@ def delete_routine(
     db: Session = Depends(get_db),
 ):
     deleted_id = routine_service.delete_routine(
+        db,
         user.id,
         routine_id,
-        db,
     )
 
     if not deleted_id:

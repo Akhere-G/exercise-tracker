@@ -11,12 +11,12 @@ class Workout(Base, AuditMixin):
     __tablename__ = "workouts"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     routine_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("routines.id", ondelete="SET NULL")
+        Integer, ForeignKey("routines.id", ondelete="CASCADE")
     )
     completed_at: Mapped[datetime] = mapped_column(DateTime)
     duration: Mapped[int] = mapped_column(Integer)
     sets: Mapped[List["WorkoutSet"]] = relationship(
-        "WorkoutSet", back_populates="workout"
+        "WorkoutSet", back_populates="workout", cascade="all, delete-orphan"
     )
 
 
