@@ -223,7 +223,8 @@ export function ExercisePickerModal({
                     {exercise.name}
                   </div>
                   <div className="text-xs text-muted-foreground capitalize">
-                    {exercise.equipment} • {exercise.muscles.join(", ")}
+                    {exercise.equipment} •{" "}
+                    {exercise.muscles.map(({ name }) => name).join(", ")}
                   </div>
                 </div>
               </button>

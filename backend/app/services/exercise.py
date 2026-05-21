@@ -12,7 +12,9 @@ def get_exercises(
     page: int = 1,
     limit: int = 10,
 ):
-    stmt = select(Exercise).options(selectinload(Exercise.muscles))
+    stmt = select(Exercise).options(
+        selectinload(Exercise.muscles).selectinload(ExerciseMuscle.muscle)
+    )
 
     if search:
         stmt = stmt.where(Exercise.name.ilike(f"%{search.strip()}%"))
