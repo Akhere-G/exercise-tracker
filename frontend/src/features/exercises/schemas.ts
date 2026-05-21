@@ -8,5 +8,10 @@ export const exerciseSchema = yup.object({
   imageUrl: yup.string(),
   metrics: yup.string(),
   equipment: yup.string(),
-  muscles: yup.array(yup.string()),
+  muscles: yup.array(
+    yup.object({
+      name: yup.string(),
+      contributionType: yup.string(),
+    }),
+  ),
 });

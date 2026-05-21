@@ -49,8 +49,9 @@ export function RoutineItemsTable({
                   {field?.exercise?.name || "Unknown Exercise"}
                 </span>
                 <span className="text-xs text-muted-foreground truncate capitalize">
-                  {field?.exercise?.muscles?.join(", ") ||
-                    "No groups specified"}
+                  {field?.exercise?.muscles
+                    ?.map(({ name }) => name)
+                    ?.join(", ") || "No groups specified"}
                 </span>
               </div>
             </div>

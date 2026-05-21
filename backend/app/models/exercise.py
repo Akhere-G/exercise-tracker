@@ -3,7 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Integer, Text
 from .audit_mixin import AuditMixin
 from typing import List
-from .muscle import Muscle
+from .exercise_muscle import ExerciseMuscle
 
 
 class Exercise(Base, AuditMixin):
@@ -16,6 +16,6 @@ class Exercise(Base, AuditMixin):
     equipment: Mapped[str] = mapped_column(String(100))
     metrics: Mapped[str] = mapped_column(String(100))
 
-    muscles: Mapped[List["Muscle"]] = relationship(
-        "Muscle", secondary="exercise_muscles"
+    muscles: Mapped[List["ExerciseMuscle"]] = relationship(
+        "ExerciseMuscle",
     )

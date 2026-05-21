@@ -1,7 +1,8 @@
 from ..database import Base
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Integer, ForeignKey
 from .audit_mixin import AuditMixin
+from .muscle import Muscle
 
 
 class ExerciseMuscle(Base, AuditMixin):
@@ -18,3 +19,4 @@ class ExerciseMuscle(Base, AuditMixin):
         index=True,
     )
     contribution_type: Mapped[str] = mapped_column(String(10))
+    muscle: Mapped["Muscle"] = relationship("Muscle")
