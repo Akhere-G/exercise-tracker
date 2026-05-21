@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import select
-from app.models import Routine, RoutineItem, Exercise
+from app.models import Routine, RoutineItem, Exercise, ExerciseMuscle
 from app.schemas.routine import RoutineCreate, RoutineUpdate
 
 
@@ -10,7 +10,8 @@ def get_routines(db: Session, user_id: int):
         .options(
             selectinload(Routine.routine_items)
             .selectinload(RoutineItem.exercise)
-            .selectinload(Exercise.muscles),
+            .selectinload(Exercise.muscles)
+            .selectinload(ExerciseMuscle.muscle),
         )
         .where(Routine.user_id == user_id)
         .order_by(Routine.day)

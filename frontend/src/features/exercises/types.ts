@@ -1,3 +1,7 @@
+export interface Muscle {
+  name: string;
+  contributionType: string;
+}
 export interface Exercise {
   id: number;
   name: string;
@@ -6,5 +10,5 @@ export interface Exercise {
   imageUrl: string;
   metrics: string;
   equipment: string;
-  muscles: string[];
+  muscles: Muscle[];
 }
