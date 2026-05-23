@@ -5,27 +5,27 @@ import ExerciseDetails from "./ExerciseDetails";
 import SetList from "./SetList";
 import RestTimeTracker from "./RestTimeTracker";
 import { Routine } from "@/src/features/routines/types";
-const workoutKey = "active_workout_start_time";
+import { useWorkout } from "@/src/features/workout/store";
 
 export default function WorkoutClientProvider({
   routine,
 }: {
   routine: Routine | null;
 }) {
+  const { setRoutineData } = useWorkout();
+
   useEffect(() => {
-    let workoutStartTime = localStorage.getItem(workoutKey);
-    if (!workoutStartTime) {
-      workoutStartTime = new Date().toISOString();
-      localStorage.setItem(workoutKey, workoutStartTime);
+    if (routine) {
+      setRoutineData({ routineId: routine.id });
     }
-  }, []);
+  }, [routine, setRoutineData]);
 
   return (
     <div>
-      <ExercliseList />
-      <ExerciseDetails />
-      <SetList />
-      <RestTimeTracker />
+      <ExercliseList routine={routine} />
+      <ExerciseDetails routine={routine} />
+      <SetList routine={routine} />
+      <RestTimeTracker routine={routine} />
     </div>
   );
 }
