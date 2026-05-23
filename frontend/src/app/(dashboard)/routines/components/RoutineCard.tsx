@@ -42,7 +42,7 @@ export default function RoutineCard({ routine }: { routine: Routine }) {
         className={buttonVariants({
           variant: "default",
         })}
-        href={`/workouts/active?routine=${id}`}
+        href={`/workouts/active?routineId=${id}`}
       >
         Start
       </Link>
