@@ -39,8 +39,11 @@ export const editRoutine = async (
       ...routine,
       day: routine.day?.toString(),
       routineItems: routine.routineItems?.map((item) => {
-        const { exercise, ...pureItemFields } = item;
-        return pureItemFields;
+        const { exercise, targetDuration, ...pureItemFields } = item;
+        return {
+          ...pureItemFields,
+          targetDuration: targetDuration ? targetDuration * 60 : undefined,
+        };
       }),
     };
 

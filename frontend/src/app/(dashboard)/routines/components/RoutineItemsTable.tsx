@@ -8,6 +8,11 @@ import {
 } from "@/src/features/routines/schema";
 import { Input } from "@/src/components/ui/input";
 import { Trash2 } from "lucide-react";
+import {
+  isDurationExercise,
+  isRepsExercise,
+} from "@/src/features/exercises/utils";
+import { Exercise } from "@/src/features/exercises/types";
 
 interface RoutineItemsTableProps {
   fields: RoutineItemSchema[];
@@ -23,79 +28,92 @@ export function RoutineItemsTable({
   errors,
 }: RoutineItemsTableProps) {
   return (
-    <div className="flex flex-col gap-2 my-4">
-      <div className="grid grid-cols-12 gap-2 items-center px-4 py-2 text-xs font-semibold text-muted-foreground uppercase border-b border-border tracking-wider">
-        <div className="col-span-6">Exercise</div>
-        <div className="col-span-2 text-center">Sets</div>
-        <div className="col-span-2 text-center">Reps</div>
-        <div className="col-span-1 text-right"></div>
-      </div>
+    <div className="flex flex-col gap-4 my-4">
+      {fields.map((field, index) => {
+        const exercise = field.exercise;
+        const hasReps = exercise ? isRepsExercise(exercise as Exercise) : false;
 
-      <div className="flex flex-col gap-2">
-        {fields.length === 0 && (
-          <div className="text-center pt-8">No exercises</div>
-        )}
-        {fields.map((field, index) => (
+        const hasDuration = exercise
+          ? isDurationExercise(exercise as Exercise)
+          : false;
+
+        return (
           <div
             key={field.exerciseId}
-            className="grid grid-cols-12 gap-2 items-center card-custom p-3 bg-muted/20"
+            className="card-custom p-4 bg-muted/20 rounded-lg flex flex-col gap-3"
           >
-            <div className="col-span-6 flex items-start gap-2 min-w-0">
-              <span className="hidden md:block font-mono text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded mt-0.5">
-                {index + 1}
-              </span>
-              <div className="flex flex-col min-w-0">
-                <span className="font-semibold text-sm text-foreground truncate">
-                  {field?.exercise?.name || "Unknown Exercise"}
+            <div className="flex justify-between items-start gap-2">
+              <div className="flex items-start gap-2 min-w-0">
+                <span className="font-mono text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded mt-0.5">
+                  {index + 1}
                 </span>
-                <span className="text-xs text-muted-foreground truncate capitalize">
-                  {field?.exercise?.muscles
-                    ?.map(({ name }) => name)
-                    ?.join(", ") || "No groups specified"}
+                <span className="font-semibold text-sm truncate">
+                  {exercise?.name || "Unknown"}
                 </span>
               </div>
-            </div>
-
-            <div className="col-span-2 flex justify-center ">
-              <Input
-                type="number"
-                placeholder="Sets"
-                className={` text-center text-xs ${
-                  errors.routineItems?.[index]?.targetSets?.message
-                    ? "border border-error!"
-                    : ""
-                }`}
-                {...register(`routineItems.${index}.targetSets` as const)}
-              />
-            </div>
-
-            <div className="col-span-2 flex justify-center">
-              <Input
-                type="number"
-                placeholder="Reps"
-                className={` text-center text-xs ${
-                  errors.routineItems?.[index]?.targetReps?.message
-                    ? "border border-error!"
-                    : ""
-                }`}
-                {...register(`routineItems.${index}.targetReps` as const)}
-              />
-            </div>
-
-            <div className="col-span-2 flex justify-end">
               <Button
                 type="button"
-                variant="destructive"
+                variant="ghost"
                 size="sm"
-                title="delete"
                 onClick={() => remove(index)}
               >
-                <Trash2 />
+                <Trash2 size={16} className="text-destructive" />
               </Button>
             </div>
+
+            <div className="grid grid-cols-2 gap-2 text-center items-center pt-2 border-t border-border/50">
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] uppercase text-muted-foreground">
+                  Sets
+                </label>
+                <Input
+                  type="number"
+                  className={`text-center ${
+                    errors.routineItems?.[index]?.targetSets?.message
+                      ? "border border-error!"
+                      : ""
+                  }`}
+                  {...register(`routineItems.${index}.targetSets`)}
+                />
+              </div>
+
+              {hasReps && (
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] uppercase text-muted-foreground">
+                    Reps
+                  </label>
+                  <Input
+                    type="number"
+                    className={`text-center ${
+                      errors.routineItems?.[index]?.targetReps?.message
+                        ? "border border-error!"
+                        : ""
+                    }`}
+                    {...register(`routineItems.${index}.targetReps`)}
+                  />
+                </div>
+              )}
+
+              {hasDuration && (
+                <div className="flex flex-col gap-1">
+                  <label className="text-[10px] uppercase text-muted-foreground">
+                    Mins
+                  </label>
+                  <Input
+                    type="number"
+                    className={`text-center ${
+                      errors.routineItems?.[index]?.targetDuration?.message
+                        ? "border border-error!"
+                        : ""
+                    }`}
+                    {...register(`routineItems.${index}.targetDuration`)}
+                  />
+                </div>
+              )}
+            </div>
           </div>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 }

@@ -5,10 +5,26 @@ export const routineItemSchema = yup.object({
   exercise: exerciseSchema.notRequired(),
   exerciseId: yup.number().required(),
   targetSets: yup.number().required().min(1, "Must be at least 1 set"),
-  targetReps: yup.number().required().min(1, "Must be at least 1 rep"),
+  targetReps: yup
+    .number()
+    .notRequired()
+    .test("reps-or-duration", "Must have reps or duration", function (value) {
+      return (
+        (value && value > 0) ||
+        (this.parent.targetDuration && this.parent.targetDuration > 0)
+      );
+    }),
+  targetDuration: yup
+    .number()
+    .notRequired()
+    .test("reps-or-duration", "Must have reps or duration", function (value) {
+      return (
+        (value && value > 0) ||
+        (this.parent.targetSets && this.parent.targetSets > 0)
+      );
+    }),
   order: yup.number().required(),
 });
-//TODO: add target duration and target weight
 
 export const routineSchema = yup.object({
   name: yup.string().required(),

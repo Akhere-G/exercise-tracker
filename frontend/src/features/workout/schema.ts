@@ -10,14 +10,15 @@ export const workoutSetSchema = Yup.object()
   })
   .test(
     "validate-set-data",
-    "You must provide either 'reps' AND 'weight', or 'duration' for this set.",
+    "You must provide either 'reps' or 'weight' or 'duration' for this set.",
     function (values) {
       const { reps, weight, durationSecs } = values;
 
-      const hasStrengthMetrics = !!reps && !!weight;
-      const hasDuration = !!durationSecs;
+      const hasReps = !!reps && reps > 0;
+      const hasWeight = !!weight && weight > 0;
+      const hasDuration = !!durationSecs && durationSecs > 0;
 
-      return hasStrengthMetrics || hasDuration;
+      return hasReps || hasWeight || hasDuration;
     },
   );
 
