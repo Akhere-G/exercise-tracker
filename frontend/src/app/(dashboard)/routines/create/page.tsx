@@ -16,7 +16,7 @@ export default async function CreateRoutinePage() {
           <CardTitle className="title mb-2">Create Routine</CardTitle>
         </CardHeader>
         <CardContent>
-          <RoutineForm submitAction={createRoutine} sumbitText="Create" />;
+          <RoutineForm submitAction={createRoutine} sumbitText="Create" />
         </CardContent>
       </Card>
     </div>
