@@ -42,7 +42,7 @@ function ExerciseCard({
 }) {
   return (
     <div
-      className={`relative w-17 h-12 overflow-hidden bg-white rounded-md ${selected ? "" : "opacity-50"}`}
+      className={`relative w-17 h-12 overflow-hidden bg-white rounded-md transition-opacity duration-300 ${selected ? "" : "opacity-50"}`}
       onClick={() => onClick(exercise.id)}
     >
       <Image

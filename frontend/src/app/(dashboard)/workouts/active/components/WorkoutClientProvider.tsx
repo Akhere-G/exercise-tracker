@@ -2,7 +2,7 @@
 import React, { useEffect } from "react";
 
 import ExerciseDetails from "./ExerciseDetails";
-import SetList from "./SetList";
+import SetList from "../../../routines/components/SetList";
 import RestTimeTracker from "./RestTimeTracker";
 import { Routine } from "@/src/features/routines/types";
 import { Exercise, useWorkout } from "@/src/features/workout/store";

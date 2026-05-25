@@ -10,8 +10,6 @@ export default function ExerciseDetails({
 }) {
   const { currentExerciseId, exercises } = useWorkout();
 
-  if (!routine) return;
-
   const currentExercise = exercises.find((e) => e.id === currentExerciseId);
 
   if (!currentExercise) return;
@@ -21,7 +19,9 @@ export default function ExerciseDetails({
       <div className="flex gap-2 justify-between items-start">
         <div className="">
           <h2>{currentExercise.name}</h2>
-          <p>{currentExercise.equipment}</p>
+          <p className="capitalize text-sm text-secondary-foreground">
+            {currentExercise.equipment}
+          </p>
         </div>
         <Button>
           <MoreVertical />
