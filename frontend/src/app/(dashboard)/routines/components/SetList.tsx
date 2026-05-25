@@ -11,6 +11,7 @@ import {
   isRepsExercise,
   isWeightsExercise,
 } from "@/src/features/exercises/utils";
+import { getNewSet } from "@/src/features/workout/utils";
 
 function SetInput({
   value,
@@ -92,7 +93,7 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
 }
 
 export default function SetList({ routine }: { routine: Routine | null }) {
-  const { exercises, currentExerciseId } = useWorkout();
+  const { exercises, currentExerciseId, setWorkoutData } = useWorkout();
   const currentExercise = exercises.find((e) => e.id === currentExerciseId);
   const sets = currentExercise?.sets ?? [];
 
@@ -100,6 +101,16 @@ export default function SetList({ routine }: { routine: Routine | null }) {
   const hasDuration = !!currentExercise && isDurationExercise(currentExercise);
   const hasWeight = !!currentExercise && isWeightsExercise(currentExercise);
 
+  const addSet = () => {
+    if (!currentExercise) return;
+    setWorkoutData({
+      exercises: exercises.map((e) =>
+        e.id === currentExerciseId
+          ? { ...e, sets: e.sets.concat(getNewSet(e)) }
+          : e,
+      ),
+    });
+  };
   if (!currentExercise) return null;
 
   return (
@@ -126,6 +137,9 @@ export default function SetList({ routine }: { routine: Routine | null }) {
           ))}
         </tbody>
       </table>
+      <Button className="w-full" onClick={addSet}>
+        Add{" "}
+      </Button>
     </div>
   );
 }
