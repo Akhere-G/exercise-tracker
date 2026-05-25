@@ -104,6 +104,10 @@ export default function RoutineForm({
     setIsModalOpen(false);
   };
 
+  const exercises: Exercise[] = values.routineItems.map(
+    (r) => r.exercise,
+  ) as Exercise[];
+
   return (
     <>
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
@@ -172,7 +176,7 @@ export default function RoutineForm({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSelect={handleAddExerciseToForm}
-        addedExercises={values.routineItems}
+        addedExercises={exercises}
       />
     </>
   );

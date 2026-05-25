@@ -1,16 +1,40 @@
 import { Button } from "@/src/components/ui/button";
-import { Exercise } from "@/src/features/exercises/types";
 import { Routine } from "@/src/features/routines/types";
-import { useWorkout } from "@/src/features/workout/store";
+import { Exercise, useWorkout } from "@/src/features/workout/store";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
+import { ExercisePickerModal } from "../../../routines/components/ExercisePickerModal";
+import { Exercise as BaseExercise } from "@/src/features/exercises/types";
+import { Plus } from "lucide-react";
+import { getDefaultSets } from "@/src/features/workout/utils";
 
 export default function ExerciseList({ routine }: { routine: Routine | null }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   const { currentExerciseId, setWorkoutData, exercises } = useWorkout();
 
   const onClick = (currentExerciseId: number) => {
     setWorkoutData({ currentExerciseId });
   };
+
+  function addExercises(newExercises: BaseExercise[]) {
+    const exisitingExerciseLookup: Record<number, boolean> = {};
+
+    exercises.forEach((e) => {
+      exisitingExerciseLookup[e.id] = true;
+    });
+
+    const exercisesToAdd: Exercise[] = newExercises
+      .filter((e) => !exisitingExerciseLookup[e.id])
+      .map((e) => ({ ...e, sets: getDefaultSets(e) }));
+
+    setWorkoutData({
+      exercises: [...exercises, ...exercisesToAdd],
+    });
+
+    setIsOpen(false);
+  }
+
   return (
     <div>
       <div className="px-2 py-4 bg-secondary overflow-x-scroll">
@@ -24,9 +48,18 @@ export default function ExerciseList({ routine }: { routine: Routine | null }) {
                 onClick={onClick}
               />
             ))}
-          <Button className="h-12 w-17">+</Button>
+          <Button className="h-12 w-17" onClick={() => setIsOpen(true)}>
+            <Plus />
+          </Button>
         </div>
       </div>
+
+      <ExercisePickerModal
+        isOpen={isOpen}
+        addedExercises={exercises}
+        onClose={() => setIsOpen(false)}
+        onSelect={addExercises}
+      />
     </div>
   );
 }
@@ -36,7 +69,7 @@ function ExerciseCard({
   selected,
   onClick,
 }: {
-  exercise: Exercise;
+  exercise: BaseExercise;
   selected: boolean;
   onClick: (exerciseId: number) => void;
 }) {
