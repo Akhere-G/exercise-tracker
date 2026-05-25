@@ -11,7 +11,6 @@ import {
 import { Exercise } from "@/src/features/exercises/types";
 import { getAllExercises } from "@/src/features/exercises/api";
 import { Button } from "@/src/components/ui/button";
-import { RoutineItemSchema } from "@/src/features/routines/schema";
 import { Input } from "@/src/components/ui/input";
 import {
   Select,
@@ -29,7 +28,7 @@ interface ExercisePickerModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (exercises: Exercise[]) => void;
-  addedExercises: RoutineItemSchema[];
+  addedExercises: Exercise[];
 }
 
 interface ExerciseItem extends Exercise {
@@ -63,7 +62,7 @@ export function ExercisePickerModal({
       if (isOpen) {
         const initialMap: Record<number, boolean> = {};
         addedExercises.forEach((e) => {
-          initialMap[e.exerciseId] = true;
+          initialMap[e.id] = true;
         });
         setSelectedIds(initialMap);
         setExercises([]);
