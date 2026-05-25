@@ -50,6 +50,14 @@ export default function ExerciseDetails({
     });
     setIsOpen(false);
   }
+
+  function removeLastSet() {
+    const updatedExercises = exercises.map((e) =>
+      e.id === currentExerciseId ? { ...e, sets: e.sets.slice(0, -1) } : e,
+    );
+
+    setWorkoutData({ exercises: updatedExercises });
+  }
   return (
     <div className="mt-4 px-2">
       <div className="flex gap-2 justify-between items-start">
@@ -64,7 +72,9 @@ export default function ExerciseDetails({
             <MoreVertical size={16} />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem>Undo Last set</DropdownMenuItem>
+            <DropdownMenuItem onClick={removeLastSet}>
+              Remove Last set
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setIsOpen(true)}>
               Replace
             </DropdownMenuItem>
