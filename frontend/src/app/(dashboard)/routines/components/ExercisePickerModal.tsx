@@ -23,6 +23,7 @@ import {
   equipmentOptions,
   muscleGroupOptions,
 } from "@/src/features/exercises/constants";
+import { Drawer, DrawerContent } from "@/src/components/ui/drawer";
 
 interface ExercisePickerModalProps {
   isOpen: boolean;
@@ -157,8 +158,8 @@ export function ExercisePickerModal({
   if (!isOpen) return null;
 
   return (
-    <div className="backdrop">
-      <div className="modal relative">
+    <Drawer open={isOpen} onOpenChange={(open) => (!open ? onClose() : null)}>
+      <DrawerContent className="border-secondary">
         <div className="flex items-baseline justify-between gap-4 p-4">
           <p>{title}</p>
           <button
@@ -253,7 +254,7 @@ export function ExercisePickerModal({
         >
           <Button className="w-full">{submitBtnText}</Button>
         </div>
-      </div>
-    </div>
+      </DrawerContent>
+    </Drawer>
   );
 }
