@@ -3,8 +3,12 @@ import { WorkoutSetSchema } from "./schema";
 import { persist } from "zustand/middleware";
 import { Exercise as BaseExercise } from "../exercises/types";
 
+export interface ActiveSet extends WorkoutSetSchema {
+  isCompleted?: boolean;
+}
+
 export interface Exercise extends BaseExercise {
-  sets: WorkoutSetSchema[];
+  sets: ActiveSet[];
 }
 
 interface WorkoutState {

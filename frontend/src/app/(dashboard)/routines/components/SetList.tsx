@@ -3,8 +3,7 @@
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Check } from "lucide-react";
-import { WorkoutSetSchema } from "@/src/features/workout/schema";
-import { useWorkout } from "@/src/features/workout/store";
+import { ActiveSet, Exercise, useWorkout } from "@/src/features/workout/store";
 import { Routine } from "@/src/features/routines/types";
 import {
   isDurationExercise,
@@ -31,7 +30,7 @@ function SetInput({
 }
 
 interface SetRowProps {
-  set: WorkoutSetSchema;
+  set: ActiveSet;
   hasReps: boolean;
   hasWeight: boolean;
   hasDuration: boolean;
@@ -40,22 +39,43 @@ interface SetRowProps {
 function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
   const { setWorkoutData, exercises, currentExerciseId } = useWorkout();
 
-  const updateSetData = (name: keyof WorkoutSetSchema, value: string) => {
+  const updateSetData = (name: keyof ActiveSet, value: string | boolean) => {
+    const newExercises = exercises.map((e) =>
+      e.id === currentExerciseId
+        ? {
+            ...e,
+            sets: e.sets.map((s) =>
+              s.setIndex === set.setIndex ? { ...s, [name]: value } : s,
+            ),
+          }
+        : e,
+    );
     setWorkoutData({
-      exercises: exercises.map((e) =>
-        e.id === currentExerciseId
-          ? {
-              ...e,
-              sets: e.sets.map((s) =>
-                s.setIndex === set.setIndex ? { ...s, [name]: value } : s,
-              ),
-            }
-          : e,
-      ),
+      exercises: newExercises,
     });
+
+    return newExercises;
+  };
+
+  const checkIsCompleted = (exercises: Exercise[]) => {
+    const currentExercise = exercises.find((e) => e.id === currentExerciseId);
+    if (!currentExercise) return;
+
+    const allSetsCompleted = currentExercise.sets.every((s) => s.isCompleted);
+
+    if (allSetsCompleted) {
+      const nextUnfinishedExercise = exercises.find((e) =>
+        e.sets.some((s) => !s.isCompleted),
+      );
+      if (nextUnfinishedExercise) {
+        setWorkoutData({ currentExerciseId: nextUnfinishedExercise.id });
+      }
+    }
   };
   return (
-    <tr className="group transition-colors">
+    <tr
+      className={`group transition-colors ${set.isCompleted ? "bg-success/50 " : ""}`}
+    >
       <td className="py-3 px-2 font-semibold text-secondary-foreground">
         {set.setIndex}
       </td>
@@ -84,7 +104,14 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
         </td>
       )}
       <td className="py-3 px-2">
-        <Button variant="ghost" className="h-10 w-10 p-0 hover:text-green-600">
+        <Button
+          variant="ghost"
+          className="h-10 w-10 p-0 hover:text-green-600"
+          onClick={() => {
+            const newExercises = updateSetData("isCompleted", !set.isCompleted);
+            checkIsCompleted(newExercises);
+          }}
+        >
           <Check size={18} />
         </Button>
       </td>
@@ -114,7 +141,7 @@ export default function SetList({ routine }: { routine: Routine | null }) {
   if (!currentExercise) return null;
 
   return (
-    <div className="bg-secondary mt-4 text-secondary-foreground p-4">
+    <div className="bg-secondary mt-4 text-secondary-foreground py-4 flex flex-col gap-4">
       <table className="w-full text-sm">
         <thead>
           <tr className="text-secondary-foreground font-medium uppercase tracking-wider text-xs text-left">
@@ -137,7 +164,7 @@ export default function SetList({ routine }: { routine: Routine | null }) {
           ))}
         </tbody>
       </table>
-      <Button className="w-full" onClick={addSet}>
+      <Button className=" mx-2" onClick={addSet}>
         Add{" "}
       </Button>
     </div>
