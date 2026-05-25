@@ -37,6 +37,22 @@ interface SetRowProps {
 }
 
 function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
+  const { setWorkoutData, exercises, currentExerciseId } = useWorkout();
+
+  const updateSetData = (name: keyof WorkoutSetSchema, value: string) => {
+    setWorkoutData({
+      exercises: exercises.map((e) =>
+        e.id === currentExerciseId
+          ? {
+              ...e,
+              sets: e.sets.map((s) =>
+                s.setIndex === set.setIndex ? { ...s, [name]: value } : s,
+              ),
+            }
+          : e,
+      ),
+    });
+  };
   return (
     <tr className="group transition-colors">
       <td className="py-3 px-2 font-semibold text-secondary-foreground">
@@ -44,17 +60,26 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
       </td>
       {hasReps && (
         <td>
-          <SetInput value={set.reps ?? ""} />
+          <SetInput
+            value={set.reps ?? ""}
+            onChange={(value) => updateSetData("reps", value)}
+          />
         </td>
       )}
       {hasWeight && (
         <td>
-          <SetInput value={set.weight ?? ""} />
+          <SetInput
+            value={set.weight ?? ""}
+            onChange={(value) => updateSetData("weight", value)}
+          />
         </td>
       )}
       {hasDuration && (
         <td>
-          <SetInput value={set.durationSecs ?? ""} />
+          <SetInput
+            value={set.durationSecs ?? ""}
+            onChange={(value) => updateSetData("durationSecs", value)}
+          />
         </td>
       )}
       <td className="py-3 px-2">
