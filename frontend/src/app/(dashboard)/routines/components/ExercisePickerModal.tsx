@@ -29,6 +29,9 @@ interface ExercisePickerModalProps {
   onClose: () => void;
   onSelect: (exercises: Exercise[]) => void;
   addedExercises: Exercise[];
+  selectMany?: boolean;
+  title?: string;
+  submitBtnText?: string;
 }
 
 interface ExerciseItem extends Exercise {
@@ -40,6 +43,9 @@ export function ExercisePickerModal({
   onClose,
   onSelect,
   addedExercises,
+  selectMany = true,
+  title = "Add Exercises",
+  submitBtnText = "Add",
 }: ExercisePickerModalProps) {
   const [equipment, setEquipment] = useState("");
   const [muscle, setMuscle] = useState("");
@@ -139,10 +145,13 @@ export function ExercisePickerModal({
   );
 
   function onClick(exercise: Exercise) {
-    setSelectedIds((prev) => ({
-      ...prev,
-      [exercise.id]: !prev[exercise.id],
-    }));
+    setSelectedIds((prev) => {
+      if (selectMany) {
+        return { ...prev, [exercise.id]: !prev[exercise.id] };
+      }
+
+      return prev[exercise.id] ? {} : { [exercise.id]: true };
+    });
   }
 
   if (!isOpen) return null;
@@ -151,7 +160,7 @@ export function ExercisePickerModal({
     <div className="backdrop">
       <div className="modal relative">
         <div className="flex items-baseline justify-between gap-4 p-4">
-          <p>Add Exercises</p>
+          <p>{title}</p>
           <button
             type="button"
             onClick={onClose}
@@ -242,7 +251,7 @@ export function ExercisePickerModal({
           className="p-4"
           onClick={() => onSelect(formattedExercises.filter((e) => e.selected))}
         >
-          <Button className="w-full">Add</Button>
+          <Button className="w-full">{submitBtnText}</Button>
         </div>
       </div>
     </div>
