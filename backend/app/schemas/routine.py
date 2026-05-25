@@ -1,14 +1,24 @@
 from datetime import time
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from .exercise import Exercise
 
 
 class RoutineItemCreate(BaseModel):
     exercise_id: int
     target_sets: int
-    target_reps: int
+    target_reps: Optional[int] = None
+    target_duration_secs: Optional[int] = None
     order: int
+
+    @model_validator(mode="after")
+    def validate_reps_duration(self) -> "RoutineItemCreate":
+        no_reps = not self.target_reps or self.target_reps < 1
+        no_duration = not self.target_duration_secs or self.target_duration_secs < 1
+        if no_reps and no_duration:
+            raise ValueError("Must have either target reps or target duration.")
+
+        return self
 
 
 class RoutineItem(RoutineItemCreate):

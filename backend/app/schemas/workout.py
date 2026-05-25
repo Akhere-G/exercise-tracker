@@ -13,13 +13,13 @@ class WorkoutSetBase(BaseModel):
 
     @model_validator(mode="after")
     def validate_set_data(self) -> "WorkoutSetBase":
-        has_strength_metrics = self.reps is not None and self.weight is not None
-        has_duration = self.duration_secs is not None
+        has_reps = self.reps is not None and self.reps > 0
+        has_weight = self.weight is not None and self.weight > 0
+        has_duration = self.duration_secs is not None and self.duration_secs > 0
 
-        if not (has_strength_metrics or has_duration):
+        if not (has_reps or has_weight or has_duration):
             raise ValueError(
-                "You must provide either 'reps' AND 'weight', "
-                "or 'duration_secs' for this set."
+                "You must provide either 'reps' or 'weight' or 'duration_secs' for this set."
             )
         return self
 
