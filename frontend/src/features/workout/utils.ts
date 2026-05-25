@@ -39,3 +39,6 @@ export const getNewSet = (exercise: Exercise): WorkoutSetSchema => {
     weight: isWeightsExercise(exercise) ? DEFAULT_WEIGHT : undefined,
   };
 };
+
+export const isWorkoutCompleted = (exercise: Exercise) =>
+  exercise.sets.every((s) => s.isCompleted);

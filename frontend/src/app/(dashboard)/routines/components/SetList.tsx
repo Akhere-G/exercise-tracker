@@ -10,7 +10,7 @@ import {
   isRepsExercise,
   isWeightsExercise,
 } from "@/src/features/exercises/utils";
-import { getNewSet } from "@/src/features/workout/utils";
+import { getNewSet, isWorkoutCompleted } from "@/src/features/workout/utils";
 
 function SetInput({
   value,
@@ -61,11 +61,11 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
     const currentExercise = exercises.find((e) => e.id === currentExerciseId);
     if (!currentExercise) return;
 
-    const allSetsCompleted = currentExercise.sets.every((s) => s.isCompleted);
+    const allSetsCompleted = isWorkoutCompleted(currentExercise);
 
     if (allSetsCompleted) {
-      const nextUnfinishedExercise = exercises.find((e) =>
-        e.sets.some((s) => !s.isCompleted),
+      const nextUnfinishedExercise = exercises.find(
+        (e) => !isWorkoutCompleted(e),
       );
       if (nextUnfinishedExercise) {
         setWorkoutData({ currentExerciseId: nextUnfinishedExercise.id });

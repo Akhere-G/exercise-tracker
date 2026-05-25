@@ -11,14 +11,28 @@ import { MoreVertical } from "lucide-react";
 import { ExercisePickerModal } from "../../../routines/components/ExercisePickerModal";
 import { useState } from "react";
 import { Exercise } from "@/src/features/exercises/types";
-import { getDefaultSets } from "@/src/features/workout/utils";
+import {
+  getDefaultSets,
+  isWorkoutCompleted,
+} from "@/src/features/workout/utils";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/src/components/ui/dialog";
 
 export default function ExerciseDetails({
   routine,
 }: {
   routine: Routine | null;
 }) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
+  const [removeModalOpen, setRemoveModalOpen] = useState(false);
   const { currentExerciseId, exercises, setWorkoutData } = useWorkout();
 
   const currentExercise = exercises.find((e) => e.id === currentExerciseId);
@@ -48,7 +62,7 @@ export default function ExerciseDetails({
       exercises: updatedExercises,
       currentExerciseId: newExercise.id,
     });
-    setIsOpen(false);
+    setIsExerciseModalOpen(false);
   }
 
   function removeLastSet() {
@@ -57,6 +71,26 @@ export default function ExerciseDetails({
     );
 
     setWorkoutData({ exercises: updatedExercises });
+  }
+
+  function removeExercise() {
+    const updatedExercises = exercises.filter(
+      (e) => e.id !== currentExerciseId,
+    );
+
+    let nextExercise: Exercise | null | undefined = updatedExercises.find(
+      (e) => !isWorkoutCompleted(e),
+    );
+
+    nextExercise =
+      (nextExercise ?? updatedExercises.length > 0)
+        ? updatedExercises[0]
+        : null;
+    setWorkoutData({
+      exercises: updatedExercises,
+      currentExerciseId: nextExercise?.id,
+    });
+    setRemoveModalOpen(false);
   }
   return (
     <div className="mt-4 px-2">
@@ -75,16 +109,41 @@ export default function ExerciseDetails({
             <DropdownMenuItem onClick={removeLastSet}>
               Remove Last set
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setIsOpen(true)}>
+            <DropdownMenuItem onClick={() => setIsExerciseModalOpen(true)}>
               Replace
             </DropdownMenuItem>
-            <DropdownMenuItem>Remove</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setRemoveModalOpen(true)}>
+              Remove
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        <Dialog
+          open={removeModalOpen}
+          onOpenChange={(open) => setRemoveModalOpen(open)}
+        >
+          <DialogContent onClick={(e) => e.stopPropagation()}>
+            <DialogHeader>
+              <DialogTitle>Delete {currentExercise.name}?</DialogTitle>
+            </DialogHeader>
+            <DialogDescription>
+              Delete {currentExercise.name} and all its sets?
+            </DialogDescription>
+            <DialogFooter>
+              <DialogClose>
+                <Button variant="secondary" className="w-full">
+                  Close
+                </Button>
+              </DialogClose>
+              <Button variant="destructive" onClick={removeExercise}>
+                Delete
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         <ExercisePickerModal
           addedExercises={[currentExercise]}
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
+          isOpen={isExerciseModalOpen}
+          onClose={() => setIsExerciseModalOpen(false)}
           onSelect={replaceExercise}
           selectMany={false}
           title="Replace Exercise"
