@@ -8,6 +8,7 @@ export const routineItemSchema = yup.object({
   targetReps: yup.number().required().min(1, "Must be at least 1 rep"),
   order: yup.number().required(),
 });
+//TODO: add target duration and target weight
 
 export const routineSchema = yup.object({
   name: yup.string().required(),

@@ -38,3 +38,6 @@ class RoutineItem(Base, AuditMixin):
     order: Mapped[int] = mapped_column(Integer)
     exercise: Mapped[Exercise] = relationship(Exercise)
     routine: Mapped[Routine] = relationship(Routine, back_populates="routine_items")
+
+
+# TODO: add target duration and target weight
