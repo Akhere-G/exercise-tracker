@@ -10,7 +10,8 @@ import {
   isRepsExercise,
   isWeightsExercise,
 } from "@/src/features/exercises/utils";
-import { getNewSet, isWorkoutCompleted } from "@/src/features/workout/utils";
+import { getNewSet, isExerciseCompleted } from "@/src/features/workout/utils";
+import { useTimer } from "@/src/features/timer/store";
 
 function SetInput({
   value,
@@ -22,7 +23,7 @@ function SetInput({
   return (
     <Input
       type="number"
-      className="w-16 h-10 text-center font-medium  border-secondary-foreground focus:ring-2 focus:ring-blue-500"
+      className="w-16 h-10 text-center font-medium bg-transparent! border-none"
       value={value}
       onChange={(e) => onChange?.(e.target.value)}
     />
@@ -38,6 +39,7 @@ interface SetRowProps {
 
 function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
   const { setWorkoutData, exercises, currentExerciseId } = useWorkout();
+  const { start, clear } = useTimer();
 
   const updateSetData = (name: keyof ActiveSet, value: string | boolean) => {
     const newExercises = exercises.map((e) =>
@@ -61,17 +63,29 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
     const currentExercise = exercises.find((e) => e.id === currentExerciseId);
     if (!currentExercise) return;
 
-    const allSetsCompleted = isWorkoutCompleted(currentExercise);
+    const allSetsCompleted = isExerciseCompleted(currentExercise);
 
     if (allSetsCompleted) {
       const nextUnfinishedExercise = exercises.find(
-        (e) => !isWorkoutCompleted(e),
+        (e) => !isExerciseCompleted(e),
       );
       if (nextUnfinishedExercise) {
         setWorkoutData({ currentExerciseId: nextUnfinishedExercise.id });
       }
     }
   };
+
+  function handleClick() {
+    const newExercises = updateSetData("isCompleted", !set.isCompleted);
+    if (!set.isCompleted) {
+      if (newExercises.some((e) => !isExerciseCompleted(e))) {
+        start();
+      } else {
+        clear();
+      }
+    }
+    checkIsCompleted(newExercises);
+  }
   return (
     <tr
       className={`group transition-colors ${set.isCompleted ? "bg-success/50 " : ""}`}
@@ -106,11 +120,8 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
       <td className="py-3 px-2">
         <Button
           variant="ghost"
-          className="h-10 w-10 p-0 hover:text-green-600"
-          onClick={() => {
-            const newExercises = updateSetData("isCompleted", !set.isCompleted);
-            checkIsCompleted(newExercises);
-          }}
+          className={"h-10 w-10 p-0 hover:text-green-600"}
+          onClick={handleClick}
         >
           <Check size={18} />
         </Button>
@@ -121,12 +132,15 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
 
 export default function SetList({ routine }: { routine: Routine | null }) {
   const { exercises, currentExerciseId, setWorkoutData } = useWorkout();
+
   const currentExercise = exercises.find((e) => e.id === currentExerciseId);
   const sets = currentExercise?.sets ?? [];
 
   const hasReps = !!currentExercise && isRepsExercise(currentExercise);
   const hasDuration = !!currentExercise && isDurationExercise(currentExercise);
   const hasWeight = !!currentExercise && isWeightsExercise(currentExercise);
+
+  console.log(exercises);
 
   const addSet = () => {
     if (!currentExercise) return;
@@ -141,9 +155,9 @@ export default function SetList({ routine }: { routine: Routine | null }) {
   if (!currentExercise) return null;
 
   return (
-    <div className="bg-secondary mt-4 text-secondary-foreground py-4 flex flex-col gap-4">
+    <div className="bg-secondary mt-4 text-secondary-foreground py-4 flex flex-col gap-4 max-h-[65vh] overflow-y-scroll">
       <table className="w-full text-sm">
-        <thead>
+        <thead className="table-header-group">
           <tr className="text-secondary-foreground font-medium uppercase tracking-wider text-xs text-left">
             <th className="pb-3 px-2">Set</th>
             {hasReps && <th className="pb-3 px-2">Reps</th>}

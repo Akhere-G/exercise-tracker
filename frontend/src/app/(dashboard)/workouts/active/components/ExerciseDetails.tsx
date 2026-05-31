@@ -13,7 +13,7 @@ import { useState } from "react";
 import { Exercise } from "@/src/features/exercises/types";
 import {
   getDefaultSets,
-  isWorkoutCompleted,
+  isExerciseCompleted,
 } from "@/src/features/workout/utils";
 import {
   Dialog,
@@ -79,7 +79,7 @@ export default function ExerciseDetails({
     );
 
     let nextExercise: Exercise | null | undefined = updatedExercises.find(
-      (e) => !isWorkoutCompleted(e),
+      (e) => !isExerciseCompleted(e),
     );
 
     nextExercise =
