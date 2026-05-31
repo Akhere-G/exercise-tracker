@@ -12,20 +12,38 @@ import {
 } from "@/src/features/exercises/utils";
 import { getNewSet, isExerciseCompleted } from "@/src/features/workout/utils";
 import { useTimer } from "@/src/features/timer/store";
+import { toast } from "sonner";
+import { useState } from "react";
 
 function SetInput({
   value,
   onChange,
+  canBeZero,
 }: {
   value: number | string;
   onChange?: (val: string) => void;
+  canBeZero?: boolean;
 }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [dirtyValue, setDirtyValue] = useState("");
+
   return (
     <Input
       type="number"
-      className="w-16 h-10 text-center font-medium bg-transparent! border-none"
-      value={value}
-      onChange={(e) => onChange?.(e.target.value)}
+      className="w-16 h-10 text-center font-medium bg-transparent! border-none placeholder-muted-foreground"
+      placeholder={value.toString()}
+      value={isEditing ? dirtyValue : value}
+      onFocus={() => setIsEditing(true)}
+      onChange={(e) => setDirtyValue(e.target.value)}
+      onBlur={() => {
+        if (
+          Number(dirtyValue.trim()) ||
+          (dirtyValue.trim() === "0" && canBeZero)
+        ) {
+          onChange?.(dirtyValue);
+        }
+        setIsEditing(false);
+      }}
     />
   );
 }
@@ -76,6 +94,9 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
   };
 
   function handleClick() {
+    if (!set.isCompleted && Number(set.reps) < 1)
+      return toast.error("Cannot complete set with reps less than 1.");
+
     const newExercises = updateSetData("isCompleted", !set.isCompleted);
     if (!set.isCompleted) {
       if (newExercises.some((e) => !isExerciseCompleted(e))) {
@@ -106,6 +127,7 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
           <SetInput
             value={set.weight ?? ""}
             onChange={(value) => updateSetData("weight", value)}
+            canBeZero
           />
         </td>
       )}
