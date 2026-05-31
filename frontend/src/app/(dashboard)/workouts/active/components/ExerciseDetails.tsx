@@ -37,8 +37,6 @@ export default function ExerciseDetails({
 
   const currentExercise = exercises.find((e) => e.id === currentExerciseId);
 
-  if (!currentExercise) return;
-
   function replaceExercise(newExercises: Exercise[]) {
     const exisiting: Record<number, boolean> = {};
     exercises.forEach((e) => {
@@ -92,6 +90,14 @@ export default function ExerciseDetails({
     });
     setRemoveModalOpen(false);
   }
+
+  if (!currentExercise)
+    return (
+      <div className="p-8 text-center">
+        <h2>No Exercise selected</h2>
+      </div>
+    );
+
   return (
     <div className="mt-4 px-2">
       <div className="flex gap-2 justify-between items-start">
