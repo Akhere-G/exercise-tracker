@@ -21,8 +21,6 @@ import { MoreVertical } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-// TODO: Make sure page refreshes on delete
-
 export default function RoutineModal({ routine }: { routine: Routine }) {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 

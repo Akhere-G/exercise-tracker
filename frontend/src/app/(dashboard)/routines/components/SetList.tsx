@@ -4,7 +4,7 @@ import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import { Check } from "lucide-react";
 import { ActiveSet, Exercise, useWorkout } from "@/src/features/workout/store";
-import { Routine } from "@/src/features/routines/types";
+import { Routine, RoutineItem } from "@/src/features/routines/types";
 import {
   isDurationExercise,
   isRepsExercise,
@@ -86,6 +86,9 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
     }
     checkIsCompleted(newExercises);
   }
+
+  // TODO: Display previous workout data
+
   return (
     <tr
       className={`group transition-colors ${set.isCompleted ? "bg-success/50 " : ""}`}
@@ -142,11 +145,16 @@ export default function SetList({ routine }: { routine: Routine | null }) {
 
   const addSet = () => {
     if (!currentExercise) return;
-    // TODO: use routineItem data to get new set data using targetRep and time data
+
+    const routineItems: Record<number, RoutineItem> = {};
+    routine?.routineItems.forEach((r) => {
+      routineItems[r.exerciseId] = r;
+    });
+
     setWorkoutData({
       exercises: exercises.map((e) =>
         e.id === currentExerciseId
-          ? { ...e, sets: e.sets.concat(getNewSet(e)) }
+          ? { ...e, sets: e.sets.concat(getNewSet(e, routineItems[e.id])) }
           : e,
       ),
     });

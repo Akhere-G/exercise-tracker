@@ -38,12 +38,11 @@ export default function ExerciseDetails() {
     });
     const newExercise = newExercises.filter((e) => !exisiting[e.id])[0];
     if (!newExercise) return;
-    // TODO: set routineItem data to get new set using targetRep and time data
     const updatedExercises = exercises.map((e) =>
       e.id === currentExerciseId
         ? {
             ...newExercise,
-            sets: getDefaultSets(newExercise),
+            sets: getDefaultSets(newExercise, e),
           }
         : e,
     );

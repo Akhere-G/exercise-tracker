@@ -4,6 +4,7 @@ import {
   isRepsExercise,
   isWeightsExercise,
 } from "../exercises/utils";
+import { RoutineItem } from "../routines/types";
 import { WorkoutSetSchema } from "./schema";
 import { ActiveSet, Exercise } from "./store";
 
@@ -12,8 +13,24 @@ const DEFAULT_REPS = 10;
 const DEFAULT_WEIGHT = 25;
 const DEFAULT_DURATION = 10;
 
-export const getDefaultSets = (exercise: BaseExercise) => {
+export const sameMetrics = (
+  exercise: BaseExercise,
+  otherExercise: BaseExercise,
+) => {
+  return (
+    (isRepsExercise(exercise) && isRepsExercise(otherExercise)) ||
+    (isDurationExercise(exercise) && isDurationExercise(otherExercise))
+  );
+};
+export const getDefaultSets = (
+  exercise: BaseExercise,
+  oldExercse?: Exercise,
+) => {
   const sets: ActiveSet[] = [];
+
+  if (oldExercse && sameMetrics(oldExercse, exercise)) {
+    return oldExercse.sets;
+  }
 
   for (let i = 1; i <= DEFAULT_TOTAL_SETS; i++) {
     const set: ActiveSet = {
@@ -30,7 +47,21 @@ export const getDefaultSets = (exercise: BaseExercise) => {
   return sets;
 };
 
-export const getNewSet = (exercise: Exercise): WorkoutSetSchema => {
+export const getNewSet = (
+  exercise: Exercise,
+  routineItem?: RoutineItem,
+): WorkoutSetSchema => {
+  if (routineItem) {
+    return {
+      exerciseId: exercise.id,
+      setIndex: exercise.sets.length + 1,
+      durationSecs: isDurationExercise(exercise)
+        ? routineItem.targetDurationSecs / 60
+        : undefined,
+      reps: isRepsExercise(exercise) ? routineItem.targetReps : undefined,
+      weight: isWeightsExercise(exercise) ? DEFAULT_WEIGHT : undefined,
+    };
+  }
   return {
     exerciseId: exercise.id,
     setIndex: exercise.sets.length + 1,
