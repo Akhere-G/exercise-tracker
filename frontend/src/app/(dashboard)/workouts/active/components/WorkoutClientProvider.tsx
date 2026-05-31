@@ -7,7 +7,7 @@ import RestTimeTracker from "./RestTimeTracker";
 import { Routine } from "@/src/features/routines/types";
 import { Exercise, useWorkout } from "@/src/features/workout/store";
 import ExerciseList from "./ExerciseList";
-import { Metrics, MetricsType } from "@/src/features/exercises/schemas";
+import { getDefaultSets } from "@/src/features/workout/utils";
 
 export default function WorkoutClientProvider({
   routine,
@@ -21,21 +21,12 @@ export default function WorkoutClientProvider({
       const exercises: Exercise[] = [];
 
       for (const item of routine.routineItems) {
-        const { exercise, targetSets, targetReps } = item;
+        const { exercise } = item;
 
-        const exerciseItem: Exercise = { ...exercise, sets: [] };
-
-        const hasReps = (
-          [MetricsType.REPS, MetricsType.REPS_WEIGHT] as Metrics[]
-        ).includes(exercise.metrics);
-
-        for (let i = 0; i < targetSets; i++) {
-          exerciseItem.sets.push({
-            exerciseId: exerciseItem.id,
-            setIndex: i,
-            reps: hasReps ? targetReps : undefined,
-          });
-        }
+        const exerciseItem: Exercise = {
+          ...exercise,
+          sets: getDefaultSets(exercise),
+        };
 
         exercises.push(exerciseItem);
       }
@@ -49,10 +40,13 @@ export default function WorkoutClientProvider({
   }, [routine, setWorkoutData]);
 
   return (
-    <div>
-      <ExerciseList routine={routine} />
-      <ExerciseDetails routine={routine} />
-      <SetList routine={routine} />
+    <div className="relative  h-screen flex flex-1 flex-col justify-between">
+      <div>
+        <ExerciseList routine={routine} />
+        <ExerciseDetails routine={routine} />
+        <SetList routine={routine} />
+      </div>
+      <div className="flex-1"></div>
       <RestTimeTracker routine={routine} />
     </div>
   );
