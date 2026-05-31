@@ -25,9 +25,19 @@ export function camelToSnake(str: string): string {
 }
 
 export function keysToSnake(obj: any): any {
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+
+  if (obj instanceof Date) {
+    return obj.toISOString();
+  }
+
   if (Array.isArray(obj)) {
     return obj.map((v) => keysToSnake(v));
-  } else if (obj !== null && obj.constructor === Object) {
+  }
+
+  if (obj.constructor === Object) {
     return Object.keys(obj).reduce(
       (result, key) => ({
         ...result,
@@ -36,5 +46,6 @@ export function keysToSnake(obj: any): any {
       {},
     );
   }
+
   return obj;
 }
