@@ -11,7 +11,6 @@ import {
 import { Exercise } from "@/src/features/exercises/types";
 import { getAllExercises } from "@/src/features/exercises/api";
 import { Button } from "@/src/components/ui/button";
-import { RoutineItemSchema } from "@/src/features/routines/schema";
 import { Input } from "@/src/components/ui/input";
 import {
   Select,
@@ -24,12 +23,16 @@ import {
   equipmentOptions,
   muscleGroupOptions,
 } from "@/src/features/exercises/constants";
+import { Drawer, DrawerContent } from "@/src/components/ui/drawer";
 
 interface ExercisePickerModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSelect: (exercises: Exercise[]) => void;
-  addedExercises: RoutineItemSchema[];
+  addedExercises: Exercise[];
+  selectMany?: boolean;
+  title?: string;
+  submitBtnText?: string;
 }
 
 interface ExerciseItem extends Exercise {
@@ -41,6 +44,9 @@ export function ExercisePickerModal({
   onClose,
   onSelect,
   addedExercises,
+  selectMany = true,
+  title = "Add Exercises",
+  submitBtnText = "Add",
 }: ExercisePickerModalProps) {
   const [equipment, setEquipment] = useState("");
   const [muscle, setMuscle] = useState("");
@@ -63,7 +69,7 @@ export function ExercisePickerModal({
       if (isOpen) {
         const initialMap: Record<number, boolean> = {};
         addedExercises.forEach((e) => {
-          initialMap[e.exerciseId] = true;
+          initialMap[e.id] = true;
         });
         setSelectedIds(initialMap);
         setExercises([]);
@@ -140,19 +146,22 @@ export function ExercisePickerModal({
   );
 
   function onClick(exercise: Exercise) {
-    setSelectedIds((prev) => ({
-      ...prev,
-      [exercise.id]: !prev[exercise.id],
-    }));
+    setSelectedIds((prev) => {
+      if (selectMany) {
+        return { ...prev, [exercise.id]: !prev[exercise.id] };
+      }
+
+      return prev[exercise.id] ? {} : { [exercise.id]: true };
+    });
   }
 
   if (!isOpen) return null;
 
   return (
-    <div className="backdrop">
-      <div className="modal relative">
+    <Drawer open={isOpen} onOpenChange={(open) => (!open ? onClose() : null)}>
+      <DrawerContent className="border-secondary">
         <div className="flex items-baseline justify-between gap-4 p-4">
-          <p>Add Exercises</p>
+          <p>{title}</p>
           <button
             type="button"
             onClick={onClose}
@@ -243,9 +252,9 @@ export function ExercisePickerModal({
           className="p-4"
           onClick={() => onSelect(formattedExercises.filter((e) => e.selected))}
         >
-          <Button className="w-full">Add</Button>
+          <Button className="w-full">{submitBtnText}</Button>
         </div>
-      </div>
-    </div>
+      </DrawerContent>
+    </Drawer>
   );
 }

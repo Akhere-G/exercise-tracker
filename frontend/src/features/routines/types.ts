@@ -5,6 +5,7 @@ export interface RoutineItem {
   exerciseId: number;
   targetSets: number;
   targetReps: number;
+  targetDurationSecs: number;
   order: number;
   exercise: Exercise;
 }

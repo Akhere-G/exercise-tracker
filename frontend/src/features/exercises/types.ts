@@ -1,3 +1,5 @@
+import { Metrics } from "./schemas";
+
 export interface Muscle {
   name: string;
   contributionType: string;
@@ -8,7 +10,7 @@ export interface Exercise {
   instructions: string;
   videoUrl: string;
   imageUrl: string;
-  metrics: string;
+  metrics: Metrics;
   equipment: string;
   muscles: Muscle[];
 }

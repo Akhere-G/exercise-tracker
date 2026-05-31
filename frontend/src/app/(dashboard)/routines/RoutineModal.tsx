@@ -21,6 +21,8 @@ import { Routine } from "@/src/features/routines/types";
 import { MoreVertical } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+// TODO: Make sure page refreshes on delete
+
 export default function RoutineModal({ routine }: { routine: Routine }) {
   const router = useRouter();
   return (

@@ -104,6 +104,10 @@ export default function RoutineForm({
     setIsModalOpen(false);
   };
 
+  const exercises: Exercise[] = values.routineItems.map(
+    (r) => r.exercise,
+  ) as Exercise[];
+
   return (
     <>
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
@@ -143,7 +147,7 @@ export default function RoutineForm({
           ))}
         </div>
 
-        <div className="flex flex-col gap-2 my-2">
+        <div className="flex flex-col gap-4 my-2">
           <h3 className="text-sm font-medium">Selected Exercises</h3>
           {formState.errors.routineItems?.message && (
             <p className="text-sm text-error">
@@ -157,24 +161,22 @@ export default function RoutineForm({
             remove={remove}
             errors={formState.errors}
           />
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => setIsModalOpen(true)}
+          >
+            Add Exercise
+          </Button>
+
+          <Button type="submit">{sumbitText}</Button>
         </div>
-
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={() => setIsModalOpen(true)}
-        >
-          Add Exercise
-        </Button>
-
-        <Button type="submit">{sumbitText}</Button>
       </form>
-
       <ExercisePickerModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSelect={handleAddExerciseToForm}
-        addedExercises={values.routineItems}
+        addedExercises={exercises}
       />
     </>
   );
