@@ -22,7 +22,7 @@ export default function WorkoutClientProvider({
 
       for (const item of routine.routineItems) {
         const { exercise } = item;
-
+        // TODO: set routineItem data to get new set using targetRep and time data
         const exerciseItem: Exercise = {
           ...exercise,
           sets: getDefaultSets(exercise),
@@ -42,11 +42,11 @@ export default function WorkoutClientProvider({
   return (
     <div className="relative  h-screen flex flex-1 flex-col justify-between">
       <div>
-        <ExerciseList routine={routine} />
-        <ExerciseDetails routine={routine} />
+        <ExerciseList />
+        <ExerciseDetails />
         <SetList routine={routine} />
       </div>
-      <RestTimeTracker routine={routine} />
+      <RestTimeTracker />
     </div>
   );
 }

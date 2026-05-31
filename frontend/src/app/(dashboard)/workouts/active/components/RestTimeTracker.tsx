@@ -1,13 +1,8 @@
 import { Button } from "@/src/components/ui/button";
-import { Routine } from "@/src/features/routines/types";
 import { useTimer } from "@/src/features/timer/store";
 import { Pause, Play, RefreshCcw } from "lucide-react";
 
-export default function RestTimeTracker({
-  routine,
-}: {
-  routine: Routine | null;
-}) {
+export default function RestTimeTracker() {
   const { currentTime, isRunning, start, pause, play, setTime, restTime } =
     useTimer();
 
