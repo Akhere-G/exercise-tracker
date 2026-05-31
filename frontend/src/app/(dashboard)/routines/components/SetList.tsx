@@ -19,14 +19,28 @@ function SetInput({
   value,
   onChange,
   canBeZero,
+  canBeNegative,
 }: {
   value: number | string;
   onChange?: (val: string) => void;
   canBeZero?: boolean;
+  canBeNegative?: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [dirtyValue, setDirtyValue] = useState("");
 
+  const updateValue = () => {
+    if (Number(dirtyValue.trim()) || (dirtyValue.trim() === "0" && canBeZero)) {
+      let value = dirtyValue;
+
+      if (!canBeNegative) {
+        value = Math.abs(Number(dirtyValue)).toString();
+      }
+      onChange?.(value);
+      setDirtyValue(value);
+    }
+    setIsEditing(false);
+  };
   return (
     <Input
       type="number"
@@ -35,15 +49,12 @@ function SetInput({
       value={isEditing ? dirtyValue : value}
       onFocus={() => setIsEditing(true)}
       onChange={(e) => setDirtyValue(e.target.value)}
-      onBlur={() => {
-        if (
-          Number(dirtyValue.trim()) ||
-          (dirtyValue.trim() === "0" && canBeZero)
-        ) {
-          onChange?.(dirtyValue);
+      onKeyDownCapture={(e) => {
+        if (e.key == "Enter") {
+          e.currentTarget.blur();
         }
-        setIsEditing(false);
       }}
+      onBlur={updateValue}
     />
   );
 }
@@ -128,6 +139,7 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
             value={set.weight ?? ""}
             onChange={(value) => updateSetData("weight", value)}
             canBeZero
+            canBeNegative
           />
         </td>
       )}
