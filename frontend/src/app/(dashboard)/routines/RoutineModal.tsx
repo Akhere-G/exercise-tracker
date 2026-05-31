@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogDescription,
   DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from "@/src/components/ui/dialog";
 import {
@@ -50,18 +49,12 @@ export default function RoutineModal({ routine }: { routine: Routine }) {
         onOpenChange={(open) => setDeleteModalOpen(open)}
       >
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete {routine.name}?</DialogTitle>
-          </DialogHeader>
+          <DialogTitle>Delete {routine.name}?</DialogTitle>
           <DialogDescription>
             Do you want to delete this routine permanently?
           </DialogDescription>
           <DialogFooter>
-            <DialogClose>
-              <Button className="w-full" variant="secondary">
-                Close
-              </Button>
-            </DialogClose>
+            <DialogClose>Close</DialogClose>
             <Button
               variant="destructive"
               onClick={async () => {

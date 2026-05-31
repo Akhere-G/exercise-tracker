@@ -33,6 +33,7 @@ interface ExercisePickerModalProps {
   selectMany?: boolean;
   title?: string;
   submitBtnText?: string;
+  defaultMuscle?: string;
 }
 
 interface ExerciseItem extends Exercise {
@@ -47,9 +48,10 @@ export function ExercisePickerModal({
   selectMany = true,
   title = "Add Exercises",
   submitBtnText = "Add",
+  defaultMuscle = "",
 }: ExercisePickerModalProps) {
   const [equipment, setEquipment] = useState("");
-  const [muscle, setMuscle] = useState("");
+  const [muscle, setMuscle] = useState(defaultMuscle);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -128,6 +130,11 @@ export function ExercisePickerModal({
     }
     getFormattedExercises();
   }, [exercises, selectedIds]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMuscle(defaultMuscle);
+  }, [defaultMuscle]);
 
   const lastElementRef = useCallback(
     (node: HTMLDivElement | null) => {
