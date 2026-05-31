@@ -35,11 +35,23 @@ export default function ExerciseList({ routine }: { routine: Routine | null }) {
     setIsOpen(false);
   }
 
+  let totalSets = 0;
+  let completedSets = 0;
+
+  for (const exercise of exercises) {
+    for (const set of exercise.sets) {
+      totalSets += 1;
+      if (set.isCompleted) {
+        completedSets += 1;
+      }
+    }
+  }
+
   return (
-    <div>
+    <div className="flex flex-col">
       <div className="px-2 py-4 bg-secondary overflow-x-scroll">
         <div className="flex gap-2 w-max">
-          {!!routine &&
+          {!!exercises.length &&
             exercises.map((item) => (
               <ExerciseCard
                 key={item.id}
@@ -53,7 +65,11 @@ export default function ExerciseList({ routine }: { routine: Routine | null }) {
           </Button>
         </div>
       </div>
-
+      <progress
+        className="progress-bar"
+        value={completedSets}
+        max={totalSets}
+      />
       <ExercisePickerModal
         isOpen={isOpen}
         addedExercises={exercises}

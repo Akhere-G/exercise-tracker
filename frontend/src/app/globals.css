@@ -186,3 +186,33 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+
+.progress-bar {
+  appearance: none;
+  height: 5px;
+  width: 100%;
+  border-radius: 100px;
+
+  &::-webkit-progress-value {
+    transition: width 300ms;
+  }
+    
+  /* Chrome and Safari */
+  &::-webkit-progress-bar {
+    background: var(--color-card);
+    border-radius: 0px;
+  }
+
+  &::-webkit-progress-value {
+    background-color: var(--color-primary);
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
+
+  /* Firefox */
+  &::-moz-progress-bar {
+    background-color: var(--color-primary);;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
+}
