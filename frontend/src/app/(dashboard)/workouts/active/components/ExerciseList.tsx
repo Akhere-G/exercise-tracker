@@ -30,6 +30,8 @@ export default function ExerciseList({ routine }: { routine: Routine | null }) {
 
     setWorkoutData({
       exercises: [...exercises, ...exercisesToAdd],
+      currentExerciseId:
+        exercises.length === 0 ? exercisesToAdd?.[0].id : currentExerciseId,
     });
 
     setIsOpen(false);
@@ -47,6 +49,7 @@ export default function ExerciseList({ routine }: { routine: Routine | null }) {
     }
   }
 
+  const noExercises = exercises.length === 0;
   return (
     <div className="flex flex-col">
       <div className="px-2 py-4 bg-secondary overflow-x-scroll">
@@ -60,7 +63,12 @@ export default function ExerciseList({ routine }: { routine: Routine | null }) {
                 onClick={onClick}
               />
             ))}
-          <Button className="h-12 w-17" onClick={() => setIsOpen(true)}>
+          <Button
+            className={`h-12 ${noExercises ? "" : "w-17"}`}
+            onClick={() => setIsOpen(true)}
+          >
+            {noExercises ? "Add Exercise" : ""}
+
             <Plus />
           </Button>
         </div>

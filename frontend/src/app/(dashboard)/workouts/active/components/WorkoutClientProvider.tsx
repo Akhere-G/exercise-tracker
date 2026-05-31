@@ -46,7 +46,6 @@ export default function WorkoutClientProvider({
         <ExerciseDetails routine={routine} />
         <SetList routine={routine} />
       </div>
-      <div className="flex-1"></div>
       <RestTimeTracker routine={routine} />
     </div>
   );
