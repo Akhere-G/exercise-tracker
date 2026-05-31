@@ -140,8 +140,6 @@ export default function SetList({ routine }: { routine: Routine | null }) {
   const hasDuration = !!currentExercise && isDurationExercise(currentExercise);
   const hasWeight = !!currentExercise && isWeightsExercise(currentExercise);
 
-  console.log(exercises);
-
   const addSet = () => {
     if (!currentExercise) return;
     setWorkoutData({
