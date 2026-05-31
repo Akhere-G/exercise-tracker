@@ -142,6 +142,7 @@ export default function SetList({ routine }: { routine: Routine | null }) {
 
   const addSet = () => {
     if (!currentExercise) return;
+    // TODO: set routineItem data to get new set using targetRep and time data
     setWorkoutData({
       exercises: exercises.map((e) =>
         e.id === currentExerciseId

@@ -1,5 +1,4 @@
 import { Button } from "@/src/components/ui/button";
-import { Routine } from "@/src/features/routines/types";
 import { Exercise, useWorkout } from "@/src/features/workout/store";
 import Image from "next/image";
 import React, { useState } from "react";
@@ -8,7 +7,7 @@ import { Exercise as BaseExercise } from "@/src/features/exercises/types";
 import { Plus } from "lucide-react";
 import { getDefaultSets } from "@/src/features/workout/utils";
 
-export default function ExerciseList({ routine }: { routine: Routine | null }) {
+export default function ExerciseList() {
   const [isOpen, setIsOpen] = useState(false);
 
   const { currentExerciseId, setWorkoutData, exercises } = useWorkout();
@@ -18,14 +17,10 @@ export default function ExerciseList({ routine }: { routine: Routine | null }) {
   };
 
   function addExercises(newExercises: BaseExercise[]) {
-    const exisitingExerciseLookup: Record<number, boolean> = {};
-
-    exercises.forEach((e) => {
-      exisitingExerciseLookup[e.id] = true;
-    });
+    const exisitingExerciseLookup = new Set(exercises.map((e) => e.id));
 
     const exercisesToAdd: Exercise[] = newExercises
-      .filter((e) => !exisitingExerciseLookup[e.id])
+      .filter((e) => !exisitingExerciseLookup.has(e.id))
       .map((e) => ({ ...e, sets: getDefaultSets(e) }));
 
     setWorkoutData({
@@ -37,17 +32,16 @@ export default function ExerciseList({ routine }: { routine: Routine | null }) {
     setIsOpen(false);
   }
 
-  let totalSets = 0;
-  let completedSets = 0;
-
-  for (const exercise of exercises) {
-    for (const set of exercise.sets) {
-      totalSets += 1;
-      if (set.isCompleted) {
-        completedSets += 1;
-      }
-    }
-  }
+  const { totalSets, completedSets } = exercises.reduce(
+    (acc, exercise) => {
+      acc.totalSets += exercise.sets.length;
+      acc.completedSets += exercise.sets.filter(
+        (set) => set.isCompleted,
+      ).length;
+      return acc;
+    },
+    { totalSets: 0, completedSets: 0 },
+  );
 
   const noExercises = exercises.length === 0;
   return (
@@ -67,7 +61,7 @@ export default function ExerciseList({ routine }: { routine: Routine | null }) {
             className={`h-12 ${noExercises ? "" : "w-17"}`}
             onClick={() => setIsOpen(true)}
           >
-            {noExercises ? "Add Exercise" : ""}
+            {noExercises && "Add Exercise"}
 
             <Plus />
           </Button>

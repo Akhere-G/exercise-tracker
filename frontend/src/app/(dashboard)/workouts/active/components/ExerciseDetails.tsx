@@ -5,7 +5,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
-import { Routine } from "@/src/features/routines/types";
 import { useWorkout } from "@/src/features/workout/store";
 import { MoreVertical } from "lucide-react";
 import { ExercisePickerModal } from "../../../routines/components/ExercisePickerModal";
@@ -23,14 +22,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/src/components/ui/dialog";
 
-export default function ExerciseDetails({
-  routine,
-}: {
-  routine: Routine | null;
-}) {
+export default function ExerciseDetails() {
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
   const [removeModalOpen, setRemoveModalOpen] = useState(false);
   const { currentExerciseId, exercises, setWorkoutData } = useWorkout();
@@ -44,7 +38,7 @@ export default function ExerciseDetails({
     });
     const newExercise = newExercises.filter((e) => !exisiting[e.id])[0];
     if (!newExercise) return;
-
+    // TODO: set routineItem data to get new set using targetRep and time data
     const updatedExercises = exercises.map((e) =>
       e.id === currentExerciseId
         ? {
