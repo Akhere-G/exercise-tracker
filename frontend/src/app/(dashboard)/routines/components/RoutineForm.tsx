@@ -90,7 +90,6 @@ export default function RoutineForm({
   const handleAddExerciseToForm = (exercises: Exercise[]) => {
     for (const exercise of exercises) {
       if (fields.some((e) => e.exerciseId === exercise.id)) {
-        // TODO: add toast error message
         continue;
       }
       append({
