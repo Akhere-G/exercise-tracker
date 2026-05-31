@@ -1,6 +1,9 @@
+"use client";
 import { Button } from "@/src/components/ui/button";
 import { useTimer } from "@/src/features/timer/store";
 import { Pause, Play, RefreshCcw } from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "sonner";
 
 export default function RestTimeTracker() {
   const { currentTime, isRunning, start, pause, play, setTime, restTime } =
@@ -15,6 +18,13 @@ export default function RestTimeTracker() {
     .padStart(2, "0");
 
   const Icon = isRunning ? Pause : Play;
+
+  useEffect(() => {
+    if (currentTime === 0 && isRunning) {
+      toast("Rest complete!");
+      // TODO: Add sound
+    }
+  }, [currentTime, isRunning]);
 
   return (
     <div className="relative bottom-0 pt-4 flex flex-col">

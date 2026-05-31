@@ -8,8 +8,6 @@ import { Routine } from "@/src/features/routines/types";
 import { Exercise, useWorkout } from "@/src/features/workout/store";
 import ExerciseList from "./ExerciseList";
 import { getDefaultSets } from "@/src/features/workout/utils";
-import { useTimer } from "@/src/features/timer/store";
-import { toast } from "sonner";
 import { Toaster } from "@/src/components/ui/sonner";
 
 export default function WorkoutClientProvider({
@@ -18,7 +16,6 @@ export default function WorkoutClientProvider({
   routine: Routine | null;
 }) {
   const { setWorkoutData } = useWorkout();
-  const { currentTime, isRunning } = useTimer();
 
   useEffect(() => {
     if (routine) {
@@ -42,14 +39,6 @@ export default function WorkoutClientProvider({
       });
     }
   }, [routine, setWorkoutData]);
-
-  useEffect(() => {
-    console.log(currentTime);
-    if (currentTime === 0 && isRunning) {
-      toast("Rest complete!");
-      // TODO: Add sound
-    }
-  }, [currentTime, isRunning]);
 
   return (
     <div className="relative  h-screen flex flex-1 flex-col justify-between">
