@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
 import { useWorkout } from "@/src/features/workout/store";
-import { MoreVertical } from "lucide-react";
+import { Dot, MoreVertical } from "lucide-react";
 import { ExercisePickerModal } from "../../../routines/components/ExercisePickerModal";
 import { useState } from "react";
 import { Exercise } from "@/src/features/exercises/types";
@@ -20,7 +20,6 @@ import {
   DialogContent,
   DialogDescription,
   DialogFooter,
-  DialogHeader,
   DialogTitle,
 } from "@/src/components/ui/dialog";
 
@@ -46,8 +45,6 @@ export default function ExerciseDetails() {
           }
         : e,
     );
-    //TODO: preserve set data if user is replacing and exercise with one of the same type
-    //TODO: replace modal should show related exercises
 
     setWorkoutData({
       exercises: updatedExercises,
@@ -96,9 +93,15 @@ export default function ExerciseDetails() {
       <div className="flex gap-2 justify-between items-start">
         <div className="">
           <h2>{currentExercise.name}</h2>
-          <p className="capitalize text-sm text-secondary-foreground">
-            {currentExercise.equipment}
-          </p>
+          <div className="flex items-center">
+            <p className="capitalize text-sm text-secondary-foreground">
+              {currentExercise.equipment}
+            </p>
+            <Dot width={16} />
+            <p className="capitalize text-sm text-secondary-foreground">
+              {currentExercise.muscles.map((m) => m.name).join(", ")}
+            </p>
+          </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger>
@@ -121,18 +124,12 @@ export default function ExerciseDetails() {
           onOpenChange={(open) => setRemoveModalOpen(open)}
         >
           <DialogContent onClick={(e) => e.stopPropagation()}>
-            <DialogHeader>
-              <DialogTitle>Delete {currentExercise.name}?</DialogTitle>
-            </DialogHeader>
+            <DialogTitle>Delete {currentExercise.name}?</DialogTitle>
             <DialogDescription>
               Delete {currentExercise.name} and all its sets?
             </DialogDescription>
             <DialogFooter>
-              <DialogClose>
-                <Button variant="secondary" className="w-full">
-                  Close
-                </Button>
-              </DialogClose>
+              <DialogClose>Close</DialogClose>
               <Button variant="destructive" onClick={removeExercise}>
                 Delete
               </Button>
@@ -147,6 +144,7 @@ export default function ExerciseDetails() {
           selectMany={false}
           title="Replace Exercise"
           submitBtnText="Replace"
+          defaultMuscle={currentExercise.muscles[0].name}
         />
       </div>
     </div>
