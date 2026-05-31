@@ -42,3 +42,6 @@ export const getNewSet = (exercise: Exercise): WorkoutSetSchema => {
 
 export const isExerciseCompleted = (exercise: Exercise) =>
   exercise.sets.every((s) => s.isCompleted);
+
+export const isWorkoutCompleted = (exercises: Exercise[]) =>
+  exercises.every((e) => isExerciseCompleted(e));
