@@ -4,8 +4,11 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { ExercisePickerModal } from "../../../routines/components/ExercisePickerModal";
 import { Exercise as BaseExercise } from "@/src/features/exercises/types";
-import { Plus } from "lucide-react";
-import { getDefaultSets } from "@/src/features/workout/utils";
+import { Check, Plus } from "lucide-react";
+import {
+  getDefaultSets,
+  isExerciseCompleted,
+} from "@/src/features/workout/utils";
 
 export default function ExerciseList() {
   const [isOpen, setIsOpen] = useState(false);
@@ -87,7 +90,7 @@ function ExerciseCard({
   selected,
   onClick,
 }: {
-  exercise: BaseExercise;
+  exercise: Exercise;
   selected: boolean;
   onClick: (exerciseId: number) => void;
 }) {
@@ -102,6 +105,9 @@ function ExerciseCard({
         fill
         className="object-scale-down"
       />
+      {isExerciseCompleted(exercise) && (
+        <Check className="absolute right-1 bottom-1 bg-white w-5 h-5 rounded-full text-success " />
+      )}
     </div>
   );
 }
