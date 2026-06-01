@@ -8,6 +8,9 @@ import {
   CardTitle,
 } from "@/src/components/card";
 
+// TODO: Redirect on succesful creation
+// TODO: Show server errors
+
 export default async function CreateRoutinePage() {
   return (
     <div className="container relative">

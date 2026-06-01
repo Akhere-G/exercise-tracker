@@ -12,20 +12,49 @@ import {
 } from "@/src/features/exercises/utils";
 import { getNewSet, isExerciseCompleted } from "@/src/features/workout/utils";
 import { useTimer } from "@/src/features/timer/store";
+import { toast } from "sonner";
+import { useState } from "react";
 
 function SetInput({
   value,
   onChange,
+  canBeZero,
+  canBeNegative,
 }: {
   value: number | string;
   onChange?: (val: string) => void;
+  canBeZero?: boolean;
+  canBeNegative?: boolean;
 }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [dirtyValue, setDirtyValue] = useState("");
+
+  const updateValue = () => {
+    if (Number(dirtyValue.trim()) || (dirtyValue.trim() === "0" && canBeZero)) {
+      let value = dirtyValue;
+
+      if (!canBeNegative) {
+        value = Math.abs(Number(dirtyValue)).toString();
+      }
+      onChange?.(value);
+      setDirtyValue(value);
+    }
+    setIsEditing(false);
+  };
   return (
     <Input
       type="number"
-      className="w-16 h-10 text-center font-medium bg-transparent! border-none"
-      value={value}
-      onChange={(e) => onChange?.(e.target.value)}
+      className="w-16 h-10 text-center font-medium bg-transparent! border-none placeholder-muted-foreground"
+      placeholder={value.toString()}
+      value={isEditing ? dirtyValue : value}
+      onFocus={() => setIsEditing(true)}
+      onChange={(e) => setDirtyValue(e.target.value)}
+      onKeyDownCapture={(e) => {
+        if (e.key == "Enter") {
+          e.currentTarget.blur();
+        }
+      }}
+      onBlur={updateValue}
     />
   );
 }
@@ -76,6 +105,9 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
   };
 
   function handleClick() {
+    if (!set.isCompleted && Number(set.reps) < 1)
+      return toast.error("Cannot complete set with reps less than 1.");
+
     const newExercises = updateSetData("isCompleted", !set.isCompleted);
     if (!set.isCompleted) {
       if (newExercises.some((e) => !isExerciseCompleted(e))) {
@@ -109,6 +141,8 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
           <SetInput
             value={set.weight ?? ""}
             onChange={(value) => updateSetData("weight", value)}
+            canBeZero
+            canBeNegative
           />
         </td>
       )}
