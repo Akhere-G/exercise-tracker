@@ -7,15 +7,25 @@ import RestTimeTracker from "./RestTimeTracker";
 import { Routine } from "@/src/features/routines/types";
 import { Exercise, useWorkout } from "@/src/features/workout/store";
 import ExerciseList from "./ExerciseList";
-import { getDefaultSets } from "@/src/features/workout/utils";
+import {
+  getDefaultSets,
+  isWorkoutCompleted,
+} from "@/src/features/workout/utils";
+import { toast } from "sonner";
 import { Toaster } from "@/src/components/ui/sonner";
+import { Button } from "@/src/components/ui/button";
+import { WorkoutSchema } from "@/src/features/workout/schema";
+import { createWorkout } from "@/src/features/workout/api";
+
+import { useRouter } from "next/navigation";
 
 export default function WorkoutClientProvider({
   routine,
 }: {
   routine: Routine | null;
 }) {
-  const { setWorkoutData } = useWorkout();
+  const { setWorkoutData, exercises, startedAt } = useWorkout();
+  const router = useRouter();
 
   useEffect(() => {
     if (routine) {
@@ -36,10 +46,33 @@ export default function WorkoutClientProvider({
         routineId: routine.id,
         currentExerciseId: routine.routineItems[0].exerciseId,
         exercises,
+        startedAt: new Date(),
       });
     }
   }, [routine, setWorkoutData]);
 
+
+
+  async function completeWorkout() {
+    const completedAt = new Date();
+    const workout: WorkoutSchema = {
+      completedAt,
+      duration: completedAt.getMilliseconds() - startedAt!.getMilliseconds(),
+      routineId: routine?.id,
+      sets: exercises.flatMap((e) => e.sets),
+    };
+    try {
+      const response = await createWorkout(workout);
+      if (response.success) {
+        const newWorkout = response.data;
+        router.push(`/workouts/summary/${newWorkout.id}?first=true`);
+      } else {
+        toast.error(Object.values(response.error).join(" "));
+      }
+    } catch {
+      toast.error("Could not save workout.");
+    }
+  }
   return (
     <div className="relative  h-screen flex flex-1 flex-col justify-between">
       <div>
@@ -50,6 +83,14 @@ export default function WorkoutClientProvider({
         <SetList routine={routine} />
       </div>
       <RestTimeTracker />
+
+      <div
+        className={`fixed left-0 w-full px-4 transition-all duration-300 ${isWorkoutCompleted(exercises) ? "bottom-8 opacity-100" : "-bottom-full opacity-0"}`}
+      >
+        <Button onClick={completeWorkout} className="w-full shadow-2xl">
+          Complete Workout
+        </Button>
+      </div>
     </div>
   );
 }

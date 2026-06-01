@@ -13,7 +13,7 @@ export interface Exercise extends BaseExercise {
 
 interface WorkoutState {
   routineId: number | null;
-  completedAt: Date | string | null;
+  startedAt: Date | null;
   duration: number | null;
   exercises: Exercise[];
   currentExerciseId: number;
@@ -29,7 +29,7 @@ export const useWorkout = create<WorkoutState>()(
   persist(
     (set) => ({
       routineId: null,
-      completedAt: null,
+      startedAt: null,
       duration: null,
       exercises: [],
       currentExerciseId: 0,
