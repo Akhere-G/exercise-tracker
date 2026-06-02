@@ -18,3 +18,8 @@ export interface Workout {
   duration: number;
   sets: WorkoutSet[];
 }
+
+export interface WorkoutStats {
+  weeklyStreak: number;
+  workoutCount: number;
+}

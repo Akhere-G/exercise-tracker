@@ -1,7 +1,6 @@
 import { Button } from "@/src/components/ui/button";
 import { Exercise, useWorkout } from "@/src/features/workout/store";
-import Image from "next/image";
-import React, { useState } from "react";
+import { useState } from "react";
 import { ExercisePickerModal } from "../../../routines/components/ExercisePickerModal";
 import { Exercise as BaseExercise } from "@/src/features/exercises/types";
 import { Check, Plus } from "lucide-react";
@@ -9,6 +8,7 @@ import {
   getDefaultSets,
   isExerciseCompleted,
 } from "@/src/features/workout/utils";
+import { ExerciseImage } from "../../components/ExerciseImage";
 
 export default function ExerciseList() {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,12 +53,16 @@ export default function ExerciseList() {
         <div className="flex gap-2 w-max">
           {!!exercises.length &&
             exercises.map((item) => (
-              <ExerciseCard
+              <div
                 key={item.id}
-                exercise={item}
-                selected={currentExerciseId === item.id}
-                onClick={onClick}
-              />
+                className={`relative transition-opacity duration-300 ${currentExerciseId === item.id ? "" : "opacity-50"}`}
+                onClick={() => onClick(item.id)}
+              >
+                <ExerciseImage exercise={item} />
+                {isExerciseCompleted(item) && (
+                  <Check className="absolute right-1 bottom-1 bg-white w-5 h-5 rounded-full text-success " />
+                )}
+              </div>
             ))}
           <Button
             className={`h-12 ${noExercises ? "" : "w-17"}`}
@@ -81,33 +85,6 @@ export default function ExerciseList() {
         onClose={() => setIsOpen(false)}
         onSelect={addExercises}
       />
-    </div>
-  );
-}
-
-function ExerciseCard({
-  exercise,
-  selected,
-  onClick,
-}: {
-  exercise: Exercise;
-  selected: boolean;
-  onClick: (exerciseId: number) => void;
-}) {
-  return (
-    <div
-      className={`relative w-17 h-12 overflow-hidden bg-white rounded-md transition-opacity duration-300 ${selected ? "" : "opacity-50"}`}
-      onClick={() => onClick(exercise.id)}
-    >
-      <Image
-        src={`https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/refs/heads/main/${exercise.imageUrl}`}
-        alt={exercise.name}
-        fill
-        className="object-scale-down"
-      />
-      {isExerciseCompleted(exercise) && (
-        <Check className="absolute right-1 bottom-1 bg-white w-5 h-5 rounded-full text-success " />
-      )}
     </div>
   );
 }

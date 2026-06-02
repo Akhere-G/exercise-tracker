@@ -14,6 +14,15 @@ from typing import Optional, List
 router = APIRouter(prefix="/api/workouts", tags=["Workout"])
 
 
+@router.get("/stats")
+def get_workouts_stats(
+    user: Annotated[User, Depends(user_service.get_current_user)],
+    db: Annotated[Session, Depends(get_db)],
+    routine_id: Optional[int] = None,
+):
+    return workout_service.get_stats(db, user.id, routine_id)
+
+
 @router.get("", response_model=List[Workout])
 def get_workouts(
     user: Annotated[User, Depends(user_service.get_current_user)],
@@ -29,8 +38,6 @@ def get_workout(
     db: Annotated[Session, Depends(get_db)],
     workout_id: int,
 ):
-    print("here", user.id)
-
     workout = workout_service.get_workout(db, user.id, workout_id)
     if not workout:
         raise HTTPException(
