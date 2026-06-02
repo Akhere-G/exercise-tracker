@@ -9,7 +9,5 @@ export default function BodyChart({
   data: ExtendedBodyPart[];
   side?: "front" | "back";
 }) {
-  console.log(data);
-
   return <Body data={data} side={side} scale={0.8} />;
 }

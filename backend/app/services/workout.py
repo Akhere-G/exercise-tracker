@@ -3,7 +3,7 @@ from sqlalchemy import select
 from app.models import Workout, WorkoutSet, Routine
 from typing import Optional
 from app.schemas.workout import WorkoutCreate, WorkoutUpdate
-from . import routine as routine_service
+from datetime import datetime, timedelta
 
 
 def get_workouts(db: Session, user_id: int, routine_id: Optional[int] = None):
@@ -12,6 +12,35 @@ def get_workouts(db: Session, user_id: int, routine_id: Optional[int] = None):
         stmt = stmt.where(Workout.routine_id == routine_id)
 
     return db.execute(stmt).scalars().all()
+
+
+def get_stats(db: Session, user_id: int, routine_id: Optional[int] = None):
+    workouts = get_workouts(db, user_id, routine_id)
+    workout_count = len(workouts)
+
+    if workout_count == 0:
+        return {"workout_count": 0, "weekly_streak": 0}
+
+    active_weeks = {
+        w.completed_at.isocalendar()[:2] for w in workouts if w.completed_at
+    }
+
+    streak = 0
+    current_date = datetime.now()
+
+    if current_date.isocalendar()[:2] in active_weeks:
+        streak += 1
+        check_date = current_date - timedelta(weeks=1)
+    else:
+        check_date = current_date - timedelta(weeks=1)
+        if check_date.isocalendar()[:2] not in active_weeks:
+            return {"workout_count": workout_count, "weekly_streak": 0}
+
+    while check_date.isocalendar()[:2] in active_weeks:
+        streak += 1
+        check_date -= timedelta(weeks=1)
+
+    return {"workout_count": workout_count, "weekly_streak": streak}
 
 
 def get_workout(db: Session, user_id: int, workout_id: int):

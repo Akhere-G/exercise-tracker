@@ -2,7 +2,7 @@
 import { ActionResponse, api } from "@/src/lib/axios";
 import { WorkoutSchema } from "./schema";
 import { keysToCamel, keysToSnake } from "@/src/lib/apiUtils";
-import { Workout } from "./types";
+import { Workout, WorkoutStats } from "./types";
 import { isAxiosError } from "axios";
 
 export const getWorkout = async (
@@ -24,6 +24,30 @@ export const getWorkout = async (
     };
   }
 };
+
+export const getWorkoutStats = async (
+  routineId: number,
+): Promise<ActionResponse<WorkoutStats>> => {
+  try {
+    const params = new URLSearchParams({ routineId: String(routineId) });
+    const response = await api.get<WorkoutStats>(
+      `/workouts/stats?${params.toString()}`,
+    );
+    return { success: true, data: keysToCamel(response.data) };
+  } catch (err) {
+    if (isAxiosError(err)) {
+      return {
+        success: false,
+        error: { general: err.response?.data.detail },
+      };
+    }
+    return {
+      success: false,
+      error: { general: "An unexpected error occured" },
+    };
+  }
+};
+
 export const createWorkout = async (
   workout: WorkoutSchema,
 ): Promise<ActionResponse<Workout>> => {
