@@ -207,7 +207,7 @@ export default function SetList({ routine }: { routine: Routine | null }) {
             <th className="pb-3 px-2 w-16"></th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-50">
+        <tbody className="divide-y divide-muted-foreground">
           {sets.map((set) => (
             <SetRow
               key={`${set.exerciseId}_${set.setIndex}`}

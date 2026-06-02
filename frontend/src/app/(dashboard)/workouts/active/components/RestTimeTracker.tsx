@@ -31,7 +31,7 @@ export default function RestTimeTracker() {
       <progress className="progress-bar" value={currentTime} max={restTime}>
         {currentTime / restTime}%
       </progress>
-      <div className="flex gap-2 items-center justify-between p-2 bg-secondary ">
+      <div className="flex gap-4 items-center justify-between p-2 bg-secondary ">
         <p className="text-lg flex-1 text-center   ">
           {mins}:{secs}
         </p>
