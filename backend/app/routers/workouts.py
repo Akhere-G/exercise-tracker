@@ -29,6 +29,8 @@ def get_workout(
     db: Annotated[Session, Depends(get_db)],
     workout_id: int,
 ):
+    print("here", user.id)
+
     workout = workout_service.get_workout(db, user.id, workout_id)
     if not workout:
         raise HTTPException(

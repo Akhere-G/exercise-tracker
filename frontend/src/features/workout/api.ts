@@ -5,6 +5,25 @@ import { keysToCamel, keysToSnake } from "@/src/lib/apiUtils";
 import { Workout } from "./types";
 import { isAxiosError } from "axios";
 
+export const getWorkout = async (
+  workoutId: number,
+): Promise<ActionResponse<Workout>> => {
+  try {
+    const response = await api.get<Workout>(`/workouts/${workoutId}`);
+    return { success: true, data: keysToCamel(response.data) };
+  } catch (err) {
+    if (isAxiosError(err)) {
+      return {
+        success: false,
+        error: { general: err.response?.data.detail },
+      };
+    }
+    return {
+      success: false,
+      error: { general: "An unexpected error occured" },
+    };
+  }
+};
 export const createWorkout = async (
   workout: WorkoutSchema,
 ): Promise<ActionResponse<Workout>> => {

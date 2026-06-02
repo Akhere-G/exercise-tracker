@@ -1,3 +1,4 @@
+import { Slug } from "react-muscle-highlighter";
 import { Exercise as BaseExercise } from "../exercises/types";
 import {
   isDurationExercise,
@@ -76,3 +77,125 @@ export const isExerciseCompleted = (exercise: Exercise) =>
 
 export const isWorkoutCompleted = (exercises: Exercise[]) =>
   exercises.every((e) => isExerciseCompleted(e));
+
+export const getOrdinalSuffix = (num: number) => {
+  switch (num % 10) {
+    case 1:
+      return "st";
+    case 2:
+      return "nd";
+    case 3:
+      return "rd";
+    default:
+      return "th";
+  }
+};
+
+const muscleMapping: Record<string, Slug> = {
+  abdominals: "abs",
+  "ankle stabilizers": "ankles",
+  ankles: "ankles",
+  back: "upper-back",
+  biceps: "biceps",
+  brachialis: "biceps",
+  calves: "calves",
+  chest: "chest",
+  core: "abs",
+  deltoids: "deltoids",
+  feet: "feet",
+  forearms: "forearm",
+  glutes: "gluteal",
+  "grip muscles": "forearm",
+  groin: "adductors",
+  hamstrings: "hamstring",
+  hands: "hands",
+  "hip flexors": "adductors",
+  "inner thighs": "adductors",
+  "latissimus dorsi": "upper-back",
+  lats: "upper-back",
+  "lower abs": "abs",
+  "lower back": "lower-back",
+  obliques: "obliques",
+  quadriceps: "quadriceps",
+  "rear deltoids": "deltoids",
+  rhomboids: "upper-back",
+  "rotator cuff": "deltoids",
+  shins: "tibialis",
+  shoulders: "deltoids",
+  soleus: "calves",
+  sternocleidomastoid: "neck",
+  trapezius: "trapezius",
+  traps: "trapezius",
+  triceps: "triceps",
+  "upper back": "upper-back",
+  "upper chest": "chest",
+  "wrist extensors": "forearm",
+  "wrist flexors": "forearm",
+  wrists: "forearm",
+};
+
+export function mapToTargetMuscle(muscleName: string): Slug | undefined {
+  if (!muscleName) return undefined;
+
+  const normalisedName = muscleName.toLowerCase().trim();
+  return muscleMapping[normalisedName];
+}
+
+export function getGreyShadeCSS(intensity: number): string {
+  const MAX_INTENSITY = 12;
+  const clamped = Math.max(0, Math.min(MAX_INTENSITY, intensity));
+
+  const minLightness = 20;
+  const maxLightness = 95;
+
+  const lightness =
+    minLightness + (clamped / MAX_INTENSITY) * (maxLightness - minLightness);
+
+  return `hsl(0, 0%, ${Math.round(lightness)}%)`;
+}
+
+export const getVolume = (exercise: Exercise) => {
+  if (isDurationExercise(exercise)) {
+    const totalSecs = exercise.sets.reduce(
+      (prev, curr) => prev + curr.durationSecs!,
+      0,
+    );
+    return getTime(totalSecs) + " mins";
+  }
+
+  if (isWeightsExercise(exercise)) {
+    const totalWeight = exercise.sets.reduce(
+      (prev, curr) => prev + curr.weight! * curr.reps!,
+      0,
+    );
+    return totalWeight + " kg";
+  }
+
+  const totalReps = exercise.sets.reduce((prev, curr) => prev + curr.reps!, 0);
+  return totalReps + " reps";
+};
+
+export const getTotalVolume = (exercises: Exercise[]) => {
+  const volume = exercises.reduce(
+    (prev, curr) =>
+      prev +
+      (!isWeightsExercise(curr)
+        ? 0
+        : curr.sets.reduce(
+            (prev, curr) => prev + curr.reps! * curr.weight!,
+            0,
+          )),
+    0,
+  );
+
+  return volume;
+};
+
+export const getTime = (totalSecs: number) => {
+  let mins = Math.floor(totalSecs / 60).toString();
+  if (mins.length === 1) mins = mins.padStart(2, "0");
+  let secs = (totalSecs % 60).toString();
+  if (secs.length === 1) secs = secs.padStart(2, "0");
+
+  return `${mins}:${secs}`;
+};
