@@ -34,11 +34,19 @@ export default function RoutineModal({ routine }: { routine: Routine }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem
+            onClick={() => router.push(`/routines/${routine.id}`)}
+          >
+            Details
+          </DropdownMenuItem>
+          <DropdownMenuItem
             onClick={() => router.push(`/routines/edit/${routine.id}`)}
           >
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setDeleteModalOpen(true)}>
+          <DropdownMenuItem
+            variant="destructive"
+            onClick={() => setDeleteModalOpen(true)}
+          >
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>

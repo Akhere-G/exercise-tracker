@@ -130,12 +130,18 @@ export default function ExerciseDetails({
               Remove Last set
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setIsExerciseModalOpen(true)}>
-              Replace
+              Replace Exercise
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setRemoveModalOpen(true)}>
-              Remove
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => setRemoveModalOpen(true)}
+            >
+              Remove Exercise
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setCancelModalOpen(true)}>
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={() => setCancelModalOpen(true)}
+            >
               Cancel Workout
             </DropdownMenuItem>
             {canComplete && (
