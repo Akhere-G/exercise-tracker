@@ -61,17 +61,21 @@ export default function StoredWorkout() {
 
   return (
     routineName && (
-      <button
-        className="fixed bottom-4 w-full"
-        onClick={() => router.push(`/workouts/active?routineId=${routineId}`)}
-      >
-        <Card>
-          <CardHeader>
-            <CardTitle>{routineName}</CardTitle>
-            {duration && <CardDescription>{getTime(duration)}</CardDescription>}
-          </CardHeader>
-        </Card>
-      </button>
+      <div className="sticky bottom-4">
+        <div
+          className=" "
+          onClick={() => router.push(`/workouts/active?routineId=${routineId}`)}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>{routineName}</CardTitle>
+              {duration && (
+                <CardDescription>{getTime(duration)}</CardDescription>
+              )}
+            </CardHeader>
+          </Card>
+        </div>
+      </div>
     )
   );
 }

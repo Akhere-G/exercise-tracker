@@ -1,11 +1,14 @@
 "use server";
 
 import { LoginSchema, RegisterSchema, Token } from "@/src/features/auth/schema";
+import { ActionResponse } from "@/src/lib/apiUtils";
 import { api } from "@/src/lib/axios";
 import { isAxiosError } from "axios";
 import { cookies } from "next/headers";
 
-export async function loginAction(formData: LoginSchema) {
+export async function loginAction(
+  formData: LoginSchema,
+): Promise<ActionResponse<Token>> {
   try {
     const response = await api.post("/auth/login", formData);
     const token: Token = response.data;
@@ -18,19 +21,24 @@ export async function loginAction(formData: LoginSchema) {
       path: "/",
     });
 
-    return { success: true };
+    return { success: true, data: token };
   } catch (err) {
     if (isAxiosError(err)) {
       return {
         success: false,
-        error: err.response?.data?.detail || "Login Failed",
+        errors: err.response?.data.detail,
       };
     }
-    return { success: false, error: "An unexpected error occurred" };
+    return {
+      success: false,
+      error: "An unexpected error occured",
+    };
   }
 }
 
-export async function registerAction(formData: RegisterSchema) {
+export async function registerAction(
+  formData: RegisterSchema,
+): Promise<ActionResponse<Token>> {
   try {
     const response = await api.post("/auth/register", formData);
     const token: Token = response.data;
@@ -43,15 +51,17 @@ export async function registerAction(formData: RegisterSchema) {
       path: "/",
     });
 
-    return { success: true };
+    return { success: true, data: token };
   } catch (err) {
     if (isAxiosError(err)) {
       return {
         success: false,
-        error: err.response?.data?.detail || "Register Failed",
+        errors: err.response?.data.detail,
       };
     }
-
-    return { success: false, error: "An unexpected error occurred" };
+    return {
+      success: false,
+      error: "An unexpected error occured",
+    };
   }
 }

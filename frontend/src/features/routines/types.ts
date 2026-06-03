@@ -4,8 +4,8 @@ export interface RoutineItem {
   routineId: number;
   exerciseId: number;
   targetSets: number;
-  targetReps: number;
-  targetDurationSecs: number;
+  targetReps: number | null;
+  targetDurationSecs: number | null;
   order: number;
   exercise: Exercise;
 }

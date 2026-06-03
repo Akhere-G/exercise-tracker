@@ -82,7 +82,7 @@ export default function WorkoutClientProvider({
         const newWorkout = response.data;
         router.push(`/workouts/summary/${newWorkout.id}?first=true`);
       } else {
-        toast.error(Object.values(response.error).join(" "));
+        toast.error(response.error);
       }
     } catch {
       toast.error("Could not save workout.");

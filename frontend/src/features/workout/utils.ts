@@ -58,7 +58,7 @@ export const getNewSet = (
       exerciseId: exercise.id,
       setIndex: exercise.sets.length + 1,
       durationSecs: isDurationExercise(exercise)
-        ? routineItem.targetDurationSecs / 60
+        ? routineItem.targetDurationSecs! / 60
         : undefined,
       reps: isRepsExercise(exercise) ? routineItem.targetReps : undefined,
       weight: isWeightsExercise(exercise) ? DEFAULT_WEIGHT : undefined,

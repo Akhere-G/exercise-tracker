@@ -7,10 +7,6 @@ export const api = axios.create({
   baseURL,
 });
 
-export type ActionResponse<T> =
-  | { success: true; data: T }
-  | { success: false; error: Record<string, string> };
-
 api.interceptors.request.use(async (config) => {
   if (typeof window === "undefined") {
     try {

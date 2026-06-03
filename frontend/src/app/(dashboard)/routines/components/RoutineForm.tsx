@@ -1,16 +1,7 @@
 "use client";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/src/components/card";
 import { Button } from "@/src/components/ui/button";
 import { FormInput } from "@/src/components/ui/formInput";
-import {
-  getValidationErrors,
-  isValidationError,
-} from "@/src/features/auth/utils";
+
 import { Exercise } from "@/src/features/exercises/types";
 import { routineSchema, RoutineSchema } from "@/src/features/routines/schema";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -20,19 +11,23 @@ import { RoutineItemsTable } from "./RoutineItemsTable";
 import { ExercisePickerModal } from "./ExercisePickerModal";
 import { useRouter } from "next/navigation";
 import { Routine } from "@/src/features/routines/types";
+import { toast } from "sonner";
+import { Toaster } from "@/src/components/ui/sonner";
+import { ActionResponse } from "@/src/lib/apiUtils";
 
 export default function RoutineForm({
   submitAction,
   sumbitText,
   initalData,
 }: {
-  submitAction: (data: RoutineSchema) => Promise<unknown>;
+  submitAction: (data: RoutineSchema) => Promise<ActionResponse<Routine>>;
   sumbitText: string;
   initalData?: Routine;
 }) {
   const [errorMessages, setErrorMessages] = useState<Record<string, string>>(
     {},
   );
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const router = useRouter();
@@ -76,12 +71,16 @@ export default function RoutineForm({
   const onSubmit = async (data: RoutineSchema) => {
     try {
       setErrorMessages({});
-      await submitAction(data);
-      router.push("/routines");
-    } catch (err) {
-      if (isValidationError(err)) {
-        setErrorMessages(getValidationErrors(err.error));
+      const response = await submitAction(data);
+      if (response.success) {
+        router.push("/routines");
+      } else {
+        console.log("in sumbit", response.error);
+        // setErrorMessages(response.);
+        toast.error(response.error);
       }
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -96,7 +95,8 @@ export default function RoutineForm({
         exercise: exercise,
         exerciseId: exercise.id,
         targetSets: 3,
-        targetReps: 10,
+        targetReps: null,
+        targetDuration: null,
         order: fields.length,
       });
     }
@@ -107,6 +107,7 @@ export default function RoutineForm({
     (r) => r.exercise,
   ) as Exercise[];
 
+  console.log(errorMessages);
   return (
     <>
       <form className="form" onSubmit={handleSubmit(onSubmit)}>
@@ -171,6 +172,7 @@ export default function RoutineForm({
           <Button type="submit">{sumbitText}</Button>
         </div>
       </form>
+      <Toaster position="top-right" richColors closeButton />
       <ExercisePickerModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
