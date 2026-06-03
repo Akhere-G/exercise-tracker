@@ -1,4 +1,4 @@
-import { getWorkout, getWorkoutStats } from "@/src/features/workout/api";
+import { getWorkout, getWorkoutStats } from "@/src/features/workout/queries";
 import {
   getGreyShadeCSS,
   getOrdinalSuffix,

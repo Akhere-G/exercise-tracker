@@ -1,4 +1,4 @@
-import { getRoutineById } from "@/src/features/routines/api";
+import { getRoutineById } from "@/src/features/routines/queries";
 import WorkoutClientProvider from "./components/WorkoutClientProvider";
 
 export default async function ActiveWorkout({

@@ -14,7 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
-import { deleteRoutine } from "@/src/features/routines/api";
+import { deleteRoutine } from "@/src/features/routines/actions";
 import { Routine } from "@/src/features/routines/types";
 import { MoreVertical } from "lucide-react";
 import { useRouter } from "next/navigation";

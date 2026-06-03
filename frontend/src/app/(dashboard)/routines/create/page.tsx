@@ -1,4 +1,4 @@
-import { createRoutine } from "@/src/features/routines/api";
+import { createRoutine } from "@/src/features/routines/actions";
 
 import RoutineForm from "../components/RoutineForm";
 import {

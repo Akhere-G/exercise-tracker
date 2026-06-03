@@ -20,7 +20,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/src/components/ui/sonner";
 import { Button } from "@/src/components/ui/button";
 import { WorkoutSchema } from "@/src/features/workout/schema";
-import { createWorkout } from "@/src/features/workout/api";
+import { createWorkout } from "@/src/features/workout/actions";
 
 import { useRouter } from "next/navigation";
 

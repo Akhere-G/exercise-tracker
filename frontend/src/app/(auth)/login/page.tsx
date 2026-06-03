@@ -10,7 +10,7 @@ import { Button } from "@/src/components/ui/button";
 import { FormInput } from "@/src/components/ui/formInput";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { loginAction } from "../../../features/auth/api";
+import { loginAction } from "../../../features/auth/actions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";

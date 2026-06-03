@@ -1,4 +1,5 @@
-import { editRoutine, getRoutineById } from "@/src/features/routines/api";
+import { getRoutineById } from "@/src/features/routines/queries";
+import { editRoutine } from "@/src/features/routines/actions";
 
 import RoutineForm from "../../components/RoutineForm";
 import {

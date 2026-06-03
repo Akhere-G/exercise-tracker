@@ -1,6 +1,6 @@
-import { getRoutineById } from "@/src/features/routines/api";
+import { getRoutineById } from "@/src/features/routines/queries";
 import { getDayStr } from "@/src/features/routines/utils";
-import { getWorkouts, getWorkoutStats } from "@/src/features/workout/api";
+import { getWorkouts, getWorkoutStats } from "@/src/features/workout/queries";
 import { Dot, Flame, Timer, Weight } from "lucide-react";
 import ExerciseStat from "../../components/ExerciseStat";
 import {

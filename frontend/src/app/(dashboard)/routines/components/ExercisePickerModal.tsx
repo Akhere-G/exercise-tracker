@@ -9,7 +9,7 @@ import {
   useCallback,
 } from "react";
 import { Exercise } from "@/src/features/exercises/types";
-import { getAllExercises } from "@/src/features/exercises/api";
+import { getAllExercises } from "@/src/features/exercises/actions";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import {
@@ -121,6 +121,7 @@ export function ExercisePickerModal({
 
   useEffect(() => {
     function getFormattedExercises() {
+      console.log("e", exercises);
       setFormattedExercises(
         exercises.map((e) => ({
           ...e,
