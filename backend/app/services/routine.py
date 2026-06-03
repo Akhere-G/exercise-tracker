@@ -50,6 +50,7 @@ def create_routine(db: Session, user_id: int, routine: RoutineCreate):
                 exercise_id=item.exercise_id,
                 target_sets=item.target_sets,
                 target_reps=item.target_reps,
+                target_duration_secs=item.target_duration_secs,
                 order=item.order,
             )
             db.add(routine_item)
@@ -88,6 +89,7 @@ def update_routine(
                     exercise_id=item.exercise_id,
                     target_sets=item.target_sets,
                     target_reps=item.target_reps,
+                    target_duration_secs=item.target_duration_secs,
                     order=item.order,
                 )
                 old_routine.routine_items.append(new_item)
