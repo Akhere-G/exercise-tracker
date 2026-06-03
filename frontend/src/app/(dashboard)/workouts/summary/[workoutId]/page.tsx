@@ -1,27 +1,18 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/src/components/card";
 import { getWorkout, getWorkoutStats } from "@/src/features/workout/api";
 import {
   getGreyShadeCSS,
   getOrdinalSuffix,
   getTime,
   getTotalVolume,
-  getVolume,
   mapToTargetMuscle,
 } from "@/src/features/workout/utils";
-import { Dot, Flame, LucideProps, Timer, Weight } from "lucide-react";
-import { ForwardRefExoticComponent, RefAttributes } from "react";
+import { Flame, Timer, Weight } from "lucide-react";
 import { ExtendedBodyPart, Slug } from "react-muscle-highlighter";
 import BodyChart from "./components/BodyChart";
 import { Exercise } from "@/src/features/workout/store";
-import Confetti from "react-confetti";
 import ConffettiEffect from "./components/ConffettiEffect";
-import { ExerciseImage } from "../../components/ExerciseImage";
+import ExerciseStat from "../../../components/ExerciseStat";
+import ExerciseCard from "../../../components/ExerciseCard";
 
 export default async function WorkoutSummary({
   params,
@@ -39,7 +30,7 @@ export default async function WorkoutSummary({
   const muscles: Record<string, number> = {};
   const exercises: Record<number, Exercise> = {};
 
-  const statsResponse = await getWorkoutStats(workout?.routineId ?? -1);
+  const statsResponse = await getWorkoutStats(workout?.routineId);
   const stats = statsResponse.success ? statsResponse.data : null;
 
   workout?.sets.forEach((s) => {
@@ -106,49 +97,5 @@ export default async function WorkoutSummary({
         {first && <ConffettiEffect />}
       </div>
     </div>
-  );
-}
-
-function ExerciseStat({
-  Icon,
-  title,
-  subtitle,
-}: {
-  Icon: ForwardRefExoticComponent<
-    Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
-  >;
-  title: string | number;
-  subtitle: string | number;
-}) {
-  return (
-    <Card className="flex-1">
-      <CardContent className="flex flex-col items-center justify-center gap-1">
-        <div className="flex gap-2 items-center">
-          <Icon size={20} />
-          <p className="text-lg">{title}</p>
-        </div>
-        <CardDescription>{subtitle}</CardDescription>
-      </CardContent>
-    </Card>
-  );
-}
-
-function ExerciseCard({ exercise }: { exercise: Exercise }) {
-  return (
-    <Card>
-      <CardHeader className="flex gap-2">
-        <ExerciseImage exercise={exercise} />
-        <div className="">
-          <CardTitle>{exercise.name}</CardTitle>
-          <CardDescription>
-            <p className="flex items-center">
-              {exercise.sets.length} sets
-              <Dot />
-              <span>{getVolume(exercise)}</span>
-            </p>
-          </CardDescription>
-        </div>
-      </CardHeader>
-    </Card>
   );
 }

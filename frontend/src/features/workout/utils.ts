@@ -8,6 +8,7 @@ import {
 import { RoutineItem } from "../routines/types";
 import { WorkoutSetSchema } from "./schema";
 import { ActiveSet, Exercise } from "./store";
+import { Workout } from "./types";
 
 const DEFAULT_TOTAL_SETS = 3;
 const DEFAULT_REPS = 10;
@@ -199,3 +200,21 @@ export const getTime = (totalSecs: number) => {
 
   return `${mins}:${secs}`;
 };
+
+export function getTotalTime(workouts: Workout[]) {
+  return workouts.reduce((prev, curr) => prev + curr.duration, 0);
+}
+
+export function getTotalWorkoutsVolume(workouts: Workout[]) {
+  let volume = 0;
+
+  for (const workout of workouts) {
+    for (const set of workout.sets) {
+      if (isWeightsExercise(set.exercise)) {
+        volume += set.weight! * set.reps!;
+      }
+    }
+  }
+
+  return volume;
+}
