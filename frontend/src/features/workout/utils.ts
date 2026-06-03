@@ -202,7 +202,9 @@ export const getTime = (totalSecs: number) => {
 };
 
 export function getTotalTime(workouts: Workout[]) {
-  return workouts.reduce((prev, curr) => prev + curr.duration, 0);
+  workouts.forEach((w) => console.log(w.duration));
+  const totalSecs = workouts.reduce((prev, curr) => prev + curr.duration, 0);
+  return Math.ceil(totalSecs / 60);
 }
 
 export function getTotalWorkoutsVolume(workouts: Workout[]) {

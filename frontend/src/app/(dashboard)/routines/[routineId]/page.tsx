@@ -14,11 +14,11 @@ import RoutineItemCard from "../../components/RoutineItemCard";
 export default async function RoutineDetails({
   params,
 }: {
-  params: Promise<{ routineId: number }>;
+  params: Promise<{ routineId: string }>;
 }) {
-  const { routineId } = await params;
+  const routineId = Number((await params).routineId);
 
-  const routineReponse = await getRoutineById(Number(routineId));
+  const routineReponse = await getRoutineById(routineId);
   const routine = routineReponse.success ? routineReponse.data : null;
   const repsonse = await getWorkouts(routineId);
 
