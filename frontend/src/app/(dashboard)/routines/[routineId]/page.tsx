@@ -4,17 +4,11 @@ import { getWorkouts, getWorkoutStats } from "@/src/features/workout/api";
 import { Dot, Flame, Timer, Weight } from "lucide-react";
 import ExerciseStat from "../../components/ExerciseStat";
 import {
-  getGreyShadeCSS,
-  getTime,
   getTotalTime,
-  getTotalVolume,
   getTotalWorkoutsVolume,
-  mapToTargetMuscle,
 } from "@/src/features/workout/utils";
 import BodyChart from "../../workouts/summary/[workoutId]/components/BodyChart";
-import { ExtendedBodyPart, Slug } from "react-muscle-highlighter";
 import { getMuscleMapData } from "@/src/features/exercises/utils";
-import ExerciseCard from "../../components/ExerciseCard";
 import RoutineItemCard from "../../components/RoutineItemCard";
 
 export default async function RoutineDetails({
@@ -24,7 +18,8 @@ export default async function RoutineDetails({
 }) {
   const { routineId } = await params;
 
-  const routine = await getRoutineById(Number(routineId));
+  const routineReponse = await getRoutineById(Number(routineId));
+  const routine = routineReponse.success ? routineReponse.data : null;
   const repsonse = await getWorkouts(routineId);
 
   const workouts = repsonse.success ? repsonse.data : [];
@@ -33,11 +28,17 @@ export default async function RoutineDetails({
 
   const stats = statsResponse.success ? statsResponse.data : null;
 
-  const exercises = routine.routineItems.map((r) => r.exercise);
+  const exercises = routine?.routineItems.map((r) => r.exercise) ?? [];
 
   const data = getMuscleMapData(exercises);
 
-  console.log("day", routine.day);
+  if (!routine) {
+    return (
+      <div className="container">
+        <h2>Routine not found</h2>
+      </div>
+    );
+  }
   return (
     <div className="container">
       <h2>{routine.name}</h2>

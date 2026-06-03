@@ -14,10 +14,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { registerAction } from "../../../features/auth/api";
-import {
-  getValidationErrors,
-  isValidationError,
-} from "@/src/features/auth/utils";
 
 export default function Register() {
   const [errorMessages, setErrorMessage] = useState<Record<string, string>>({
@@ -46,15 +42,8 @@ export default function Register() {
 
       const response = await registerAction(formattedData);
 
-      if (response?.error) {
-        if (isValidationError(response)) {
-          const errors = getValidationErrors(response.error);
-          setErrorMessage(errors);
-        } else {
-          setErrorMessage({
-            general: "Something went wrong... try logging in.",
-          });
-        }
+      if (!response.success) {
+        console.log(response.error);
       } else {
         router.push("/routines");
       }

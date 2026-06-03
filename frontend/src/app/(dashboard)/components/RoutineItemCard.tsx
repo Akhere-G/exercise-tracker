@@ -18,7 +18,6 @@ export default function RoutineItemCard({
     ? Math.ceil(targetDurationSecs / 60)
     : null;
 
-  console.log(routineItem);
   return (
     <Card>
       <CardHeader className="flex gap-2">

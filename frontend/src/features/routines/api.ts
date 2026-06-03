@@ -1,39 +1,84 @@
 "use server";
 import { api } from "@/src/lib/axios";
 import type { Routine } from "./types";
-import { keysToCamel, keysToSnake } from "@/src/lib/apiUtils";
+import { ActionResponse, keysToCamel, keysToSnake } from "@/src/lib/apiUtils";
 import { RoutineSchema } from "./schema";
-import { isValidationError } from "../auth/utils";
+import { isAxiosError } from "axios";
 
-export const getAllRoutines = async (): Promise<Routine[]> => {
-  const response = await api.get<Routine[]>("/routines");
-  return keysToCamel(response.data);
+export const getAllRoutines = async (): Promise<ActionResponse<Routine[]>> => {
+  try {
+    const response = await api.get<Routine[]>("/routines");
+    return { success: true, data: keysToCamel(response.data) };
+  } catch (err) {
+    if (isAxiosError(err)) {
+      return {
+        success: false,
+        errors: err.response?.data.detail,
+      };
+    }
+    return {
+      success: false,
+      error: "An unexpected error occured",
+    };
+  }
 };
 
-export const getRoutineById = async (id: number): Promise<Routine> => {
-  const response = await api.get<Routine>(`/routines/${id}`);
-  return keysToCamel(response.data);
+export const getRoutineById = async (
+  id: number,
+): Promise<ActionResponse<Routine>> => {
+  try {
+    const response = await api.get<Routine>(`/routines/${id}`);
+    return { success: true, data: keysToCamel(response.data) };
+  } catch (err) {
+    if (isAxiosError(err)) {
+      return {
+        success: false,
+        errors: err.response?.data.detail,
+      };
+    }
+    return {
+      success: false,
+      error: "An unexpected error occured",
+    };
+  }
 };
 export const createRoutine = async (
   routine: RoutineSchema,
-): Promise<Routine> => {
+): Promise<ActionResponse<Routine>> => {
   try {
-    const response = await api.post<Routine>("/routines", keysToSnake(routine));
+    const formattedRoutine = {
+      ...routine,
+      routineItems: routine.routineItems.map((r) => ({
+        ...r,
+        targetDurationSecs: r.targetDuration
+          ? r.targetDuration * 60
+          : undefined,
+      })),
+    };
+    const response = await api.post<Routine>(
+      "/routines",
+      keysToSnake(formattedRoutine),
+    );
 
-    return keysToCamel(response.data);
+    return { success: true, data: keysToCamel(response.data) };
   } catch (err) {
-    if (isValidationError(err)) {
-      throw err;
+    if (isAxiosError(err)) {
+      return {
+        success: false,
+        errors: err.response?.data.detail,
+      };
     }
-
-    throw err;
+    return {
+      success: false,
+      error: "An unexpected error occured",
+    };
   }
 };
 
 export const editRoutine = async (
   routine: Partial<RoutineSchema>,
   routineId: number,
-): Promise<Routine> => {
+): Promise<ActionResponse<Routine>> => {
   try {
     const cleanedRoutine = {
       ...routine,
@@ -42,7 +87,7 @@ export const editRoutine = async (
         const { exercise, targetDuration, ...pureItemFields } = item;
         return {
           ...pureItemFields,
-          targetDuration: targetDuration ? targetDuration * 60 : undefined,
+          targetDurationSecs: targetDuration ? targetDuration * 60 : undefined,
         };
       }),
     };
@@ -52,16 +97,38 @@ export const editRoutine = async (
       keysToSnake(cleanedRoutine),
     );
 
-    return keysToCamel(response.data);
+    return { success: true, data: keysToCamel(response.data) };
   } catch (err) {
-    if (isValidationError(err)) {
-      throw err;
+    if (isAxiosError(err)) {
+      return {
+        success: false,
+        errors: err.response?.data.detail,
+      };
     }
-
-    throw err;
+    return {
+      success: false,
+      error: "An unexpected error occured",
+    };
   }
 };
 
-export const deleteRoutine = async (routineId: number) => {
-  await api.delete(`/routines/${routineId}`);
+export const deleteRoutine = async (
+  routineId: number,
+): Promise<ActionResponse<number>> => {
+  try {
+    const response = await api.delete<number>(`/routines/${routineId}`);
+
+    return { success: true, data: response.data };
+  } catch (err) {
+    if (isAxiosError(err)) {
+      return {
+        success: false,
+        errors: err.response?.data.detail,
+      };
+    }
+    return {
+      success: false,
+      error: "An unexpected error occured",
+    };
+  }
 };

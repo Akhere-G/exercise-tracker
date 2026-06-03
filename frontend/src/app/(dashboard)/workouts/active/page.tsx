@@ -8,7 +8,8 @@ export default async function ActiveWorkout({
 }) {
   const { routineId } = await searchParams;
 
-  const routine = await getRoutineById(routineId);
+  const response = await getRoutineById(routineId);
+  const routine = response.success ? response.data : null;
 
   return <WorkoutClientProvider routine={routine} />;
 }
