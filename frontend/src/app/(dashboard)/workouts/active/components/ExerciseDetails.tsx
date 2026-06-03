@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/src/components/ui/button";
 import {
   DropdownMenu,
@@ -5,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
-import { useWorkout } from "@/src/features/workout/store";
+import { useWorkout, workoutStorageKey } from "@/src/features/workout/store";
 import { Dot, MoreVertical } from "lucide-react";
 import { ExercisePickerModal } from "../../../routines/components/ExercisePickerModal";
 import { useState } from "react";
@@ -22,6 +23,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/src/components/ui/dialog";
+import { useRouter } from "next/navigation";
 
 export default function ExerciseDetails({
   completeWorkout,
@@ -33,6 +35,9 @@ export default function ExerciseDetails({
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
   const [removeModalOpen, setRemoveModalOpen] = useState(false);
   const [finishModalOpen, setFinishModalOpen] = useState(false);
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+
+  const router = useRouter();
 
   const { currentExerciseId, exercises, setWorkoutData } = useWorkout();
 
@@ -89,6 +94,11 @@ export default function ExerciseDetails({
     setRemoveModalOpen(false);
   }
 
+  function cancelWorkout() {
+    localStorage.removeItem(workoutStorageKey);
+    router.push("/routines");
+  }
+
   if (!currentExercise)
     return (
       <div className="p-8 text-center">
@@ -124,6 +134,9 @@ export default function ExerciseDetails({
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setRemoveModalOpen(true)}>
               Remove
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setCancelModalOpen(true)}>
+              Cancel Workout
             </DropdownMenuItem>
             {canComplete && (
               <DropdownMenuItem onClick={() => setFinishModalOpen(true)}>
@@ -163,6 +176,22 @@ export default function ExerciseDetails({
               <DialogClose>Cancel</DialogClose>
               <Button variant="default" onClick={() => completeWorkout()}>
                 Finish
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={cancelModalOpen}
+          onOpenChange={(open) => setCancelModalOpen(open)}
+        >
+          <DialogContent onClick={(e) => e.stopPropagation()}>
+            <DialogTitle>Cancel workout?</DialogTitle>
+            <DialogDescription>All sets will be deleted.</DialogDescription>
+            <DialogFooter>
+              <DialogClose>Continue workout</DialogClose>
+              <Button variant="default" onClick={cancelWorkout}>
+                Cancel Workout
               </Button>
             </DialogFooter>
           </DialogContent>

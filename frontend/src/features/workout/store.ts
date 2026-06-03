@@ -11,7 +11,9 @@ export interface Exercise extends BaseExercise {
   sets: ActiveSet[];
 }
 
-interface WorkoutState {
+export const workoutStorageKey = "workout-storage";
+
+export interface WorkoutState {
   routineId: number | null;
   startedAt: Date | null;
   duration: number | null;
@@ -45,7 +47,7 @@ export const useWorkout = create<WorkoutState>()(
         })),
     }),
     {
-      name: "workout-storage",
+      name: workoutStorageKey,
     },
   ),
 );

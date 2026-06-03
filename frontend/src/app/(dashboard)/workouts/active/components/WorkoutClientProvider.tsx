@@ -5,7 +5,12 @@ import ExerciseDetails from "./ExerciseDetails";
 import SetList from "../../../routines/components/SetList";
 import RestTimeTracker from "./RestTimeTracker";
 import { Routine } from "@/src/features/routines/types";
-import { Exercise, useWorkout } from "@/src/features/workout/store";
+import {
+  Exercise,
+  useWorkout,
+  WorkoutState,
+  workoutStorageKey,
+} from "@/src/features/workout/store";
 import ExerciseList from "./ExerciseList";
 import {
   getDefaultSets,
@@ -28,6 +33,17 @@ export default function WorkoutClientProvider({
   const router = useRouter();
 
   useEffect(() => {
+    try {
+      const workoutJson = localStorage.getItem(workoutStorageKey);
+
+      if (workoutJson) {
+        const workoutData: { state: WorkoutState } = JSON.parse(workoutJson);
+
+        setWorkoutData(workoutData.state);
+        return;
+      }
+    } catch {}
+
     if (routine) {
       const exercises: Exercise[] = [];
 
