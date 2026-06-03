@@ -25,14 +25,41 @@ export const getWorkout = async (
   }
 };
 
+export const getWorkouts = async (
+  routineId?: number,
+): Promise<ActionResponse<Workout[]>> => {
+  try {
+    let url = "/workouts";
+    if (routineId) {
+      url += `?routineId=${routineId}`;
+    }
+
+    const response = await api.get<Workout[]>(url);
+    return { success: true, data: keysToCamel(response.data) };
+  } catch (err) {
+    if (isAxiosError(err)) {
+      return {
+        success: false,
+        error: { general: err.response?.data.detail },
+      };
+    }
+    return {
+      success: false,
+      error: { general: "An unexpected error occured" },
+    };
+  }
+};
+
 export const getWorkoutStats = async (
-  routineId: number,
+  routineId?: number,
 ): Promise<ActionResponse<WorkoutStats>> => {
   try {
-    const params = new URLSearchParams({ routineId: String(routineId) });
-    const response = await api.get<WorkoutStats>(
-      `/workouts/stats?${params.toString()}`,
-    );
+    let url = "/workouts/stats";
+    if (routineId) {
+      url += `?routineId=${routineId}`;
+    }
+    const response = await api.get<WorkoutStats>(url);
+
     return { success: true, data: keysToCamel(response.data) };
   } catch (err) {
     if (isAxiosError(err)) {
