@@ -15,6 +15,7 @@ export const workoutStorageKey = "workout-storage";
 
 export interface WorkoutState {
   routineId: number | null;
+  routineName: string | null;
   startedAt: Date | null;
   duration: number | null;
   exercises: Exercise[];
@@ -31,6 +32,7 @@ export const useWorkout = create<WorkoutState>()(
   persist(
     (set) => ({
       routineId: null,
+      routineName: null,
       startedAt: null,
       duration: null,
       exercises: [],

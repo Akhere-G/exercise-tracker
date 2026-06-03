@@ -1,6 +1,7 @@
 import { getAllRoutines } from "@/src/features/routines/api";
 import RoutineCard from "./components/RoutineCard";
 import Link from "next/link";
+import StoredWorkout from "./components/StoredWorkout";
 
 export default async function Routines() {
   const routines = await getAllRoutines();
@@ -24,6 +25,7 @@ export default async function Routines() {
       <Link className="text-center" href="/routines/create">
         Add New Routine
       </Link>
+      <StoredWorkout />
     </div>
   );
 }
