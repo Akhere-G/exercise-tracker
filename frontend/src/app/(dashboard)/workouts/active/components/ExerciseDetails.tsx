@@ -23,9 +23,17 @@ import {
   DialogTitle,
 } from "@/src/components/ui/dialog";
 
-export default function ExerciseDetails() {
+export default function ExerciseDetails({
+  completeWorkout,
+  canComplete,
+}: {
+  completeWorkout: () => Promise<void>;
+  canComplete: boolean;
+}) {
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
   const [removeModalOpen, setRemoveModalOpen] = useState(false);
+  const [finishModalOpen, setFinishModalOpen] = useState(false);
+
   const { currentExerciseId, exercises, setWorkoutData } = useWorkout();
 
   const currentExercise = exercises.find((e) => e.id === currentExerciseId);
@@ -117,6 +125,11 @@ export default function ExerciseDetails() {
             <DropdownMenuItem onClick={() => setRemoveModalOpen(true)}>
               Remove
             </DropdownMenuItem>
+            {canComplete && (
+              <DropdownMenuItem onClick={() => setFinishModalOpen(true)}>
+                Finish Workout
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
         <Dialog
@@ -136,6 +149,25 @@ export default function ExerciseDetails() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <Dialog
+          open={finishModalOpen}
+          onOpenChange={(open) => setFinishModalOpen(open)}
+        >
+          <DialogContent onClick={(e) => e.stopPropagation()}>
+            <DialogTitle>Finish workout?</DialogTitle>
+            <DialogDescription>
+              Only completed sets will be saved.
+            </DialogDescription>
+            <DialogFooter>
+              <DialogClose>Cancel</DialogClose>
+              <Button variant="default" onClick={() => completeWorkout()}>
+                Finish
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <ExercisePickerModal
           addedExercises={[currentExercise]}
           isOpen={isExerciseModalOpen}
