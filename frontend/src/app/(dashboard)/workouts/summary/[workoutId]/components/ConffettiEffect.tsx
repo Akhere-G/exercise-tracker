@@ -8,11 +8,5 @@ export default function ConffettiEffect() {
   useEffect(() => {
     setTimeout(() => setShow(false), 1500);
   }, []);
-  return (
-    <ReactConfetti
-      numberOfPieces={show ? 300 : 0}
-      width={window.innerWidth}
-      height={window.innerHeight}
-    />
-  );
+  return <ReactConfetti numberOfPieces={show ? 300 : 0} />;
 }

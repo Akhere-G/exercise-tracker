@@ -51,15 +51,13 @@ export default function WorkoutClientProvider({
     }
   }, [routine, setWorkoutData]);
 
-
-
   async function completeWorkout() {
     const completedAt = new Date();
     const workout: WorkoutSchema = {
       completedAt,
       duration: completedAt.getMilliseconds() - startedAt!.getMilliseconds(),
       routineId: routine?.id,
-      sets: exercises.flatMap((e) => e.sets),
+      sets: exercises.flatMap((e) => e.sets).filter((s) => s.isCompleted),
     };
     try {
       const response = await createWorkout(workout);
@@ -79,7 +77,12 @@ export default function WorkoutClientProvider({
         <Toaster position="top-right" richColors closeButton />
 
         <ExerciseList />
-        <ExerciseDetails />
+        <ExerciseDetails
+          completeWorkout={completeWorkout}
+          canComplete={exercises
+            .flatMap((e) => e.sets)
+            .some((s) => s.isCompleted)}
+        />
         <SetList routine={routine} />
       </div>
       <RestTimeTracker />
