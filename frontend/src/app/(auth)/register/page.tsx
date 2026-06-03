@@ -13,7 +13,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { registerAction } from "../../../features/auth/api";
+import { registerAction } from "../../../features/auth/actions";
 
 export default function Register() {
   const [errorMessages, setErrorMessage] = useState<Record<string, string>>({

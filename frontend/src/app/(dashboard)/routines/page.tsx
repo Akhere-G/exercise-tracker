@@ -1,4 +1,4 @@
-import { getAllRoutines } from "@/src/features/routines/api";
+import { getAllRoutines } from "@/src/features/routines/queries";
 import RoutineCard from "./components/RoutineCard";
 import Link from "next/link";
 import StoredWorkout from "./components/StoredWorkout";
