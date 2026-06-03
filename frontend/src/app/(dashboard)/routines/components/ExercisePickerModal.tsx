@@ -121,7 +121,6 @@ export function ExercisePickerModal({
 
   useEffect(() => {
     function getFormattedExercises() {
-      console.log("e", exercises);
       setFormattedExercises(
         exercises.map((e) => ({
           ...e,

@@ -1,7 +1,8 @@
-from pydantic import BaseModel, model_validator
+from pydantic import model_validator
 from typing import Optional, List
 from datetime import datetime
 from .exercise import Exercise
+from .base import BaseModel
 
 
 class WorkoutSetBase(BaseModel):

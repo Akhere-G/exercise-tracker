@@ -1,7 +1,7 @@
 "use server";
 
 import { LoginSchema, RegisterSchema, Token } from "@/src/features/auth/schema";
-import { ActionResponse } from "@/src/lib/apiUtils";
+import { ActionResponse } from "@/src/lib/apiTypes";
 import { api } from "@/src/lib/axios";
 import { isAxiosError } from "axios";
 import { cookies } from "next/headers";

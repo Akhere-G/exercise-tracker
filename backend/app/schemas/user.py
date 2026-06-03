@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr, ConfigDict, Field, field_validator
+from pydantic import EmailStr, ConfigDict, Field, field_validator
 import re
+from .base import BaseModel
 
 
 class UserBase(BaseModel):

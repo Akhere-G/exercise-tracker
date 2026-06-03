@@ -1,5 +1,5 @@
 import { api } from "@/src/lib/axios";
-import { ActionResponse, keysToCamel } from "@/src/lib/apiUtils";
+import { ActionResponse } from "@/src/lib/apiTypes";
 import { Workout, WorkoutStats } from "./types";
 import { isAxiosError } from "axios";
 
@@ -8,7 +8,7 @@ export const getWorkout = async (
 ): Promise<ActionResponse<Workout>> => {
   try {
     const response = await api.get<Workout>(`/workouts/${workoutId}`);
-    return { success: true, data: keysToCamel(response.data) };
+    return { success: true, data: response.data };
   } catch (err) {
     if (isAxiosError(err)) {
       return {
@@ -33,7 +33,7 @@ export const getWorkouts = async (
     }
 
     const response = await api.get<Workout[]>(url);
-    return { success: true, data: keysToCamel(response.data) };
+    return { success: true, data: response.data };
   } catch (err) {
     if (isAxiosError(err)) {
       return {
@@ -58,7 +58,7 @@ export const getWorkoutStats = async (
     }
     const response = await api.get<WorkoutStats>(url);
 
-    return { success: true, data: keysToCamel(response.data) };
+    return { success: true, data: response.data };
   } catch (err) {
     if (isAxiosError(err)) {
       return {

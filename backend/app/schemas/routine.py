@@ -1,7 +1,8 @@
 from datetime import time
 from typing import List, Optional
-from pydantic import BaseModel, model_validator
+from pydantic import model_validator
 from .exercise import Exercise
+from .base import BaseModel
 
 
 class RoutineItemCreate(BaseModel):

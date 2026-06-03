@@ -1,5 +1,6 @@
-from pydantic import BaseModel, field_validator
+from pydantic import field_validator
 from typing import List
+from .base import BaseModel
 
 
 class Muscle(BaseModel):
