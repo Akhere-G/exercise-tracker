@@ -18,18 +18,18 @@ router = APIRouter(prefix="/api/workouts", tags=["Workout"])
 def get_workouts_stats(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Annotated[Session, Depends(get_db)],
-    routine_id: Optional[int] = None,
+    routineId: Optional[int] = None,
 ):
-    return workout_service.get_stats(db, user.id, routine_id)
+    return workout_service.get_stats(db, user.id, routineId)
 
 
 @router.get("", response_model=List[Workout])
 def get_workouts(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Annotated[Session, Depends(get_db)],
-    routine_id: Optional[int] = None,
+    routineId: Optional[int] = None,
 ):
-    return workout_service.get_workouts(db, user.id, routine_id)
+    return workout_service.get_workouts(db, user.id, routineId)
 
 
 @router.get("/{workout_id}", response_model=Workout)
