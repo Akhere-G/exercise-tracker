@@ -60,6 +60,7 @@ export default function WorkoutClientProvider({
 
       setWorkoutData({
         routineId: routine.id,
+        routineName: routine.name,
         currentExerciseId: routine.routineItems[0].exerciseId,
         exercises,
         startedAt: new Date(),

@@ -190,7 +190,7 @@ export default function ExerciseDetails({
             <DialogDescription>All sets will be deleted.</DialogDescription>
             <DialogFooter>
               <DialogClose>Continue workout</DialogClose>
-              <Button variant="default" onClick={cancelWorkout}>
+              <Button variant="destructive" onClick={cancelWorkout}>
                 Cancel Workout
               </Button>
             </DialogFooter>
