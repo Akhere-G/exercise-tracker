@@ -19,7 +19,7 @@ def get_stats(db: Session, user_id: int, routine_id: Optional[int] = None):
     workout_count = len(workouts)
 
     if workout_count == 0:
-        return {"workout_count": 0, "weekly_streak": 0}
+        return {"workoutCount": 0, "weeklyStreak": 0}
 
     active_weeks = {
         w.completed_at.isocalendar()[:2] for w in workouts if w.completed_at
@@ -34,13 +34,13 @@ def get_stats(db: Session, user_id: int, routine_id: Optional[int] = None):
     else:
         check_date = current_date - timedelta(weeks=1)
         if check_date.isocalendar()[:2] not in active_weeks:
-            return {"workout_count": workout_count, "weekly_streak": 0}
+            return {"workoutCount": workout_count, "weeklyStreak": 0}
 
     while check_date.isocalendar()[:2] in active_weeks:
         streak += 1
         check_date -= timedelta(weeks=1)
 
-    return {"workout_count": workout_count, "weekly_streak": streak}
+    return {"workoutCount": workout_count, "weeklyStreak": streak}
 
 
 def get_workout(db: Session, user_id: int, workout_id: int):

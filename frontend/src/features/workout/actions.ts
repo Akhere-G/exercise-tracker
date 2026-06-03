@@ -1,7 +1,7 @@
 "use server";
 import { api } from "@/src/lib/axios";
 import { WorkoutSchema } from "./schema";
-import { ActionResponse, keysToCamel, keysToSnake } from "@/src/lib/apiUtils";
+import { ActionResponse } from "@/src/lib/apiTypes";
 import { Workout } from "./types";
 import { isAxiosError } from "axios";
 
@@ -17,11 +17,8 @@ export const createWorkout = async (
       })),
     };
 
-    const repsonse = await api.post<Workout>(
-      "/workouts",
-      keysToSnake(formattedWorkout),
-    );
-    return { success: true, data: keysToCamel(repsonse.data) };
+    const repsonse = await api.post<Workout>("/workouts", formattedWorkout);
+    return { success: true, data: repsonse.data };
   } catch (err) {
     if (isAxiosError(err)) {
       // const error = getValidationErrors(err.reponse?.data?.detail);

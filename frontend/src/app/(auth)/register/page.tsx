@@ -43,7 +43,6 @@ export default function Register() {
       const response = await registerAction(formattedData);
 
       if (!response.success) {
-        console.log(response.error);
       } else {
         router.push("/routines");
       }

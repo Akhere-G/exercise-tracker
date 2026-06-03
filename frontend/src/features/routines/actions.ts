@@ -1,7 +1,7 @@
 "use server";
 import { api } from "@/src/lib/axios";
 import type { Routine } from "./types";
-import { ActionResponse, keysToCamel, keysToSnake } from "@/src/lib/apiUtils";
+import { ActionResponse } from "@/src/lib/apiTypes";
 import { RoutineSchema } from "./schema";
 import { isAxiosError } from "axios";
 
@@ -18,12 +18,9 @@ export const createRoutine = async (
           : undefined,
       })),
     };
-    const response = await api.post<Routine>(
-      "/routines",
-      keysToSnake(formattedRoutine),
-    );
+    const response = await api.post<Routine>("/routines", formattedRoutine);
 
-    return { success: true, data: keysToCamel(response.data) };
+    return { success: true, data: response.data };
   } catch (err) {
     if (isAxiosError(err)) {
       return {
@@ -57,10 +54,10 @@ export const editRoutine = async (
 
     const response = await api.patch<Routine>(
       `/routines/${routineId}`,
-      keysToSnake(cleanedRoutine),
+      cleanedRoutine,
     );
 
-    return { success: true, data: keysToCamel(response.data) };
+    return { success: true, data: response.data };
   } catch (err) {
     if (isAxiosError(err)) {
       return {

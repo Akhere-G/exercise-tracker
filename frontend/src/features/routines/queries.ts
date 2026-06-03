@@ -1,12 +1,12 @@
 import { api } from "@/src/lib/axios";
 import type { Routine } from "./types";
-import { ActionResponse, keysToCamel } from "@/src/lib/apiUtils";
+import { ActionResponse } from "@/src/lib/apiTypes";
 import { isAxiosError } from "axios";
 
 export const getAllRoutines = async (): Promise<ActionResponse<Routine[]>> => {
   try {
     const response = await api.get<Routine[]>("/routines");
-    return { success: true, data: keysToCamel(response.data) };
+    return { success: true, data: response.data };
   } catch (err) {
     if (isAxiosError(err)) {
       return {
@@ -26,7 +26,7 @@ export const getRoutineById = async (
 ): Promise<ActionResponse<Routine>> => {
   try {
     const response = await api.get<Routine>(`/routines/${id}`);
-    return { success: true, data: keysToCamel(response.data) };
+    return { success: true, data: response.data };
   } catch (err) {
     if (isAxiosError(err)) {
       return {

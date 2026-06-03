@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 import { Routine } from "@/src/features/routines/types";
 import { toast } from "sonner";
 import { Toaster } from "@/src/components/ui/sonner";
-import { ActionResponse } from "@/src/lib/apiUtils";
+import { ActionResponse } from "@/src/lib/apiTypes";
 
 export default function RoutineForm({
   submitAction,
@@ -75,12 +75,11 @@ export default function RoutineForm({
       if (response.success) {
         router.push("/routines");
       } else {
-        console.log("in sumbit", response.error);
-        // setErrorMessages(response.);
+        // TODO: setErrorMessages(response.);
         toast.error(response.error);
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
     }
   };
 
@@ -107,7 +106,6 @@ export default function RoutineForm({
     (r) => r.exercise,
   ) as Exercise[];
 
-  console.log(errorMessages);
   return (
     <>
       <form className="form" onSubmit={handleSubmit(onSubmit)}>

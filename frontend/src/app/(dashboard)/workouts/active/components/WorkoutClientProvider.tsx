@@ -72,7 +72,7 @@ export default function WorkoutClientProvider({
     const completedAt = new Date();
     const workout: WorkoutSchema = {
       completedAt,
-      duration: completedAt.getMilliseconds() - startedAt!.getMilliseconds(),
+      duration: completedAt.getTime() - new Date(startedAt!).getTime(),
       routineId: routine?.id,
       sets: exercises.flatMap((e) => e.sets).filter((s) => s.isCompleted),
     };
