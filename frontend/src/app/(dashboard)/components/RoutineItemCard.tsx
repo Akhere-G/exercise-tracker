@@ -4,9 +4,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/components/card";
-import { ExerciseImage } from "../workouts/components/ExerciseImage";
 import { RoutineItem } from "@/src/features/routines/types";
 import { Dot } from "lucide-react";
+import Image from "next/image";
 
 export default function RoutineItemCard({
   routineItem,
@@ -21,9 +21,16 @@ export default function RoutineItemCard({
     : null;
 
   return (
-    <Card>
-      <CardHeader className="flex gap-2">
-        <ExerciseImage exercise={exercise} />
+    <Card className="pt-0">
+      <div className="relative w-full h-24 bg-white">
+        <Image
+          src={`https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/refs/heads/main/${exercise.imageUrl}`}
+          alt={exercise.name}
+          fill
+          className="object-scale-down"
+        />
+      </div>
+      <CardHeader className="flex gap-2 flex-wrap">
         <div className="">
           <CardTitle>{exercise.name}</CardTitle>
           <CardDescription className="flex items-center flex-wrap text-muted-foreground capitalize gap-0.5 mb-2">
