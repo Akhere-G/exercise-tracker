@@ -1,4 +1,4 @@
-from pydantic import EmailStr, ConfigDict, Field, field_validator
+from pydantic import EmailStr, ConfigDict, Field, field_validator, BaseModel as Base
 import re
 from .base import BaseModel
 
@@ -38,6 +38,6 @@ class UserLogin(BaseModel):
     password: str
 
 
-class Token(BaseModel):
+class Token(Base):
     access_token: str
     token_type: str
