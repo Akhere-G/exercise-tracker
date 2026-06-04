@@ -105,7 +105,7 @@ export default function WorkoutClientProvider({
       <RestTimeTracker />
 
       <div
-        className={`fixed left-0 w-full px-4 transition-all duration-300 ${isWorkoutCompleted(exercises) ? "bottom-8 opacity-100" : "-bottom-full opacity-0"}`}
+        className={`fixed left-0 w-full px-4 transition-all duration-300 ${isWorkoutCompleted(exercises) ? "bottom-32 opacity-100" : "-bottom-full opacity-0"}`}
       >
         <Button onClick={completeWorkout} className="w-full shadow-2xl">
           Complete Workout
