@@ -61,7 +61,7 @@ export default function StoredWorkout() {
 
   return (
     routineName && (
-      <div className="sticky bottom-4">
+      <div className="sticky bottom-12">
         <div
           className=" "
           onClick={() => router.push(`/workouts/active?routineId=${routineId}`)}
