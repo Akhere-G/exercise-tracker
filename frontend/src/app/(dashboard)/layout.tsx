@@ -37,10 +37,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
+        <div className="min-h-[90vh]">{children}</div>
 
-        <div className="sticky bottom-0 w-screen">
-          <NavigationMenu className="bg-secondary/95 w-screen  ">
+        <div className="sticky bottom-0 w-screen ">
+          <NavigationMenu className="bg-secondary/95 w-screen h-[10vh] ">
             <NavigationMenuList className="gap-8 w-screen">
               <NavigationMenuItem>
                 <NavigationMenuLink>
