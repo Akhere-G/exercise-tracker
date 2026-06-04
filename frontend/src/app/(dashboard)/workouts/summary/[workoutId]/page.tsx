@@ -6,7 +6,7 @@ import {
   getTotalVolume,
   mapToTargetMuscle,
 } from "@/src/features/workout/utils";
-import { Flame, Timer, Weight } from "lucide-react";
+import { BicepsFlexed, Flame, Timer, Weight } from "lucide-react";
 import { ExtendedBodyPart, Slug } from "react-muscle-highlighter";
 import BodyChart from "./components/BodyChart";
 import { Exercise } from "@/src/features/workout/store";
@@ -35,7 +35,7 @@ export default async function WorkoutSummary({
 
   workout?.sets.forEach((s) => {
     s.exercise.muscles.forEach((m) => {
-      const contribution = m.contributionType === "primary" ? 2 : 1;
+      const contribution = m.contributionType === "primary" ? 5 : 3;
       const name = mapToTargetMuscle(m.name);
       if (name) {
         muscles[name] = (muscles[name] ?? 0) + contribution;
@@ -58,16 +58,20 @@ export default async function WorkoutSummary({
 
   const exercisesList = Object.values(exercises);
 
+  const completedDate = new Date(workout!.completedAt).toDateString();
   return (
     <div className="flex justify-center w-screen">
       <div className="container">
-        <h2 className="text-2xl">Workout Complete</h2>
-        <span className="text-center block w-full text-2xl p-16">
-          {stats?.workoutCount}
-          {getOrdinalSuffix(stats?.workoutCount ?? -1)} workout
-        </span>
-
-        <div className="flex gap-4">
+        <h2 className="text-2xl mb-4">
+          {first ? "Workout Complete" : completedDate}
+        </h2>
+        {first && (
+          <span className="text-center block w-full text-2xl p-12 pt-8">
+            {stats?.workoutCount}
+            {getOrdinalSuffix(stats?.workoutCount ?? -1)} workout
+          </span>
+        )}
+        <div className="flex gap-4 flex-wrap">
           <ExerciseStat
             Icon={Weight}
             title={getTotalVolume(exercisesList) + " kg"}

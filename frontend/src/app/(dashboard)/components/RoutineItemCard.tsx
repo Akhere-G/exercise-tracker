@@ -6,6 +6,7 @@ import {
 } from "@/src/components/card";
 import { ExerciseImage } from "../workouts/components/ExerciseImage";
 import { RoutineItem } from "@/src/features/routines/types";
+import { Dot } from "lucide-react";
 
 export default function RoutineItemCard({
   routineItem,
@@ -14,6 +15,7 @@ export default function RoutineItemCard({
 }) {
   const { exercise, targetSets, targetReps, targetDurationSecs } = routineItem;
 
+  const { equipment, muscles } = exercise;
   const duration = targetDurationSecs
     ? Math.ceil(targetDurationSecs / 60)
     : null;
@@ -24,8 +26,15 @@ export default function RoutineItemCard({
         <ExerciseImage exercise={exercise} />
         <div className="">
           <CardTitle>{exercise.name}</CardTitle>
+          <CardDescription className="flex items-center flex-wrap text-muted-foreground capitalize gap-0.5 mb-2">
+            <span>{equipment}</span>
+            <Dot className="w-3 h-3 opacity-60 shrink-0" />
+            <span className="truncate">
+              {muscles.map((m) => m.name).join(", ")}
+            </span>
+          </CardDescription>
           <CardDescription>
-            <p className="flex gap-2  items-center">
+            <p className="flex gap-2 items-center font-bold brightness-110">
               {targetSets} set{targetSets === 1 ? "" : "s"}
               {targetReps && (
                 <span>

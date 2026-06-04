@@ -8,7 +8,7 @@ import {
 import { RoutineItem } from "../routines/types";
 import { WorkoutSetSchema } from "./schema";
 import { ActiveSet, Exercise } from "./store";
-import { Workout } from "./types";
+import { Workout, WorkoutSet } from "./types";
 
 const DEFAULT_TOTAL_SETS = 3;
 const DEFAULT_REPS = 10;
@@ -146,14 +146,26 @@ export function getGreyShadeCSS(intensity: number): string {
   const MAX_INTENSITY = 12;
   const clamped = Math.max(0, Math.min(MAX_INTENSITY, intensity));
 
-  const minLightness = 20;
-  const maxLightness = 95;
+  const minLightness = 40;
+  const maxLightness = 100;
 
   const lightness =
-    minLightness + (clamped / MAX_INTENSITY) * (maxLightness - minLightness);
+    maxLightness + (clamped / MAX_INTENSITY) * (minLightness - maxLightness);
 
-  return `hsl(0, 0%, ${Math.round(lightness)}%)`;
+  return `hsl(0, 100%, ${Math.round(lightness)}%)`;
 }
+
+export const getSetVolume = (exercise: Exercise, set: WorkoutSetSchema) => {
+  if (isDurationExercise(exercise)) {
+    return getTime(set.durationSecs!) + " mins";
+  }
+
+  if (isWeightsExercise(exercise)) {
+    return `${set.reps!} x ${set.weight} kg`;
+  }
+
+  return set.reps! + " reps";
+};
 
 export const getVolume = (exercise: Exercise) => {
   if (isDurationExercise(exercise)) {
@@ -202,7 +214,6 @@ export const getTime = (totalSecs: number) => {
 };
 
 export function getTotalTime(workouts: Workout[]) {
-  workouts.forEach((w) => console.log(w.duration));
   const totalSecs = workouts.reduce((prev, curr) => prev + curr.duration, 0);
   return Math.ceil(totalSecs / 60);
 }
