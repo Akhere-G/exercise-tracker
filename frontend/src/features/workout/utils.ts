@@ -222,12 +222,44 @@ export function getTotalWorkoutsVolume(workouts: Workout[]) {
   let volume = 0;
 
   for (const workout of workouts) {
-    for (const set of workout.sets) {
-      if (isWeightsExercise(set.exercise)) {
-        volume += set.weight! * set.reps!;
-      }
+    volume += getWorkoutVolume(workout);
+  }
+
+  return volume;
+}
+
+export function getWorkoutVolume(workout: Workout) {
+  let volume = 0;
+
+  for (const set of workout.sets) {
+    if (isWeightsExercise(set.exercise)) {
+      volume += set.weight! * set.reps!;
     }
   }
 
   return volume;
+}
+
+export function getWorkoutDuration(workout: Workout) {
+  let duration = 0;
+
+  for (const set of workout.sets) {
+    if (isDurationExercise(set.exercise)) {
+      duration += set.durationSecs!;
+    }
+  }
+
+  return duration;
+}
+
+export function getWorkoutReps(workout: Workout) {
+  let reps = 0;
+
+  for (const set of workout.sets) {
+    if (isRepsExercise(set.exercise)) {
+      reps += set.reps!;
+    }
+  }
+
+  return reps;
 }
