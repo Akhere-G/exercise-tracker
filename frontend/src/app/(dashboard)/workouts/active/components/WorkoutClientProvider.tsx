@@ -80,6 +80,7 @@ export default function WorkoutClientProvider({
       const response = await createWorkout(workout);
       if (response.success) {
         const newWorkout = response.data;
+        localStorage.removeItem(workoutStorageKey);
         router.push(`/workouts/summary/${newWorkout.id}?first=true`);
       } else {
         toast.error(response.error);
