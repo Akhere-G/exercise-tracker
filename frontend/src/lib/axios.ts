@@ -1,6 +1,9 @@
 import axios from "axios";
 
-const baseURL = process.env.NEXT_PUBLIC_BASE_URL || process.env.BASE_URL;
+const baseURL =
+  process.env.NEXT_PUBLIC_BASE_URL ||
+  process.env.BASE_URL ||
+  "https://exercise-tracker-backend-752853711822.europe-west2.run.app/api";
 
 export const api = axios.create({
   withCredentials: true,
