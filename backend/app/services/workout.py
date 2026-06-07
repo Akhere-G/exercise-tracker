@@ -1,13 +1,23 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import select
-from app.models import Workout, WorkoutSet, Routine
+from app.models import Workout, WorkoutSet, Routine, Exercise, ExerciseMuscle
 from typing import Optional
 from app.schemas.workout import WorkoutCreate, WorkoutUpdate
 from datetime import datetime, timedelta
 
 
 def get_workouts(db: Session, user_id: int, routine_id: Optional[int] = None):
-    stmt = select(Workout).join(Routine).where(Routine.user_id == user_id)
+    stmt = (
+        select(Workout)
+        .options(
+            selectinload(Workout.sets)
+            .selectinload(WorkoutSet.exercise)
+            .selectinload(Exercise.muscles)
+            .selectinload(ExerciseMuscle.muscle)
+        )
+        .join(Routine)
+        .where(Routine.user_id == user_id)
+    )
     if routine_id:
         stmt = stmt.where(Workout.routine_id == routine_id)
 
@@ -46,6 +56,12 @@ def get_stats(db: Session, user_id: int, routine_id: Optional[int] = None):
 def get_workout(db: Session, user_id: int, workout_id: int):
     stmt = (
         select(Workout)
+        .options(
+            selectinload(Workout.sets)
+            .selectinload(WorkoutSet.exercise)
+            .selectinload(Exercise.muscles)
+            .selectinload(ExerciseMuscle.muscle)
+        )
         .join(Routine)
         .where(Routine.user_id == user_id)
         .where(Workout.id == workout_id)
