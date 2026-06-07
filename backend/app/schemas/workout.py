@@ -39,7 +39,7 @@ class WorkoutSetWithDate(WorkoutSet):
 
 
 class WorkoutBase(BaseModel):
-    routine_id: int
+    routine_id: Optional[int] = None
     completed_at: datetime
     duration: int
 
@@ -56,4 +56,5 @@ class WorkoutUpdate(BaseModel):
 
 class Workout(WorkoutBase):
     id: int
+    user_id: int
     sets: List[WorkoutSet] = []

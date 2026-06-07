@@ -15,8 +15,7 @@ def get_workouts(db: Session, user_id: int, routine_id: Optional[int] = None):
             .selectinload(Exercise.muscles)
             .selectinload(ExerciseMuscle.muscle)
         )
-        .join(Routine)
-        .where(Routine.user_id == user_id)
+        .where(Workout.user_id == user_id)
     )
     if routine_id:
         stmt = stmt.where(Workout.routine_id == routine_id)
@@ -62,20 +61,20 @@ def get_workout(db: Session, user_id: int, workout_id: int):
             .selectinload(Exercise.muscles)
             .selectinload(ExerciseMuscle.muscle)
         )
-        .join(Routine)
-        .where(Routine.user_id == user_id)
+        .where(Workout.user_id == user_id)
         .where(Workout.id == workout_id)
     )
 
     return db.execute(stmt).scalar_one_or_none()
 
 
-def create_workout(db: Session, workout_in: WorkoutCreate):
+def create_workout(db: Session, user_id: int, workout_in: WorkoutCreate):
     try:
         new_workout = Workout(
             routine_id=workout_in.routine_id,
             completed_at=workout_in.completed_at,
             duration=workout_in.duration,
+            user_id=user_id,
         )
         db.add(new_workout)
         db.flush()
