@@ -14,11 +14,14 @@ import ExerciseInstructions from "./ExerciseInstructions";
 import ExerciseHistory from "./ExerciseHistory";
 import ExerciseStats from "./ExerciseStats";
 import { useRouter } from "next/navigation";
+import { workoutSetWithDate } from "@/src/features/workout/types";
 
 export default function ExerciseDetails({
   exercise,
+  workoutSets,
 }: {
   exercise: Exercise | null;
+  workoutSets: workoutSetWithDate[] | null;
 }) {
   const [isOpen, setIsOpen] = useState(true);
   const router = useRouter();
@@ -32,8 +35,8 @@ export default function ExerciseDetails({
         }}
       >
         <DrawerContent className="border-secondary">
-          {exercise ? (
-            <ExerciseDetail exercise={exercise} />
+          {exercise && workoutSets ? (
+            <ExerciseDetail exercise={exercise} workoutSets={workoutSets} />
           ) : (
             <div className="container">
               <p>Not Found</p>
@@ -45,7 +48,13 @@ export default function ExerciseDetails({
   );
 }
 
-function ExerciseDetail({ exercise }: { exercise: Exercise }) {
+function ExerciseDetail({
+  exercise,
+  workoutSets,
+}: {
+  exercise: Exercise;
+  workoutSets: workoutSetWithDate[];
+}) {
   const { videoUrl, name, equipment, muscles, metrics } = exercise;
 
   const tabClasses = `data-[state=active]:text-primary data-[state=active]:border-primary hover:text-primary!  bg-transparent! border-0 border-b-2 rounded-none
@@ -94,7 +103,7 @@ function ExerciseDetail({ exercise }: { exercise: Exercise }) {
               <ExerciseInstructions exercise={exercise} />
             </TabsContent>
             <TabsContent value="history">
-              <ExerciseHistory exercise={exercise} />
+              <ExerciseHistory exercise={exercise} workoutSets={workoutSets} />
             </TabsContent>
             <TabsContent value="stats">
               <ExerciseStats exercise={exercise} />
