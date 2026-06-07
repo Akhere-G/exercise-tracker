@@ -13,13 +13,13 @@ import {
 } from "@/src/features/exercises/utils";
 import ExerciseStat from "../../../components/ExerciseStat";
 import { BicepsFlexed, Tally5, Timer } from "lucide-react";
+import ZoneBar from "../../../components/ZoneBar";
 
 export default function ExerciseStats({
   exercise,
   groupedSets,
 }: {
   exercise: Exercise;
-
   groupedSets: Record<string, workoutSetWithDate[]>;
 }) {
   const sets = Object.values(groupedSets).flat();
@@ -30,9 +30,23 @@ export default function ExerciseStats({
   }));
 
   const weightData = Object.keys(groupedSets).map((date) => ({
-    y: Math.max(...groupedSets[date].map((s) => s.weight!)),
+    y: Math.max(...groupedSets[date].map((s) => s.weight || 0)),
     x: date,
   }));
+
+  // Epley Formula for Estimated 1RM: Weight * (1 + Reps / 30)
+  const e1rmData = Object.keys(groupedSets).map((date) => {
+    const max1rm = Math.max(
+      ...groupedSets[date].map(
+        (s) => (s.weight || 0) * (1 + (s.reps || 0) / 30),
+      ),
+    );
+    return {
+      y: Math.round(max1rm),
+      x: date,
+    };
+  });
+
   const durationData = Object.keys(groupedSets).map((date) => ({
     y: getWorkoutDuration(groupedSets[date]),
     x: date,
@@ -43,13 +57,24 @@ export default function ExerciseStats({
     x: date,
   }));
 
-  const maxWeight = Math.max(...sets.map((s) => s.weight!));
+  const maxWeight = Math.max(...sets.map((s) => s.weight || 0));
   const maxDuration = Math.max(...durationData.map((d) => d.y));
   const maxReps = Math.max(...repsData.map((d) => d.y));
 
+  const totalWeightSets = sets.filter(
+    (s) => s.weight !== undefined && s.reps,
+  ).length;
+  const strengthSets = sets.filter(
+    (s) => (s.reps || 0) > 0 && (s.reps || 0) <= 5,
+  ).length;
+  const hypertrophySets = sets.filter(
+    (s) => (s.reps || 0) >= 6 && (s.reps || 0) <= 12,
+  ).length;
+  const enduranceSets = sets.filter((s) => (s.reps || 0) >= 13).length;
+
   return (
     <div className="container">
-      <div className="flex flex-wrap gap-4 mb-4">
+      <div className="flex flex-wrap gap-4 mb-6">
         {isWeightsExercise(exercise) && (
           <ExerciseStat
             Icon={BicepsFlexed}
@@ -68,18 +93,44 @@ export default function ExerciseStats({
           <ExerciseStat Icon={Tally5} title={maxReps} subtitle="Max Reps" />
         )}
       </div>
-      <div className="flex flex-col gap-2">
+
+      <div className="flex flex-col gap-6">
         {isWeightsExercise(exercise) && (
-          <ProgressChart data={volumeData} title="Volume" />
+          <>
+            <ProgressChart data={e1rmData} title="Estimated 1RM (kg)" />
+            <ProgressChart data={weightData} title="Peak Load (kg)" />
+            <ProgressChart data={volumeData} title="Total Volume" />
+
+            {totalWeightSets > 0 && (
+              <div className="bg-card border border-border p-4 rounded-xl shadow-sm">
+                <h2 className="text-xl mb-4 font-semibold">Repetition Zones</h2>
+                <div className="flex flex-col gap-3">
+                  <ZoneBar
+                    label="Strength (1-5)"
+                    count={strengthSets}
+                    total={totalWeightSets}
+                  />
+                  <ZoneBar
+                    label="Hypertrophy (6-12)"
+                    count={hypertrophySets}
+                    total={totalWeightSets}
+                  />
+                  <ZoneBar
+                    label="Endurance (13+)"
+                    count={enduranceSets}
+                    total={totalWeightSets}
+                  />
+                </div>
+              </div>
+            )}
+          </>
         )}
-        {isWeightsExercise(exercise) && (
-          <ProgressChart data={weightData} title="Max Weight" />
-        )}
-        {isRepsExercise(exercise) && (
+
+        {isRepsExercise(exercise) && !isWeightsExercise(exercise) && (
           <ProgressChart data={repsData} title="Reps" />
         )}
         {isDurationExercise(exercise) && (
-          <ProgressChart data={durationData} title="Duration (Cardio)" />
+          <ProgressChart data={durationData} title="Duration (Mins)" />
         )}
       </div>
     </div>

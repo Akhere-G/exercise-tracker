@@ -1,4 +1,4 @@
-import { Line, LineChart, XAxis, YAxis } from "recharts";
+import { Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 
 export default function ProgressChart({
   data,
@@ -34,6 +34,15 @@ export default function ProgressChart({
           dataKey="y"
           width="auto"
           stroke="var(--color-secondary-foreground)"
+        />
+        <Tooltip
+          contentStyle={{
+            backgroundColor: "var(--color-card, #fff)",
+            borderColor: "var(--color-border, #e2e8f0)",
+            borderRadius: "0.5rem",
+          }}
+          itemStyle={{ color: "var(--color-foreground)" }}
+          labelStyle={{ color: "var(--color-muted-foreground)" }}
         />
         <Line type="monotone" dataKey="y" stroke="var(--color-primary)" />
       </LineChart>
