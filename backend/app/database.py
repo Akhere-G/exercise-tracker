@@ -12,7 +12,10 @@ cert_path = os.getenv("DB_CA_CERT_PATH", "/app/certs/ca.pem")
 if DATABASE_URL.startswith("sqlite"):
     engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 else:
-    engine = create_engine(DATABASE_URL, connect_args={"ssl": {"ca": cert_path}})
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"ssl": {"ca": cert_path}},
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

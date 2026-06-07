@@ -21,4 +21,6 @@ RUN chmod +x start.sh
 
 EXPOSE 8080
 
+RUN python -c "import psycopg2; print('Driver found')"
+
 CMD ["./start.sh"]
