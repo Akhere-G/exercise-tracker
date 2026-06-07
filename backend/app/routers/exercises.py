@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from app.services import exercise as exercise_service
 from app.services import user as user_service
 from app.models import User
@@ -22,3 +22,19 @@ def get_exercises(
     limit: int = 10,
 ):
     return exercise_service.get_exercises(db, search, equipment, muscle, page, limit)
+
+
+@router.get("/{exercise_id}", response_model=Exercise)
+def get_exercise(
+    user: Annotated[User, Depends(user_service.get_current_user)],
+    exercise_id: int,
+    db: Session = Depends(get_db),
+):
+    exercise = exercise_service.get_exercise(db, exercise_id)
+
+    if not exercise:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Exercise not found."
+        )
+
+    return exercise
