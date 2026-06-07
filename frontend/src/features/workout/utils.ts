@@ -240,6 +240,7 @@ export function getWorkoutVolume(sets: WorkoutSet[]) {
   return volume;
 }
 
+// in minutes
 export function getWorkoutDuration(sets: WorkoutSet[]) {
   let duration = 0;
 
@@ -249,7 +250,7 @@ export function getWorkoutDuration(sets: WorkoutSet[]) {
     }
   }
 
-  return duration;
+  return duration / 60;
 }
 
 export function getWorkoutReps(sets: WorkoutSet[]) {
