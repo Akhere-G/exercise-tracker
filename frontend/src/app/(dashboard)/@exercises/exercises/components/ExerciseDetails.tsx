@@ -57,6 +57,16 @@ function ExerciseDetail({
 }) {
   const { videoUrl, name, equipment, muscles, metrics } = exercise;
 
+  const groupedSets = workoutSets.reduce(
+    (acc, set) => {
+      const dateKey = new Date(set.completedAt).toDateString();
+      if (!acc[dateKey]) acc[dateKey] = [];
+      acc[dateKey].push(set);
+      return acc;
+    },
+    {} as Record<string, typeof workoutSets>,
+  );
+
   const tabClasses = `data-[state=active]:text-primary data-[state=active]:border-primary hover:text-primary!  bg-transparent! border-0 border-b-2 rounded-none
     transition-colors duration-500`;
 
@@ -103,10 +113,10 @@ function ExerciseDetail({
               <ExerciseInstructions exercise={exercise} />
             </TabsContent>
             <TabsContent value="history">
-              <ExerciseHistory exercise={exercise} workoutSets={workoutSets} />
+              <ExerciseHistory exercise={exercise} groupedSets={groupedSets} />
             </TabsContent>
             <TabsContent value="stats">
-              <ExerciseStats exercise={exercise} />
+              <ExerciseStats exercise={exercise} groupedSets={groupedSets} />
             </TabsContent>
           </div>
         </Tabs>

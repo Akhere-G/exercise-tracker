@@ -11,21 +11,11 @@ import { getSetVolume } from "@/src/features/workout/utils";
 
 export default function ExerciseHistory({
   exercise,
-  workoutSets,
+  groupedSets,
 }: {
   exercise: Exercise;
-  workoutSets: workoutSetWithDate[];
+  groupedSets: Record<string, workoutSetWithDate[]>;
 }) {
-  const groupedSets = workoutSets.reduce(
-    (acc, set) => {
-      const dateKey = new Date(set.completedAt).toDateString();
-      if (!acc[dateKey]) acc[dateKey] = [];
-      acc[dateKey].push(set);
-      return acc;
-    },
-    {} as Record<string, typeof workoutSets>,
-  );
-
   return (
     <div className="flex flex-col gap-2.5">
       {Object.entries(groupedSets).map(([date, sets]) => (
