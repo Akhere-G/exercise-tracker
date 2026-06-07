@@ -19,7 +19,9 @@ export default function StoredWorkout() {
   const [routineName, setRoutineName] = useState<string | null>(null);
   const [routineId, setRoutineId] = useState<number | null>(null);
   const [duration, setDuration] = useState<number | null>(null);
-
+  const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(
+    null,
+  );
   const router = useRouter();
   const { setWorkoutData } = useWorkout();
   useEffect(() => {
@@ -42,10 +44,12 @@ export default function StoredWorkout() {
           );
           setDuration(duration);
 
-          setInterval(
+          const interval = setInterval(
             () => setDuration((prev) => (prev !== null ? prev + 1 : null)),
             1000,
           );
+
+          setTimerInterval(interval);
         }
 
         if (workoutData.state.routineId) {
@@ -57,6 +61,10 @@ export default function StoredWorkout() {
     }
 
     getWorkoutData();
+
+    return () => {
+      if (timerInterval) clearInterval(timerInterval);
+    };
   }, []);
 
   return (

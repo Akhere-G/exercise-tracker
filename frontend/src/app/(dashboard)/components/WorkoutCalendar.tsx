@@ -41,8 +41,6 @@ export default function WorkoutsCalendar({
     {},
   );
 
-  console.log(workouts);
-
   const handlePrevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const handleNextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
 
