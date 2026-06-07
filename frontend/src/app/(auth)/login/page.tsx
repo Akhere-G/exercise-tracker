@@ -29,8 +29,8 @@ export default function Login() {
         email: formState.email.toLowerCase(),
       };
       const response = await loginAction(formattedData);
-      if (response?.error) {
-        setErrorMessage(response.error);
+      if (!response.success) {
+        setErrorMessage(response.error!);
       } else {
         router.push("/routines");
       }
