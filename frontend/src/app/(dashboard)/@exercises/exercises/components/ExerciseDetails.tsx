@@ -1,5 +1,5 @@
 "use client";
-import { Drawer, DrawerContent, DrawerTitle } from "@/src/components/ui/drawer";
+import { Drawer, DrawerContent } from "@/src/components/ui/drawer";
 import {
   Tabs,
   TabsContent,
@@ -13,6 +13,7 @@ import { useState } from "react";
 import ExerciseInstructions from "./ExerciseInstructions";
 import ExerciseHistory from "./ExerciseHistory";
 import ExerciseStats from "./ExerciseStats";
+import { useRouter } from "next/navigation";
 
 export default function ExerciseDetails({
   exercise,
@@ -20,11 +21,17 @@ export default function ExerciseDetails({
   exercise: Exercise | null;
 }) {
   const [isOpen, setIsOpen] = useState(true);
+  const router = useRouter();
   return (
-    <div>
-      <Drawer open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
-        <DrawerTitle>Exercise Details</DrawerTitle>
-        <DrawerContent>
+    <>
+      <Drawer
+        open={isOpen}
+        onOpenChange={(open) => {
+          setIsOpen(open);
+          setTimeout(() => router.back(), 500);
+        }}
+      >
+        <DrawerContent className="border-secondary">
           {exercise ? (
             <ExerciseDetail exercise={exercise} />
           ) : (
@@ -34,30 +41,30 @@ export default function ExerciseDetails({
           )}
         </DrawerContent>
       </Drawer>
-    </div>
+    </>
   );
 }
 
 function ExerciseDetail({ exercise }: { exercise: Exercise }) {
-  const { videoUrl, name, equipment, muscles } = exercise;
+  const { videoUrl, name, equipment, muscles, metrics } = exercise;
 
   const tabClasses = `data-[state=active]:text-primary data-[state=active]:border-primary hover:text-primary!  bg-transparent! border-0 border-b-2 rounded-none
     transition-colors duration-500`;
 
   return (
-    <div className="">
-      <div className="">
-        <div className="relative w-full h-24 bg-white mb-4">
-          <Image
-            src={`https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/refs/heads/main/${videoUrl}`}
-            alt={exercise.name}
-            fill
-            className="object-scale-down"
-          />
-        </div>
+    <div className=" px-4">
+      <div className="relative h-30 bg-white rounded-2xl mx-2">
+        <Image
+          src={`https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/refs/heads/main/${videoUrl}`}
+          alt={exercise.name}
+          fill
+          className="object-scale-down"
+        />
+      </div>
 
-        <div className="container">
-          <h2 className="text-2xl">{name}</h2>
+      <div className="container">
+        <h2 className="text-2xl">{name}</h2>
+        <div className="flex justify-between">
           <p className="flex items-center text-muted-foreground capitalize ">
             <span>{equipment}</span>
             <Dot className="w-3 h-3 opacity-60 shrink-0" />
@@ -65,19 +72,24 @@ function ExerciseDetail({ exercise }: { exercise: Exercise }) {
               {muscles.map((m) => m.name).join(", ")}
             </span>
           </p>
+          <p className="flex items-center text-muted-foreground capitalize ">
+            {metrics}
+          </p>
+        </div>
 
-          <Tabs>
-            <TabsList className="container bg-transparent mx-0">
-              <TabsTrigger value="details" className={tabClasses}>
-                Details
-              </TabsTrigger>
-              <TabsTrigger value="history" className={tabClasses}>
-                History
-              </TabsTrigger>
-              <TabsTrigger value="stats" className={tabClasses}>
-                Stats
-              </TabsTrigger>
-            </TabsList>
+        <Tabs defaultValue="details">
+          <TabsList className="-translate-x-1 bg-transparent mx-0">
+            <TabsTrigger value="details" className={tabClasses}>
+              Details
+            </TabsTrigger>
+            <TabsTrigger value="history" className={tabClasses}>
+              History
+            </TabsTrigger>
+            <TabsTrigger value="stats" className={tabClasses}>
+              Stats
+            </TabsTrigger>
+          </TabsList>
+          <div className="no-scrollbar overflow-y-auto max-h-[40vh]">
             <TabsContent value="details">
               <ExerciseInstructions exercise={exercise} />
             </TabsContent>
@@ -87,8 +99,8 @@ function ExerciseDetail({ exercise }: { exercise: Exercise }) {
             <TabsContent value="stats">
               <ExerciseStats exercise={exercise} />
             </TabsContent>
-          </Tabs>
-        </div>
+          </div>
+        </Tabs>
       </div>
     </div>
   );

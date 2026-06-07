@@ -92,40 +92,42 @@ function WorkoutCard({ workout }: { workout: Workout }) {
 function ExerciseCard({ exercise }: { exercise: Exercise }) {
   const { sets, name, equipment, muscles } = exercise;
   return (
-    <Card className="border border-border flex flex-col h-full transition-all pt-0">
-      <div className="relative w-full h-24 bg-white">
-        <Image
-          src={`https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/refs/heads/main/${exercise.imageUrl}`}
-          alt={exercise.name}
-          fill
-          className="object-scale-down"
-        />
-      </div>
-      <CardHeader className="px-3 pb-2  gap-0.5 flex-1">
-        <CardTitle className="text-sm font-bold  leading-tight">
-          {name}
-        </CardTitle>
-        <CardDescription className="flex items-center flex-wrap text-[11px] text-muted-foreground capitalize gap-0.5">
-          <span>{equipment}</span>
-          <Dot className="w-3 h-3 opacity-60 shrink-0" />
-          <span className="truncate">
-            {muscles.map((m) => m.name).join(", ")}
-          </span>
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="p-3 pt-0 flex flex-col gap-1">
-        {sets.map((set) => (
-          <div
-            className="text-[11px] font-semibold text-foreground bg-muted/50 px-2.5 py-1.5 rounded-lg border border-border/40 flex items-center justify-between"
-            key={set.setIndex}
-          >
-            <span className="text-muted-foreground text-[9px] tracking-wider uppercase">
-              Set {set.setIndex}
+    <Link href={`/exercises/${exercise.id}`} className="no-underline!">
+      <Card className="border border-border flex flex-col h-full transition-all pt-0">
+        <div className="relative w-full h-24 bg-white">
+          <Image
+            src={`https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/refs/heads/main/${exercise.imageUrl}`}
+            alt={exercise.name}
+            fill
+            className="object-scale-down"
+          />
+        </div>
+        <CardHeader className="px-3 pb-2  gap-0.5 flex-1">
+          <CardTitle className="text-sm font-bold  leading-tight">
+            {name}
+          </CardTitle>
+          <CardDescription className="flex items-center flex-wrap text-[11px] text-muted-foreground capitalize gap-0.5">
+            <span>{equipment}</span>
+            <Dot className="w-3 h-3 opacity-60 shrink-0" />
+            <span className="truncate">
+              {muscles.map((m) => m.name).join(", ")}
             </span>
-            <span>{getSetVolume(exercise, set)}</span>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-3 pt-0 flex flex-col gap-1">
+          {sets.map((set) => (
+            <div
+              className="text-[11px] font-semibold text-foreground bg-muted/50 px-2.5 py-1.5 rounded-lg border border-border/40 flex items-center justify-between"
+              key={set.setIndex}
+            >
+              <span className="text-muted-foreground text-[9px] tracking-wider uppercase">
+                Set {set.setIndex}
+              </span>
+              <span>{getSetVolume(exercise, set)}</span>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+    </Link>
   );
 }
