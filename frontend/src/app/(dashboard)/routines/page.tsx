@@ -5,7 +5,7 @@ import StoredWorkout from "./components/StoredWorkout";
 
 export default async function Routines() {
   const response = await getAllRoutines();
-  const routines = response.success ? response.data : null;
+  const routines = response.success ? response.data : [];
 
   return (
     <div className="container flex flex-col gap-4">
