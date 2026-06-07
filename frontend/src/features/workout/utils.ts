@@ -155,7 +155,7 @@ export function getGreyShadeCSS(intensity: number): string {
   return `hsl(0, 100%, ${Math.round(lightness)}%)`;
 }
 
-export const getSetVolume = (exercise: Exercise, set: WorkoutSetSchema) => {
+export const getSetVolume = (exercise: BaseExercise, set: WorkoutSetSchema) => {
   if (isDurationExercise(exercise)) {
     return getTime(set.durationSecs!) + " mins";
   }

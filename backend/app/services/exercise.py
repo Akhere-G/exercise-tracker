@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import select
-from app.models import Exercise, Muscle, ExerciseMuscle
+from app.models import Exercise, Muscle, ExerciseMuscle, Workout, Routine, WorkoutSet
 from typing import Optional
 
 
@@ -39,5 +39,32 @@ def get_exercises(
 
 
 def get_exercise(db: Session, exercise_id: int):
-    stmt = select(Exercise).where(Exercise.id == exercise_id)
+    stmt = (
+        select(Exercise)
+        .options(selectinload(Exercise.muscles).selectinload(ExerciseMuscle.muscle))
+        .where(Exercise.id == exercise_id)
+    )
     return db.execute(stmt).scalar_one_or_none()
+
+
+def get_workouts(db: Session, user_id: int, exercise_id: int):
+    stmt = (
+        select(WorkoutSet, Workout.completed_at)
+        .options(
+            selectinload(WorkoutSet.exercise)
+            .selectinload(Exercise.muscles)
+            .selectinload(ExerciseMuscle.muscle)
+        )
+        .join(Workout)
+        .join(Routine)
+        .where(Routine.user_id == user_id)
+        .where(WorkoutSet.exercise_id == exercise_id)
+    )
+    rows = db.execute(stmt).all()
+
+    workouts = []
+    for workout_set, completed_at in rows:
+        workout_set.completed_at = completed_at
+        workouts.append(workout_set)
+
+    return workouts

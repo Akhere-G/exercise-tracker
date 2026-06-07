@@ -34,6 +34,10 @@ class WorkoutSet(WorkoutSetBase):
     exercise: Exercise
 
 
+class WorkoutSetWithDate(WorkoutSet):
+    completed_at: datetime
+
+
 class WorkoutBase(BaseModel):
     routine_id: int
     completed_at: datetime

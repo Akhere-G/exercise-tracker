@@ -23,3 +23,7 @@ export interface WorkoutStats {
   weeklyStreak: number;
   workoutCount: number;
 }
+
+export interface workoutSetWithDate extends WorkoutSet {
+  completedAt: string;
+}

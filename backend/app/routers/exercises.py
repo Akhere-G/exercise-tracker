@@ -6,6 +6,7 @@ from app.database import get_db
 from sqlalchemy.orm import Session
 from typing import Optional, Annotated
 from app.schemas.exercise import Exercise
+from app.schemas.workout import WorkoutSetWithDate
 from typing import List
 
 router = APIRouter(prefix="/api/exercises", tags=["Exercises"])
@@ -38,3 +39,17 @@ def get_exercise(
         )
 
     return exercise
+
+
+@router.get("/{exercise_id}/workouts", response_model=List[WorkoutSetWithDate])
+def get_exercise_workouts(
+    user: Annotated[User, Depends(user_service.get_current_user)],
+    exercise_id: int,
+    db: Session = Depends(get_db),
+):
+    workouts = exercise_service.get_workouts(db, user.id, exercise_id)
+
+    print(workouts)
+    print(workouts[0])
+
+    return workouts
