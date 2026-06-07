@@ -16,7 +16,7 @@ import { Routine } from "@/src/features/routines/types";
 import { Exercise } from "@/src/features/workout/store";
 import { Workout, WorkoutStats } from "@/src/features/workout/types";
 import { getSetVolume, getTime } from "@/src/features/workout/utils";
-import { Dot } from "lucide-react";
+import { Dot, Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -63,9 +63,10 @@ function WorkoutCard({ workout }: { workout: Workout }) {
               <div className="flex w-full justify-between items-center pr-2">
                 <Link
                   href={`/workouts/summary/${workout.id}`}
-                  className="font-semibold text-secondary-foreground"
+                  className="font-semibold text-secondary-foreground flex gap-2 items-start"
                 >
                   {completeDate}
+                  <Info size={16} />
                 </Link>
                 <span className="text-muted-foreground text-xs bg-muted px-2.5 py-0.5  rounded-full border border-border/40">
                   {timeStr}

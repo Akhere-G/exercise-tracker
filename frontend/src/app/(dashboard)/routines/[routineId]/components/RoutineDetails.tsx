@@ -5,7 +5,7 @@ import {
   getTotalTime,
   getTotalWorkoutsVolume,
 } from "@/src/features/workout/utils";
-import { BicepsFlexed, Dot, Flame, Timer, Weight } from "lucide-react";
+import { BicepsFlexed, Flame, Timer, Weight } from "lucide-react";
 import React from "react";
 import ExerciseStat from "../../../components/ExerciseStat";
 import RoutineItemCard from "../../../components/RoutineItemCard";

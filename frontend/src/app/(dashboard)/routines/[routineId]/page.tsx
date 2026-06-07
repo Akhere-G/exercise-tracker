@@ -29,6 +29,8 @@ export default async function RoutineData({
 
   const stats = statsResponse.success ? statsResponse.data : null;
 
+  const tabClasses = `data-[state=active]:text-primary data-[state=active]:border-primary hover:text-primary!  bg-transparent! border-0 border-b-2 rounded-none
+    transition-colors duration-500`;
   if (!routine || !stats) {
     return (
       <div className="container">
@@ -46,11 +48,19 @@ export default async function RoutineData({
         </p>
       </div>
       <Tabs defaultValue="details">
-        <TabsList className="container bg-transparent mx-0">
-          <TabsTrigger value="details">Details</TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
-          <TabsTrigger value="stats">Stats</TabsTrigger>
-        </TabsList>
+        <div className="container py-0 px-3">
+          <TabsList className="container bg-transparent mx-0">
+            <TabsTrigger value="details" className={tabClasses}>
+              Details
+            </TabsTrigger>
+            <TabsTrigger value="history" className={tabClasses}>
+              History
+            </TabsTrigger>
+            <TabsTrigger value="stats" className={tabClasses}>
+              Stats
+            </TabsTrigger>
+          </TabsList>
+        </div>
         <TabsContent value="details">
           <RoutineDetails routine={routine} workouts={workouts} stats={stats} />
         </TabsContent>

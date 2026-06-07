@@ -36,3 +36,8 @@ def get_exercises(
 
     exercises = db.execute(stmt).scalars().all()
     return exercises
+
+
+def get_exercise(db: Session, exercise_id: int):
+    stmt = select(Exercise).where(Exercise.id == exercise_id)
+    return db.execute(stmt).scalar_one_or_none()

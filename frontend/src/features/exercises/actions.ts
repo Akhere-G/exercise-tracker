@@ -17,7 +17,3 @@ export const getAllExercises = async (
   );
   return response.data;
 };
-export const getExerciseById = async (id: number): Promise<Exercise> => {
-  const response = await api.get<Exercise>(`/exercises/${id}`);
-  return response.data;
-};

@@ -8,22 +8,12 @@ import {
   getWorkoutReps,
   getWorkoutVolume,
 } from "@/src/features/workout/utils";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { LineChart, Line, XAxis, YAxis } from "recharts";
 import ExerciseStat from "../../../components/ExerciseStat";
-import { BicepsFlexed, Tally1, Tally5, Timer } from "lucide-react";
+import { BicepsFlexed, Tally5, Timer } from "lucide-react";
 
 export default function RoutineStats({
-  routine,
   workouts,
-  stats,
 }: {
   routine: Routine;
   workouts: Workout[];

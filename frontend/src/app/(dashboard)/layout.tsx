@@ -28,8 +28,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
+  exercises,
 }: Readonly<{
   children: React.ReactNode;
+  exercises: React.ReactNode;
 }>) {
   return (
     <html
@@ -38,6 +40,8 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <div className="min-h-[90vh]">{children}</div>
+
+        {exercises}
 
         <div className="sticky bottom-0 w-screen ">
           <NavigationMenu className="bg-secondary/95 w-screen h-[10vh] ">
