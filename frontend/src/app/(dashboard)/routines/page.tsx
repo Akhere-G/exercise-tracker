@@ -16,7 +16,7 @@ export default async function Routines() {
             <h3 className="text-center">No routines yet</h3>
           </div>
         ) : (
-          routines?.map((routine) => (
+          routines.map((routine) => (
             <RoutineCard key={routine.id} routine={routine} />
           ))
         )}
