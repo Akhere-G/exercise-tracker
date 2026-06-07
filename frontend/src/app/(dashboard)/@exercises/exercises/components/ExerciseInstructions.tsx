@@ -13,7 +13,11 @@ export default function ExerciseInstructions({
 
   return (
     <div>
-      <p>{instructions}</p>
+      <ol className="list-decimal! pl-4">
+        {instructions.split(". ").map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ol>
 
       <div className="flex justify-center ">
         <BodyChart data={data} side="front" />
