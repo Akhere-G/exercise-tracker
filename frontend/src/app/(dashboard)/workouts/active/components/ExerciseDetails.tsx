@@ -102,7 +102,11 @@ export default function ExerciseDetails({
   if (!currentExercise)
     return (
       <div className="p-8 text-center">
-        <h2>No Exercise selected</h2>
+        <h2 className="mb-4">No Exercise selected</h2>
+
+        <Button variant="destructive" onClick={() => setCancelModalOpen(true)}>
+          Cancel Workout
+        </Button>
       </div>
     );
 

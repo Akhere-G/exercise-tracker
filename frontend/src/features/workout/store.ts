@@ -26,6 +26,7 @@ export interface WorkoutState {
     workoutData: Partial<Omit<WorkoutState, "setWorkoutData" | "addSet">>,
   ) => void;
   addSet: (workoutSet: WorkoutSetSchema) => void;
+  resetState: () => void;
 }
 
 export const useWorkout = create<WorkoutState>()(
@@ -47,6 +48,15 @@ export const useWorkout = create<WorkoutState>()(
               : e,
           ),
         })),
+      resetState: () =>
+        set({
+          routineId: null,
+          routineName: null,
+          startedAt: null,
+          duration: null,
+          exercises: [],
+          currentExerciseId: 0,
+        }),
     }),
     {
       name: workoutStorageKey,

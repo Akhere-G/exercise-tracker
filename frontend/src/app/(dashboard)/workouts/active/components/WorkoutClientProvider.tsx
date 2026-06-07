@@ -29,7 +29,7 @@ export default function WorkoutClientProvider({
 }: {
   routine: Routine | null;
 }) {
-  const { setWorkoutData, exercises, startedAt } = useWorkout();
+  const { setWorkoutData, exercises, startedAt, resetState } = useWorkout();
   const router = useRouter();
 
   useEffect(() => {
@@ -70,9 +70,11 @@ export default function WorkoutClientProvider({
 
   async function completeWorkout() {
     const completedAt = new Date();
+    const durationInMs = completedAt.getTime() - new Date(startedAt!).getTime();
+    const duration = Math.floor(durationInMs / 1000);
     const workout: WorkoutSchema = {
       completedAt,
-      duration: completedAt.getTime() - new Date(startedAt!).getTime(),
+      duration,
       routineId: routine?.id,
       sets: exercises.flatMap((e) => e.sets).filter((s) => s.isCompleted),
     };
@@ -80,6 +82,7 @@ export default function WorkoutClientProvider({
       const response = await createWorkout(workout);
       if (response.success) {
         const newWorkout = response.data;
+        resetState();
         localStorage.removeItem(workoutStorageKey);
         router.push(`/workouts/summary/${newWorkout.id}?first=true`);
       } else {
