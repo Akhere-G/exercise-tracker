@@ -52,14 +52,15 @@ def create_workout(
     db: Annotated[Session, Depends(get_db)],
     workout_in: WorkoutCreate,
 ):
-    routine = routine_service.get_routine(db, user.id, workout_in.routine_id)
+    if workout_in.routine_id:
+        routine = routine_service.get_routine(db, user.id, workout_in.routine_id)
 
-    if not routine:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Routine not found."
-        )
+        if not routine:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="Routine not found."
+            )
 
-    workout = workout_service.create_workout(db, workout_in)
+    workout = workout_service.create_workout(db, user.id, workout_in)
     return workout
 
 

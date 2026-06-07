@@ -10,8 +10,11 @@ from .exercise import Exercise
 class Workout(Base, AuditMixin):
     __tablename__ = "workouts"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    routine_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("routines.id", ondelete="CASCADE")
+    routine_id: Mapped[Optional[int]] = mapped_column(
+        Integer, ForeignKey("routines.id", ondelete="SET NULL")
+    )
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE")
     )
     completed_at: Mapped[datetime] = mapped_column(DateTime)
     duration: Mapped[int] = mapped_column(Integer)

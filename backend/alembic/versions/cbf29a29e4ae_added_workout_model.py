@@ -25,12 +25,17 @@ def upgrade() -> None:
     op.create_table(
         "workouts",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("routine_id", sa.Integer(), nullable=False),
+        sa.Column("routine_id", sa.Integer(), nullable=True),
         sa.Column("completed_at", sa.DateTime(), nullable=False),
         sa.Column("duration", sa.Integer(), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.Column("updated_at", sa.DateTime(), nullable=False),
-        sa.ForeignKeyConstraint(["routine_id"], ["routines.id"], ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(
+            ["routine_id"],
+            ["routines.id"],
+            name="fk_workouts_routine_id",
+            ondelete="SET NULL",
+        ),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_table(

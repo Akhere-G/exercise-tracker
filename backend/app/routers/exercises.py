@@ -49,7 +49,4 @@ def get_exercise_workouts(
 ):
     workouts = exercise_service.get_workouts(db, user.id, exercise_id)
 
-    print(workouts)
-    print(workouts[0])
-
     return workouts
