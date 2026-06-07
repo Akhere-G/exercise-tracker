@@ -126,6 +126,11 @@ export default function ExerciseDetails({
             <MoreVertical size={16} />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
+            <DropdownMenuItem
+              onClick={() => router.push(`/exercises/${currentExerciseId}`)}
+            >
+              Details
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={removeLastSet}>
               Remove Last set
             </DropdownMenuItem>
