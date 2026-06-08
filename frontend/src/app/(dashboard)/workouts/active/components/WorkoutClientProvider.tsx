@@ -93,7 +93,7 @@ export default function WorkoutClientProvider({
     }
   }
   return (
-    <div className="relative  h-screen flex flex-1 flex-col justify-between">
+    <div className="relative  h-[90vh] flex flex-1 flex-col justify-between">
       <div>
         <Toaster position="top-right" richColors closeButton />
 

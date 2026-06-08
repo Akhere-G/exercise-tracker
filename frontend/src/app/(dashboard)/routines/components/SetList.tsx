@@ -196,7 +196,7 @@ export default function SetList({ routine }: { routine: Routine | null }) {
   if (!currentExercise) return null;
 
   return (
-    <div className="bg-secondary mt-4 text-secondary-foreground py-4 flex flex-col gap-4 max-h-[65vh] overflow-y-scroll">
+    <div className="bg-secondary mt-4 text-secondary-foreground py-4 flex flex-col gap-4 max-h-[54vh] overflow-y-scroll">
       <table className="w-full text-sm">
         <thead className="table-header-group">
           <tr className="text-secondary-foreground font-medium uppercase tracking-wider text-xs text-left">
