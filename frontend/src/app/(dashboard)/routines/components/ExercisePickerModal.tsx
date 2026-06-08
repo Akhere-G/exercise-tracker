@@ -1,4 +1,3 @@
-// ExercisePickerModal.tsx
 "use client";
 
 import {
@@ -27,6 +26,8 @@ import { Drawer, DrawerContent } from "@/src/components/ui/drawer";
 import { X } from "lucide-react";
 import Image from "next/image";
 import { getImageUrl } from "@/src/features/exercises/utils";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface ExercisePickerModalProps {
   isOpen: boolean;
@@ -63,6 +64,8 @@ export function ExercisePickerModal({
   );
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+
+  const router = useRouter();
 
   const [selectedExercises, setSelectedExercise] = useState<
     Record<number, Exercise>
@@ -246,14 +249,18 @@ export function ExercisePickerModal({
                   ${exercise.selected ? "bg-secondary" : ""}`}
               >
                 <span className="flex gap-4">
-                  <span className="relative bg-white shrink-0 w-20 h-15 rounded-md overflow-hidden flex items-center justify-center p-2">
+                  <Link
+                    onClick={(e) => e.stopPropagation()}
+                    href={`/exercises/${exercise.id}`}
+                    className="relative bg-white shrink-0 w-20 h-15 rounded-md overflow-hidden flex items-center justify-center p-2"
+                  >
                     <Image
                       src={getImageUrl(exercise.imageUrl)}
                       alt={exercise.name}
                       width={70}
                       height={40}
                     />
-                  </span>
+                  </Link>
                   <span>
                     <p className="font-semibold text-foreground">
                       {exercise.name}

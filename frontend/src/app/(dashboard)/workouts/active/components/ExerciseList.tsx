@@ -9,14 +9,19 @@ import {
   isExerciseCompleted,
 } from "@/src/features/workout/utils";
 import { ExerciseImage } from "../../components/ExerciseImage";
+import { useRouter } from "next/navigation";
 
 export default function ExerciseList() {
   const [isOpen, setIsOpen] = useState(false);
 
   const { currentExerciseId, setWorkoutData, exercises } = useWorkout();
-
-  const onClick = (currentExerciseId: number) => {
-    setWorkoutData({ currentExerciseId });
+  const router = useRouter();
+  const onClick = (exerciseId: number) => {
+    if (exerciseId === currentExerciseId) {
+      router.push(`/exercises/${exerciseId}`);
+    } else {
+      setWorkoutData({ currentExerciseId: exerciseId });
+    }
   };
 
   function addExercises(newExercises: BaseExercise[]) {
@@ -55,7 +60,7 @@ export default function ExerciseList() {
             exercises.map((item) => (
               <div
                 key={item.id}
-                className={`relative transition-opacity duration-300 ${currentExerciseId === item.id ? "" : "opacity-50"}`}
+                className={`relative transition-opacity duration-300 ${currentExerciseId === item.id ? "cursor-pointer" : "opacity-50"}`}
                 onClick={() => onClick(item.id)}
               >
                 <ExerciseImage exercise={item} />
