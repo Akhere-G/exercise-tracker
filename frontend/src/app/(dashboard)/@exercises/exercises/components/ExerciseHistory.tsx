@@ -1,4 +1,4 @@
-import { Card } from "@/src/components/card";
+import { Card, CardContent } from "@/src/components/card";
 import {
   Accordion,
   AccordionContent,
@@ -16,9 +16,20 @@ export default function ExerciseHistory({
   exercise: Exercise;
   groupedSets: Record<string, workoutSetWithDate[]>;
 }) {
+  const allSets = Object.entries(groupedSets);
+
+  if (allSets.length === 0) {
+    return (
+      <Card className="m-1">
+        <CardContent>
+          <h3 className="p-4 text-center">No Data</h3>
+        </CardContent>
+      </Card>
+    );
+  }
   return (
     <div className="flex flex-col gap-2.5">
-      {Object.entries(groupedSets).map(([date, sets]) => (
+      {allSets.map(([date, sets]) => (
         <WorkoutCard key={date} title={date} sets={sets} exercise={exercise} />
       ))}
     </div>

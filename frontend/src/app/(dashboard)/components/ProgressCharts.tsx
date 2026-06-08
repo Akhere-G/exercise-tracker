@@ -1,3 +1,4 @@
+import { Card, CardContent } from "@/src/components/card";
 import { Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 
 export default function ProgressChart({
@@ -7,6 +8,15 @@ export default function ProgressChart({
   data: { x: number | string; y: number | string }[];
   title: string;
 }) {
+  if (data.length === 0) {
+    return (
+      <Card>
+        <CardContent>
+          <h3 className="p-4 text-center">No Data</h3>
+        </CardContent>
+      </Card>
+    );
+  }
   return (
     <div>
       <h2 className="text-xl mb-4">{title}</h2>
