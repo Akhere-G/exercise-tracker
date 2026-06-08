@@ -11,6 +11,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/src/components/ui/accordion";
+import { getImageUrl } from "@/src/features/exercises/utils";
 
 import { Routine } from "@/src/features/routines/types";
 import { Exercise } from "@/src/features/workout/store";
@@ -96,7 +97,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
       <Card className="border border-border flex flex-col h-full transition-all pt-0">
         <div className="relative w-full h-24 bg-white">
           <Image
-            src={`https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/refs/heads/main/${exercise.imageUrl}`}
+            src={getImageUrl(exercise.imageUrl)}
             alt={exercise.name}
             fill
             className="object-scale-down"
