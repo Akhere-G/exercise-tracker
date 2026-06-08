@@ -120,7 +120,9 @@ export function ExercisePickerModal({
         setLoading(false);
       }
     }
-    fetchExercises();
+    const timeout = setTimeout(() => fetchExercises(), 300);
+
+    return () => clearTimeout(timeout);
   }, [isOpen, deferredQuery, page, equipment, muscle]);
 
   useEffect(() => {
