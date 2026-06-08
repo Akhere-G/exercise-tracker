@@ -15,7 +15,7 @@ else:
     engine = create_engine(
         DATABASE_URL,
         connect_args={
-            "sslmode": "verify-full",
+            "sslmode": "require",
             "sslrootcert": cert_path,
         },
     )
