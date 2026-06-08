@@ -15,6 +15,7 @@ import ExerciseHistory from "./ExerciseHistory";
 import ExerciseStats from "./ExerciseStats";
 import { useRouter } from "next/navigation";
 import { workoutSetWithDate } from "@/src/features/workout/types";
+import { getImageUrl } from "@/src/features/exercises/utils";
 
 export default function ExerciseDetails({
   exercise,
@@ -74,7 +75,7 @@ function ExerciseDetail({
     <div className=" px-4">
       <div className="relative h-30 bg-white rounded-2xl mx-2">
         <Image
-          src={`https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/refs/heads/main/${videoUrl}`}
+          src={getImageUrl(videoUrl)}
           alt={exercise.name}
           fill
           className="object-scale-down"

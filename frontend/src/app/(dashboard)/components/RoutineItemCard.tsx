@@ -4,6 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/components/card";
+import { getImageUrl } from "@/src/features/exercises/utils";
 import { RoutineItem } from "@/src/features/routines/types";
 import { Dot } from "lucide-react";
 import Image from "next/image";
@@ -26,7 +27,7 @@ export default function RoutineItemCard({
       <Card className="pt-0">
         <div className="relative w-full h-24 bg-white">
           <Image
-            src={`https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/refs/heads/main/${exercise.imageUrl}`}
+            src={getImageUrl(exercise.imageUrl)}
             alt={exercise.name}
             fill
             className="object-scale-down"

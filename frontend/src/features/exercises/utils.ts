@@ -37,3 +37,6 @@ export const getMuscleMapData = (exercises: Exercise[]) => {
 
   return data;
 };
+
+export const getImageUrl = (exerciseImage: string) =>
+  `https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/refs/heads/main/${exerciseImage}`;

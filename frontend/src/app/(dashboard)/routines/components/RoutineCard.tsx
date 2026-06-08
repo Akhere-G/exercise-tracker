@@ -16,6 +16,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/src/components/ui/dialog";
+import { getImageUrl } from "@/src/features/exercises/utils";
 
 export default function RoutineCard({ routine }: { routine: Routine }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,7 +47,7 @@ export default function RoutineCard({ routine }: { routine: Routine }) {
             className="relative w-17 h-12 overflow-hidden bg-white rounded-md"
           >
             <Image
-              src={`https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/refs/heads/main/${item.exercise.imageUrl}`}
+              src={getImageUrl(item.exercise.imageUrl)}
               alt={item.exercise.name}
               fill
               className="object-scale-down"
