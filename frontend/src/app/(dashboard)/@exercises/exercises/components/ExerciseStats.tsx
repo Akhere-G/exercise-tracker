@@ -57,9 +57,9 @@ export default function ExerciseStats({
     x: date,
   }));
 
-  const maxWeight = Math.max(...sets.map((s) => s.weight || 0));
-  const maxDuration = Math.max(...durationData.map((d) => d.y));
-  const maxReps = Math.max(...repsData.map((d) => d.y));
+  const maxWeight = Math.max(0, ...sets.map((s) => s.weight || 0));
+  const maxDuration = Math.max(0, ...durationData.map((d) => d.y));
+  const maxReps = Math.max(0, ...repsData.map((d) => d.y));
 
   const totalWeightSets = sets.filter(
     (s) => s.weight !== undefined && s.reps,
@@ -72,6 +72,7 @@ export default function ExerciseStats({
   ).length;
   const enduranceSets = sets.filter((s) => (s.reps || 0) >= 13).length;
 
+  console.log(repsData);
   return (
     <div className="container">
       <div className="flex flex-wrap gap-4 mb-6">
