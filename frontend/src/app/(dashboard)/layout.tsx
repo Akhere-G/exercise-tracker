@@ -7,7 +7,7 @@ import {
 import "../globals.css";
 
 import { Calendar, Cog, House } from "lucide-react";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 
@@ -22,8 +22,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Dashboard for your exercises",
+  manifest: "/manifest.json",
+  title: "Gains | Fitness Tracker",
+  description: "Track your workouts with Gains",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
