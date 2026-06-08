@@ -47,7 +47,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <div className="min-h-[90vh]">{children}</div>
+        <div className="h-[90vh]  overflow-auto no-scrollbar">{children}</div>
 
         {exercises}
 
