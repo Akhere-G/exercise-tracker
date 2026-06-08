@@ -24,6 +24,9 @@ import {
   muscleGroupOptions,
 } from "@/src/features/exercises/constants";
 import { Drawer, DrawerContent } from "@/src/components/ui/drawer";
+import { X } from "lucide-react";
+import Image from "next/image";
+import { getImageUrl } from "@/src/features/exercises/utils";
 
 interface ExercisePickerModalProps {
   isOpen: boolean;
@@ -168,16 +171,16 @@ export function ExercisePickerModal({
     <Drawer open={isOpen} onOpenChange={(open) => (!open ? onClose() : null)}>
       <DrawerContent className="border-secondary">
         <div className="flex items-baseline justify-between gap-4 p-4">
-          <p>{title}</p>
+          <h2 className="text-xl">{title}</h2>
           <button
             type="button"
             onClick={onClose}
             className="text-muted-foreground hover:text-foreground w-min "
           >
-            ✕
+            <X size={16} />
           </button>
         </div>
-        <div className="p-5 pt-0  flex justify-between items-center gap-2">
+        <div className="p-5 pt-0">
           <Input
             placeholder="Search"
             value={query}
@@ -216,7 +219,7 @@ export function ExercisePickerModal({
           </Select>
         </div>
 
-        <div className="p-4 overflow-y-auto flex flex-col gap-2 max-h-[60vh]">
+        <div className="p-4 overflow-y-auto flex flex-col gap-2  max-h-[60vh]">
           {formattedExercises.length === 0 && loading ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               Loading exercises...
@@ -231,18 +234,28 @@ export function ExercisePickerModal({
                 key={exercise.id}
                 type="button"
                 onClick={() => onClick(exercise)}
-                className={`w-full text-left p-3 rounded-xl hover:bg-secondary border border-transparent hover:border-border transition-all flex justify-between items-center 
+                className={` w-full text-left p-2 rounded-xl hover:bg-secondary border border-transparent hover:border-border transition-all flex justify-between items-center 
                   ${exercise.selected ? "bg-secondary" : ""}`}
               >
-                <div>
-                  <div className="font-semibold text-foreground">
-                    {exercise.name}
-                  </div>
-                  <div className="text-xs text-muted-foreground capitalize">
-                    {exercise.equipment} •{" "}
-                    {exercise.muscles.map(({ name }) => name).join(", ")}
-                  </div>
-                </div>
+                <span className="flex gap-4">
+                  <span className="relative bg-white shrink-0 w-20 h-15 rounded-md overflow-hidden flex items-center justify-center p-2">
+                    <Image
+                      src={getImageUrl(exercise.imageUrl)}
+                      alt={exercise.name}
+                      width={70}
+                      height={40}
+                    />
+                  </span>
+                  <span>
+                    <p className="font-semibold text-foreground">
+                      {exercise.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground capitalize">
+                      {exercise.equipment} •{" "}
+                      {exercise.muscles.map(({ name }) => name).join(", ")}
+                    </p>
+                  </span>
+                </span>
               </button>
             ))
           )}
