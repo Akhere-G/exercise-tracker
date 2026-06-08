@@ -64,19 +64,20 @@ export function ExercisePickerModal({
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
-  const [selectedIds, setSelectedIds] = useState<Record<number, boolean>>({});
-
+  const [selectedExercises, setSelectedExercise] = useState<
+    Record<number, Exercise>
+  >({});
   const deferredQuery = useDeferredValue(query);
   const observer = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     function updateSelected() {
       if (isOpen) {
-        const initialMap: Record<number, boolean> = {};
+        const initialMap: Record<number, Exercise> = {};
         addedExercises.forEach((e) => {
-          initialMap[e.id] = true;
+          initialMap[e.id] = e;
         });
-        setSelectedIds(initialMap);
+        setSelectedExercise(initialMap);
         setExercises([]);
         setPage(1);
         setHasMore(true);
@@ -127,12 +128,12 @@ export function ExercisePickerModal({
       setFormattedExercises(
         exercises.map((e) => ({
           ...e,
-          selected: !!selectedIds[e.id],
+          selected: !!selectedExercises[e.id],
         })),
       );
     }
     getFormattedExercises();
-  }, [exercises, selectedIds]);
+  }, [exercises, selectedExercises]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -156,12 +157,17 @@ export function ExercisePickerModal({
   );
 
   function onClick(exercise: Exercise) {
-    setSelectedIds((prev) => {
+    setSelectedExercise((prev) => {
       if (selectMany) {
-        return { ...prev, [exercise.id]: !prev[exercise.id] };
+        if (prev[exercise.id]) {
+          const result = { ...prev };
+          delete result[exercise.id];
+          return result;
+        }
+        return { ...prev, [exercise.id]: exercise };
       }
 
-      return prev[exercise.id] ? {} : { [exercise.id]: true };
+      return prev[exercise.id] ? {} : { [exercise.id]: exercise };
     });
   }
 
@@ -270,7 +276,7 @@ export function ExercisePickerModal({
         </div>
         <div
           className="p-4"
-          onClick={() => onSelect(formattedExercises.filter((e) => e.selected))}
+          onClick={() => onSelect(Object.values(selectedExercises))}
         >
           <Button className="w-full">{submitBtnText}</Button>
         </div>
