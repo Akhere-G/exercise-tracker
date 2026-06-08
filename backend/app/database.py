@@ -14,7 +14,10 @@ if DATABASE_URL.startswith("sqlite"):
 else:
     engine = create_engine(
         DATABASE_URL,
-        connect_args={"ssl": {"ca": cert_path}},
+        connect_args={
+            "sslmode": "verify-full",
+            "sslrootcert": cert_path,
+        },
     )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
