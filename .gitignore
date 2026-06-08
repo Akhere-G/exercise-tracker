@@ -19,6 +19,7 @@ Thumbs.db
 # --- Databases (Development) ---
 *.db
 *.sqlite3
+ca.pem
 
 # --- IDE Specific ---
 .vscode*
