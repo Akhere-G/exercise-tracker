@@ -1,11 +1,10 @@
 #!/bin/sh
-echo "Checking for psycopg2..."
-python3 -c "import psycopg2; print('psycopg2 imported successfully')"
-if [ $? -ne 0 ]; then
-    echo "ERROR: psycopg2 not found!"
-    exit 1
-fi
 
-echo "Starting migrations..."
+echo "Running migrations..."
 alembic upgrade head
+
+echo "Running database seed..."
+python3 seed.py
+
+echo "Starting Uvicorn..."
 exec python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8080
