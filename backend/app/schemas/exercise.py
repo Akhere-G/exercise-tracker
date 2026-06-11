@@ -16,6 +16,7 @@ class ExerciseBase(BaseModel):
     equipment: str
     metrics: str
     muscles: List[Muscle]
+    priority: int
 
     @field_validator("muscles", mode="before")
     @classmethod

@@ -15,7 +15,7 @@ class Exercise(Base, AuditMixin):
     video_url: Mapped[str] = mapped_column(String(255))
     equipment: Mapped[str] = mapped_column(String(100))
     metrics: Mapped[str] = mapped_column(String(100))
-
+    priority: Mapped[int] = mapped_column(Integer, default=0, index=True)
     muscles: Mapped[List["ExerciseMuscle"]] = relationship(
         "ExerciseMuscle",
     )
