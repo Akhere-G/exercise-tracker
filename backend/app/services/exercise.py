@@ -31,6 +31,8 @@ def get_exercises(
 
         stmt = stmt.distinct()
 
+    stmt = stmt.order_by(Exercise.priority)
+
     offset = limit * (page - 1)
     stmt = stmt.limit(limit).offset(offset)
 
