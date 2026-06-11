@@ -21,7 +21,7 @@ import { getImageUrl } from "@/src/features/exercises/utils";
 export default function RoutineCard({ routine }: { routine: Routine }) {
   const [isOpen, setIsOpen] = useState(false);
   const { id, name, routineItems } = routine;
-  const { startedAt, routineId, routineName } = useWorkout();
+  const { startedAt } = useWorkout();
   const maxExercisesShown = 3;
   const router = useRouter();
   function startWorkout() {

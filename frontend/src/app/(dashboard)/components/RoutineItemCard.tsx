@@ -30,6 +30,7 @@ export default function RoutineItemCard({
             src={getImageUrl(exercise.imageUrl)}
             alt={exercise.name}
             fill
+            sizes="100vw"
             className="object-scale-down"
           />
         </div>
