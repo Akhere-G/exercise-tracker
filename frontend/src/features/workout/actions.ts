@@ -1,9 +1,8 @@
 "use server";
-import { api } from "@/src/lib/axios";
+import { api, handleApiError } from "@/src/lib/axios";
 import { WorkoutSchema } from "./schema";
 import { ActionResponse } from "@/src/lib/apiTypes";
 import { Workout } from "./types";
-import { isAxiosError } from "axios";
 
 export const createWorkout = async (
   workout: WorkoutSchema,
@@ -20,14 +19,6 @@ export const createWorkout = async (
     const repsonse = await api.post<Workout>("/workouts", formattedWorkout);
     return { success: true, data: repsonse.data };
   } catch (err) {
-    if (isAxiosError(err)) {
-      // const error = getValidationErrors(err.reponse?.data?.detail);
-      return {
-        success: false,
-        error: "An unknown error occured.",
-      };
-    }
-
-    return { success: false, error: "An unknown error occured." };
+    return handleApiError<Workout>(err);
   }
 };

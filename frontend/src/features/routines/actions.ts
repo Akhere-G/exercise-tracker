@@ -1,9 +1,8 @@
 "use server";
-import { api } from "@/src/lib/axios";
+import { api, handleApiError } from "@/src/lib/axios";
 import type { Routine } from "./types";
 import { ActionResponse } from "@/src/lib/apiTypes";
 import { RoutineSchema } from "./schema";
-import { isAxiosError } from "axios";
 
 export const createRoutine = async (
   routine: RoutineSchema,
@@ -22,16 +21,7 @@ export const createRoutine = async (
 
     return { success: true, data: response.data };
   } catch (err) {
-    if (isAxiosError(err)) {
-      return {
-        success: false,
-        errors: err.response?.data.detail,
-      };
-    }
-    return {
-      success: false,
-      error: "An unexpected error occured",
-    };
+    return handleApiError<Routine>(err);
   }
 };
 
@@ -59,16 +49,7 @@ export const editRoutine = async (
 
     return { success: true, data: response.data };
   } catch (err) {
-    if (isAxiosError(err)) {
-      return {
-        success: false,
-        errors: err.response?.data.detail,
-      };
-    }
-    return {
-      success: false,
-      error: "An unexpected error occured",
-    };
+    return handleApiError<Routine>(err);
   }
 };
 
@@ -80,15 +61,6 @@ export const deleteRoutine = async (
 
     return { success: true, data: response.data };
   } catch (err) {
-    if (isAxiosError(err)) {
-      return {
-        success: false,
-        errors: err.response?.data.detail,
-      };
-    }
-    return {
-      success: false,
-      error: "An unexpected error occured",
-    };
+    return handleApiError<number>(err);
   }
 };

@@ -2,8 +2,7 @@
 
 import { LoginSchema, RegisterSchema, Token } from "@/src/features/auth/schema";
 import { ActionResponse } from "@/src/lib/apiTypes";
-import { api } from "@/src/lib/axios";
-import { isAxiosError } from "axios";
+import { api, handleApiError } from "@/src/lib/axios";
 import { cookies } from "next/headers";
 
 export async function loginAction(
@@ -23,16 +22,7 @@ export async function loginAction(
 
     return { success: true, data: token };
   } catch (err) {
-    if (isAxiosError(err)) {
-      return {
-        success: false,
-        errors: err.response?.data.detail,
-      };
-    }
-    return {
-      success: false,
-      error: "An unexpected error occured",
-    };
+    return handleApiError<Token>(err);
   }
 }
 
@@ -53,15 +43,6 @@ export async function registerAction(
 
     return { success: true, data: token };
   } catch (err) {
-    if (isAxiosError(err)) {
-      return {
-        success: false,
-        errors: err.response?.data.detail,
-      };
-    }
-    return {
-      success: false,
-      error: "An unexpected error occured",
-    };
+    return handleApiError<Token>(err);
   }
 }

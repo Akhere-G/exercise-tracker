@@ -1,7 +1,6 @@
-import { api } from "@/src/lib/axios";
+import { api, handleApiError } from "@/src/lib/axios";
 import { ActionResponse } from "@/src/lib/apiTypes";
 import { Workout, WorkoutStats } from "./types";
-import { isAxiosError } from "axios";
 
 export const getWorkout = async (
   workoutId: number,
@@ -10,16 +9,7 @@ export const getWorkout = async (
     const response = await api.get<Workout>(`/workouts/${workoutId}`);
     return { success: true, data: response.data };
   } catch (err) {
-    if (isAxiosError(err)) {
-      return {
-        success: false,
-        errors: err.response?.data.detail,
-      };
-    }
-    return {
-      success: false,
-      error: "An unexpected error occured",
-    };
+    return handleApiError<Workout>(err);
   }
 };
 
@@ -35,16 +25,7 @@ export const getWorkouts = async (
     const response = await api.get<Workout[]>(url);
     return { success: true, data: response.data };
   } catch (err) {
-    if (isAxiosError(err)) {
-      return {
-        success: false,
-        errors: err.response?.data.detail,
-      };
-    }
-    return {
-      success: false,
-      error: "An unexpected error occured",
-    };
+    return handleApiError<Workout[]>(err);
   }
 };
 
@@ -60,15 +41,6 @@ export const getWorkoutStats = async (
 
     return { success: true, data: response.data };
   } catch (err) {
-    if (isAxiosError(err)) {
-      return {
-        success: false,
-        error: err.response?.data.detail,
-      };
-    }
-    return {
-      success: false,
-      error: "An unexpected error occured",
-    };
+    return handleApiError<WorkoutStats>(err);
   }
 };

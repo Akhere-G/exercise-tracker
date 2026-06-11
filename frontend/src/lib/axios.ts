@@ -1,4 +1,5 @@
-import axios from "axios";
+import axios, { isAxiosError } from "axios";
+import { ActionResponse } from "./apiTypes";
 
 const baseURL =
   process.env.NEXT_PUBLIC_BASE_URL ||
@@ -26,3 +27,16 @@ api.interceptors.request.use(async (config) => {
   }
   return config;
 });
+
+export function handleApiError<T>(err: unknown): ActionResponse<T> {
+  if (isAxiosError(err)) {
+    return {
+      success: false,
+      errors: err.response?.data.detail,
+    };
+  }
+  return {
+    success: false,
+    error: "An unexpected error occured",
+  };
+}
