@@ -26,7 +26,6 @@ import { Drawer, DrawerContent } from "@/src/components/ui/drawer";
 import { X } from "lucide-react";
 import Image from "next/image";
 import { getImageUrl } from "@/src/features/exercises/utils";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 interface ExercisePickerModalProps {
@@ -64,8 +63,9 @@ export function ExercisePickerModal({
   );
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-
-  const router = useRouter();
+  const [exercisesToAdd, setExercisesToAdd] = useState<
+    Record<number, Exercise>
+  >({});
 
   const [selectedExercises, setSelectedExercise] = useState<
     Record<number, Exercise>
@@ -133,12 +133,12 @@ export function ExercisePickerModal({
       setFormattedExercises(
         exercises.map((e) => ({
           ...e,
-          selected: !!selectedExercises[e.id],
+          selected: !!selectedExercises[e.id] || !!exercisesToAdd[e.id],
         })),
       );
     }
     getFormattedExercises();
-  }, [exercises, selectedExercises]);
+  }, [exercises, selectedExercises, exercisesToAdd]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -162,7 +162,8 @@ export function ExercisePickerModal({
   );
 
   function onClick(exercise: Exercise) {
-    setSelectedExercise((prev) => {
+    setExercisesToAdd((prev) => {
+      if (selectedExercises[exercise.id]) return prev;
       if (selectMany) {
         if (prev[exercise.id]) {
           const result = { ...prev };
@@ -285,9 +286,15 @@ export function ExercisePickerModal({
         </div>
         <div
           className="p-4"
-          onClick={() => onSelect(Object.values(selectedExercises))}
+          onClick={() => {
+            onSelect(Object.values(exercisesToAdd));
+
+            setExercisesToAdd({});
+          }}
         >
-          <Button className="w-full">{submitBtnText}</Button>
+          <Button className="w-full">
+            {submitBtnText} ({Object.values(exercisesToAdd).length})
+          </Button>
         </div>
       </DrawerContent>
     </Drawer>
