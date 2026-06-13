@@ -6,6 +6,7 @@ import {
   useState,
   useRef,
   useCallback,
+  useMemo,
 } from "react";
 import { Exercise } from "@/src/features/exercises/types";
 import { getAllExercises } from "@/src/features/exercises/actions";
@@ -39,10 +40,6 @@ interface ExercisePickerModalProps {
   defaultMuscle?: string;
 }
 
-interface ExerciseItem extends Exercise {
-  selected: boolean;
-}
-
 export function ExercisePickerModal({
   isOpen,
   onClose,
@@ -58,47 +55,53 @@ export function ExercisePickerModal({
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [formattedExercises, setFormattedExercises] = useState<ExerciseItem[]>(
-    [],
-  );
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [exercisesToAdd, setExercisesToAdd] = useState<
     Record<number, Exercise>
   >({});
 
-  const [selectedExercises, setSelectedExercise] = useState<
-    Record<number, Exercise>
-  >({});
   const deferredQuery = useDeferredValue(query);
   const observer = useRef<IntersectionObserver | null>(null);
 
+  // Derived state: replacing redundant useState/useEffect combinations
+  const addedExerciseIds = useMemo(
+    () => new Set(addedExercises.map((e) => e.id)),
+    [addedExercises],
+  );
+
   useEffect(() => {
-    function updateSelected() {
+    function resetOnOpen() {
       if (isOpen) {
-        const initialMap: Record<number, Exercise> = {};
-        addedExercises.forEach((e) => {
-          initialMap[e.id] = e;
-        });
-        setSelectedExercise(initialMap);
-        setExercises([]);
+        setExercisesToAdd({});
         setPage(1);
         setHasMore(true);
       }
     }
-    updateSelected();
-  }, [isOpen, addedExercises]);
+
+    resetOnOpen();
+  }, [isOpen]);
 
   useEffect(() => {
-    function resetPage() {
+    function resetOnParamChange() {
       setPage(1);
       setHasMore(true);
+      setExercises([]);
     }
-    resetPage();
+    resetOnParamChange();
   }, [deferredQuery, equipment, muscle]);
 
   useEffect(() => {
+    function resetMuscle() {
+      setMuscle(defaultMuscle);
+    }
+    resetMuscle();
+  }, [defaultMuscle]);
+
+  useEffect(() => {
     if (!isOpen) return;
+
+    const controller = new AbortController();
 
     async function fetchExercises() {
       setLoading(true);
@@ -110,6 +113,8 @@ export function ExercisePickerModal({
           page,
         });
 
+        if (controller.signal.aborted) return;
+
         if (fetchedExercises.length === 0) {
           setHasMore(false);
         }
@@ -118,32 +123,23 @@ export function ExercisePickerModal({
           page === 1 ? fetchedExercises : [...prev, ...fetchedExercises],
         );
       } catch (error) {
-        console.error("Failed to load modal exercises:", error);
+        if (!controller.signal.aborted) {
+          console.error("Failed to load modal exercises:", error);
+        }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     }
-    const timeout = setTimeout(() => fetchExercises(), 300);
 
-    return () => clearTimeout(timeout);
+    const timeoutId = setTimeout(() => fetchExercises(), 300);
+
+    return () => {
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
   }, [isOpen, deferredQuery, page, equipment, muscle]);
-
-  useEffect(() => {
-    function getFormattedExercises() {
-      setFormattedExercises(
-        exercises.map((e) => ({
-          ...e,
-          selected: !!selectedExercises[e.id] || !!exercisesToAdd[e.id],
-        })),
-      );
-    }
-    getFormattedExercises();
-  }, [exercises, selectedExercises, exercisesToAdd]);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMuscle(defaultMuscle);
-  }, [defaultMuscle]);
 
   const lastElementRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -161,33 +157,36 @@ export function ExercisePickerModal({
     [loading, hasMore],
   );
 
-  function onClick(exercise: Exercise) {
-    setExercisesToAdd((prev) => {
-      if (selectedExercises[exercise.id]) return prev;
-      if (selectMany) {
-        if (prev[exercise.id]) {
-          const result = { ...prev };
-          delete result[exercise.id];
-          return result;
-        }
-        return { ...prev, [exercise.id]: exercise };
-      }
+  function handleToggleExercise(exercise: Exercise) {
+    if (addedExerciseIds.has(exercise.id)) return;
 
-      return prev[exercise.id] ? {} : { [exercise.id]: exercise };
+    setExercisesToAdd((prev) => {
+      const next = { ...prev };
+      if (next[exercise.id]) {
+        delete next[exercise.id];
+      } else {
+        if (!selectMany) {
+          return { [exercise.id]: exercise };
+        }
+        next[exercise.id] = exercise;
+      }
+      return next;
     });
   }
 
   if (!isOpen) return null;
 
+  const selectedCount = Object.keys(exercisesToAdd).length;
+
   return (
-    <Drawer open={isOpen} onOpenChange={(open) => (!open ? onClose() : null)}>
+    <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent className="border-secondary">
         <div className="flex items-baseline justify-between gap-4 p-4">
           <h2 className="text-xl">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-muted-foreground hover:text-foreground w-min "
+            className="text-muted-foreground hover:text-foreground w-min"
           >
             <X size={16} />
           </button>
@@ -201,10 +200,7 @@ export function ExercisePickerModal({
         </div>
 
         <div className="flex px-5 gap-4">
-          <Select
-            value={equipment}
-            onValueChange={(value) => setEquipment(value)}
-          >
+          <Select value={equipment} onValueChange={setEquipment}>
             <SelectTrigger className="flex-1 w-full">
               <SelectValue placeholder="Equipment" />
             </SelectTrigger>
@@ -217,7 +213,7 @@ export function ExercisePickerModal({
             </SelectContent>
           </Select>
 
-          <Select value={muscle} onValueChange={(value) => setMuscle(value)}>
+          <Select value={muscle} onValueChange={setMuscle}>
             <SelectTrigger className="flex-1 w-full">
               <SelectValue placeholder="Muscle" />
             </SelectTrigger>
@@ -231,69 +227,78 @@ export function ExercisePickerModal({
           </Select>
         </div>
 
-        <div className="p-4 overflow-y-auto flex flex-col gap-2  max-h-[60vh]">
-          {formattedExercises.length === 0 && loading ? (
+        <div className="p-4 overflow-y-auto flex flex-col gap-2 max-h-[60vh]">
+          {exercises.length === 0 && loading ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               Loading exercises...
             </p>
-          ) : formattedExercises.length === 0 ? (
+          ) : exercises.length === 0 ? (
             <p className="text-sm text-muted-foreground text-center py-4">
               No exercises found.
             </p>
           ) : (
-            formattedExercises.map((exercise) => (
-              <button
-                key={exercise.id}
-                type="button"
-                onClick={() => onClick(exercise)}
-                className={` w-full text-left p-2 rounded-xl hover:bg-secondary border border-transparent hover:border-border transition-all flex justify-between items-center 
-                  ${exercise.selected ? "bg-secondary" : ""}`}
-              >
-                <span className="flex gap-4">
-                  <Link
-                    onClick={(e) => e.stopPropagation()}
-                    href={`/exercises/${exercise.id}`}
-                    className="relative bg-white shrink-0 w-20 h-15 rounded-md overflow-hidden flex items-center justify-center p-2"
-                  >
-                    <Image
-                      src={getImageUrl(exercise.imageUrl)}
-                      alt={exercise.name}
-                      width={70}
-                      height={40}
-                    />
-                  </Link>
-                  <span>
-                    <p className="font-semibold text-foreground">
-                      {exercise.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground capitalize">
-                      {exercise.equipment} •{" "}
-                      {exercise.muscles.map(({ name }) => name).join(", ")}
-                    </p>
+            exercises.map((exercise) => {
+              const isSelected =
+                !!exercisesToAdd[exercise.id] ||
+                addedExerciseIds.has(exercise.id);
+
+              return (
+                <button
+                  key={exercise.id}
+                  type="button"
+                  onClick={() => handleToggleExercise(exercise)}
+                  className={`w-full text-left p-2 rounded-xl border transition-all flex justify-between items-center ${
+                    isSelected
+                      ? "bg-secondary border-transparent"
+                      : "hover:bg-secondary border-transparent hover:border-border"
+                  }`}
+                >
+                  <span className="flex gap-4">
+                    <Link
+                      onClick={(e) => e.stopPropagation()}
+                      href={`/exercises/${exercise.id}`}
+                      className="relative bg-white shrink-0 w-20 h-15 rounded-md overflow-hidden flex items-center justify-center p-2"
+                    >
+                      <Image
+                        src={getImageUrl(exercise.imageUrl)}
+                        alt={exercise.name}
+                        width={70}
+                        height={40}
+                      />
+                    </Link>
+                    <span>
+                      <p className="font-semibold text-foreground">
+                        {exercise.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground capitalize">
+                        {exercise.equipment} •{" "}
+                        {exercise.muscles.map(({ name }) => name).join(", ")}
+                      </p>
+                    </span>
                   </span>
-                </span>
-              </button>
-            ))
+                </button>
+              );
+            })
           )}
 
           <div ref={lastElementRef} className="h-1" />
 
-          {loading && formattedExercises.length > 0 && (
+          {loading && exercises.length > 0 && (
             <p className="text-sm text-muted-foreground text-center py-2">
               Loading more exercises...
             </p>
           )}
         </div>
-        <div
-          className="p-4"
-          onClick={() => {
-            onSelect(Object.values(exercisesToAdd));
 
-            setExercisesToAdd({});
-          }}
-        >
-          <Button className="w-full">
-            {submitBtnText} ({Object.values(exercisesToAdd).length})
+        <div className="p-4">
+          <Button
+            className="w-full"
+            onClick={() => {
+              onSelect(Object.values(exercisesToAdd));
+              setExercisesToAdd({});
+            }}
+          >
+            {submitBtnText} {selectedCount > 0 && `(${selectedCount})`}
           </Button>
         </div>
       </DrawerContent>
