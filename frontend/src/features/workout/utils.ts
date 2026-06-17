@@ -1,6 +1,7 @@
 import { Slug } from "react-muscle-highlighter";
 import { Exercise as BaseExercise } from "../exercises/types";
 import {
+  isCardioExercise,
   isDurationExercise,
   isRepsExercise,
   isWeightsExercise,
@@ -14,6 +15,7 @@ const DEFAULT_TOTAL_SETS = 3;
 const DEFAULT_REPS = 10;
 const DEFAULT_WEIGHT = 25;
 const DEFAULT_DURATION = 10;
+const DEFAULT_DISTANCE = 500;
 
 export const sameMetrics = (
   exercise: BaseExercise,
@@ -41,6 +43,7 @@ export const getDefaultSets = (
       durationSecs: isDurationExercise(exercise) ? DEFAULT_DURATION : undefined,
       reps: isRepsExercise(exercise) ? DEFAULT_REPS : undefined,
       weight: isWeightsExercise(exercise) ? DEFAULT_WEIGHT : undefined,
+      distanceMeters: isCardioExercise(exercise) ? DEFAULT_DISTANCE : undefined,
       isCompleted: false,
     };
     sets.push(set);
@@ -62,6 +65,7 @@ export const getNewSet = (
         : undefined,
       reps: isRepsExercise(exercise) ? routineItem.targetReps : undefined,
       weight: isWeightsExercise(exercise) ? DEFAULT_WEIGHT : undefined,
+      distanceMeters: isCardioExercise(exercise) ? DEFAULT_DISTANCE : undefined,
     };
   }
   return {
@@ -70,6 +74,7 @@ export const getNewSet = (
     durationSecs: isDurationExercise(exercise) ? DEFAULT_DURATION : undefined,
     reps: isRepsExercise(exercise) ? DEFAULT_REPS : undefined,
     weight: isWeightsExercise(exercise) ? DEFAULT_WEIGHT : undefined,
+    distanceMeters: isCardioExercise(exercise) ? DEFAULT_DISTANCE : undefined,
   };
 };
 

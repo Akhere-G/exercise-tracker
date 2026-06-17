@@ -4,6 +4,7 @@ export const MetricsType = {
   REPS: "reps",
   REPS_WEIGHT: "reps+weight",
   DURATION: "duration",
+  DURATION_DISTANCE: "duration+distance",
 } as const;
 
 export type Metrics = (typeof MetricsType)[keyof typeof MetricsType];

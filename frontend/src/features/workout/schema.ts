@@ -6,6 +6,7 @@ export const workoutSetSchema = Yup.object()
     setIndex: Yup.number().default(1),
     reps: Yup.number().nullable(),
     weight: Yup.number().nullable(),
+    distanceMeters: Yup.number().nullable(),
     durationSecs: Yup.number().nullable(),
   })
   .test(

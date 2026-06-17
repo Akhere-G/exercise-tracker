@@ -35,6 +35,7 @@ class WorkoutSet(Base, AuditMixin):
     set_index: Mapped[int] = mapped_column(Integer, default=1)
     reps: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     weight: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    distance_meters: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     duration_secs: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     workout: Mapped[Workout] = relationship(Workout, back_populates="sets")
