@@ -269,3 +269,39 @@ export function getWorkoutReps(sets: WorkoutSet[]) {
 
   return reps;
 }
+
+export function getWorkoutDistance(sets: WorkoutSet[]) {
+  let distance = 0;
+  for (const set of sets) {
+    if (isCardioExercise(set.exercise)) {
+      distance += set.distanceMeters!;
+    }
+  }
+
+  return distance;
+}
+
+export function getWorkoutPace(sets: WorkoutSet[]) {
+  let totalDuration = 0;
+  let totalDistance = 0;
+  let cardioSetCount = 0;
+
+  for (const set of sets) {
+    if (
+      isCardioExercise(set.exercise) &&
+      set.durationSecs &&
+      set.distanceMeters
+    ) {
+      totalDuration += set.durationSecs;
+      totalDistance += set.distanceMeters;
+      cardioSetCount++;
+    }
+  }
+
+  if (cardioSetCount === 0 || totalDistance === 0) return 0;
+
+  const secondsPerMetre = totalDuration / totalDistance;
+  const minutesPerKm = secondsPerMetre * (1000 / 60);
+
+  return minutesPerKm;
+}

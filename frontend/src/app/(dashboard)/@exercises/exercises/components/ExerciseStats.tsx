@@ -1,18 +1,21 @@
 import { Exercise } from "@/src/features/exercises/types";
 import ProgressChart from "../../../components/ProgressCharts";
 import {
+  getWorkoutDistance,
   getWorkoutDuration,
+  getWorkoutPace,
   getWorkoutReps,
   getWorkoutVolume,
 } from "@/src/features/workout/utils";
 import { workoutSetWithDate } from "@/src/features/workout/types";
 import {
+  isCardioExercise,
   isDurationExercise,
   isRepsExercise,
   isWeightsExercise,
 } from "@/src/features/exercises/utils";
 import ExerciseStat from "../../../components/ExerciseStat";
-import { BicepsFlexed, Tally5, Timer } from "lucide-react";
+import { BicepsFlexed, Gauge, Route, Tally5, Timer } from "lucide-react";
 import ZoneBar from "../../../components/ZoneBar";
 
 export default function ExerciseStats({
@@ -57,9 +60,21 @@ export default function ExerciseStats({
     x: date,
   }));
 
+  const distanceData = Object.keys(groupedSets).map((date) => ({
+    y: getWorkoutDistance(groupedSets[date]),
+    x: date,
+  }));
+
+  const paceData = Object.keys(groupedSets).map((date) => ({
+    y: getWorkoutPace(groupedSets[date]),
+    x: date,
+  }));
+
   const maxWeight = Math.max(0, ...sets.map((s) => s.weight || 0));
   const maxDuration = Math.max(0, ...durationData.map((d) => d.y));
   const maxReps = Math.max(0, ...repsData.map((d) => d.y));
+  const maxDistance = Math.max(...distanceData.map((d) => d.y), 0);
+  const maxPace = Math.max(...paceData.map((d) => d.y), 0);
 
   const totalWeightSets = sets.filter(
     (s) => s.weight !== undefined && s.reps,
@@ -72,9 +87,8 @@ export default function ExerciseStats({
   ).length;
   const enduranceSets = sets.filter((s) => (s.reps || 0) >= 13).length;
 
-  console.log(repsData);
   return (
-    <div className="container">
+    <div className="container p-0.5">
       <div className="flex flex-wrap gap-4 mb-6">
         {isWeightsExercise(exercise) && (
           <ExerciseStat
@@ -92,6 +106,20 @@ export default function ExerciseStats({
         )}
         {isRepsExercise(exercise) && (
           <ExerciseStat Icon={Tally5} title={maxReps} subtitle="Max Reps" />
+        )}
+        {maxDistance > 0 && (
+          <ExerciseStat
+            Icon={Route}
+            title={maxDistance}
+            subtitle="Max Distance (m)"
+          />
+        )}
+        {maxPace > 0 && (
+          <ExerciseStat
+            Icon={Gauge}
+            title={maxPace}
+            subtitle="Max pace (mins/Km)"
+          />
         )}
       </div>
 
@@ -130,6 +158,14 @@ export default function ExerciseStats({
         {isRepsExercise(exercise) && !isWeightsExercise(exercise) && (
           <ProgressChart data={repsData} title="Reps" />
         )}
+
+        {isCardioExercise(exercise) && (
+          <>
+            <ProgressChart data={distanceData} title="Distance (m)" />
+            <ProgressChart data={paceData} title="Pace (mins/Km)" />
+          </>
+        )}
+
         {isDurationExercise(exercise) && (
           <ProgressChart data={durationData} title="Duration (Mins)" />
         )}

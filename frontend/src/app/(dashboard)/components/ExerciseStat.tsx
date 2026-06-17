@@ -14,13 +14,13 @@ export default function ExerciseStat({
   subtitle: string | number;
 }) {
   return (
-    <Card className="flex-1 min-w-17">
+    <Card className="flex-1 min-w-30">
       <CardContent className="flex flex-col items-center justify-center gap-1">
         <div className="flex gap-2 items-center">
           <Icon size={20} />
           <p className="text-nowrap">{title}</p>
         </div>
-        <CardDescription>{subtitle}</CardDescription>
+        <CardDescription className="text-xs">{subtitle}</CardDescription>
       </CardContent>
     </Card>
   );

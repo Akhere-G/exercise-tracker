@@ -6,13 +6,14 @@ import {
   getTotalVolume,
   mapToTargetMuscle,
 } from "@/src/features/workout/utils";
-import { BicepsFlexed, Flame, Timer, Weight } from "lucide-react";
+import { Flame, Timer, Weight } from "lucide-react";
 import { ExtendedBodyPart, Slug } from "react-muscle-highlighter";
 import BodyChart from "./components/BodyChart";
 import { Exercise } from "@/src/features/workout/store";
 import ConffettiEffect from "./components/ConffettiEffect";
 import ExerciseStat from "../../../components/ExerciseStat";
 import ExerciseCard from "../../../components/ExerciseCard";
+import Link from "next/link";
 
 export default async function WorkoutSummary({
   params,
@@ -95,7 +96,9 @@ export default async function WorkoutSummary({
         <h2 className="text-2xl">Exercises</h2>
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {Object.values(exercises).map((exercise) => (
-            <ExerciseCard key={exercise.id} exercise={exercise} />
+            <Link key={exercise.id} href={`/exercises/${exercise.id}`}>
+              <ExerciseCard exercise={exercise} />
+            </Link>
           ))}
         </div>
         {first && <ConffettiEffect />}

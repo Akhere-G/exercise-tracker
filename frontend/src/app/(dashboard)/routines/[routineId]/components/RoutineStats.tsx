@@ -2,12 +2,14 @@
 import { Routine } from "@/src/features/routines/types";
 import { Workout, WorkoutStats } from "@/src/features/workout/types";
 import {
+  getWorkoutDistance,
   getWorkoutDuration,
+  getWorkoutPace,
   getWorkoutReps,
   getWorkoutVolume,
 } from "@/src/features/workout/utils";
 import ExerciseStat from "../../../components/ExerciseStat";
-import { BicepsFlexed, Tally5, Timer } from "lucide-react";
+import { BicepsFlexed, Gauge, Route, Tally5, Timer } from "lucide-react";
 import ProgressChart from "../../../components/ProgressCharts";
 import ZoneBar from "../../../components/ZoneBar";
 
@@ -62,13 +64,23 @@ export default function RoutineStats({
     x: new Date(workout.completedAt).toLocaleDateString(),
   }));
 
-  // Reverted back to peak max metrics per session
+  const distanceData = workouts.map((workout) => ({
+    y: getWorkoutDistance(workout.sets),
+    x: new Date(workout.completedAt).toLocaleDateString(),
+  }));
+
+  const paceData = workouts.map((workout) => ({
+    y: getWorkoutPace(workout.sets),
+    x: new Date(workout.completedAt).toLocaleDateString(),
+  }));
+
   const maxVolume = Math.max(...volumeData.map((d) => d.y), 0);
   const maxWeight = Math.max(...weightData.map((d) => d.y), 0);
   const maxDuration = Math.max(...durationData.map((d) => d.y), 0);
   const maxReps = Math.max(...repsData.map((d) => d.y), 0);
+  const maxDistance = Math.max(...distanceData.map((d) => d.y), 0);
+  const maxPace = Math.max(...paceData.map((d) => d.y), 0);
 
-  // Repetition Zone Distribution calculations across the routine
   const totalWeightSets = allSets.filter(
     (s) => s.weight !== undefined && s.reps,
   ).length;
@@ -83,11 +95,13 @@ export default function RoutineStats({
   return (
     <div className="container">
       <div className="flex flex-wrap gap-4 mb-6">
-        <ExerciseStat
-          Icon={BicepsFlexed}
-          title={maxVolume}
-          subtitle="Max Volume"
-        />
+        {maxVolume > 0 && (
+          <ExerciseStat
+            Icon={BicepsFlexed}
+            title={maxVolume}
+            subtitle="Max Volume"
+          />
+        )}
         {maxWeight > 0 && (
           <ExerciseStat
             Icon={BicepsFlexed}
@@ -95,12 +109,30 @@ export default function RoutineStats({
             subtitle="Max Weight"
           />
         )}
-        <ExerciseStat
-          Icon={Timer}
-          title={maxDuration}
-          subtitle="Max Duration"
-        />
-        <ExerciseStat Icon={Tally5} title={maxReps} subtitle="Max Reps" />
+        {maxDuration > 0 && (
+          <ExerciseStat
+            Icon={Timer}
+            title={maxDuration}
+            subtitle="Max Duration"
+          />
+        )}
+        {maxReps > 0 && (
+          <ExerciseStat Icon={Tally5} title={maxReps} subtitle="Max Reps" />
+        )}
+        {maxDistance > 0 && (
+          <ExerciseStat
+            Icon={Route}
+            title={maxDistance}
+            subtitle="Max Distance (m)"
+          />
+        )}
+        {maxPace > 0 && (
+          <ExerciseStat
+            Icon={Gauge}
+            title={maxPace}
+            subtitle="Max pace (mins/Km)"
+          />
+        )}
       </div>
 
       <div className="flex flex-col gap-6">
@@ -113,6 +145,8 @@ export default function RoutineStats({
         <ProgressChart data={volumeData} title="Volume" />
         <ProgressChart data={durationData} title="Duration (Mins)" />
         <ProgressChart data={repsData} title="Reps" />
+        <ProgressChart data={distanceData} title="Distance (m)" />
+        <ProgressChart data={paceData} title="Pace (mins/Km)" />
 
         {totalWeightSets > 0 && (
           <div className="bg-card border border-border p-4 rounded-xl shadow-sm">
