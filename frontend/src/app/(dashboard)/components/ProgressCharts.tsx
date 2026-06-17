@@ -18,7 +18,7 @@ export default function ProgressChart({
     );
   }
   return (
-    <div>
+    <div className="md:flex-1">
       <h2 className="text-xl mb-4">{title}</h2>
 
       <LineChart

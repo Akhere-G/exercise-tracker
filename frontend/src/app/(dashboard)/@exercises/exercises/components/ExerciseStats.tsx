@@ -123,35 +123,12 @@ export default function ExerciseStats({
         )}
       </div>
 
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col md:flex-row md:flex-wrap gap-6">
         {isWeightsExercise(exercise) && (
           <>
             <ProgressChart data={e1rmData} title="Estimated 1RM (kg)" />
             <ProgressChart data={weightData} title="Peak Load (kg)" />
             <ProgressChart data={volumeData} title="Total Volume" />
-
-            {totalWeightSets > 0 && (
-              <div className="bg-card border border-border p-4 rounded-xl shadow-sm">
-                <h2 className="text-xl mb-4 font-semibold">Repetition Zones</h2>
-                <div className="flex flex-col gap-3">
-                  <ZoneBar
-                    label="Strength (1-5)"
-                    count={strengthSets}
-                    total={totalWeightSets}
-                  />
-                  <ZoneBar
-                    label="Hypertrophy (6-12)"
-                    count={hypertrophySets}
-                    total={totalWeightSets}
-                  />
-                  <ZoneBar
-                    label="Endurance (13+)"
-                    count={enduranceSets}
-                    total={totalWeightSets}
-                  />
-                </div>
-              </div>
-            )}
           </>
         )}
 
@@ -170,6 +147,28 @@ export default function ExerciseStats({
           <ProgressChart data={durationData} title="Duration (Mins)" />
         )}
       </div>
+      {totalWeightSets > 0 && (
+        <div className="bg-card border border-border mt-12 p-4 rounded-xl shadow-sm">
+          <h2 className="text-xl mb-4 font-semibold">Repetition Zones</h2>
+          <div className="flex flex-col gap-3">
+            <ZoneBar
+              label="Strength (1-5)"
+              count={strengthSets}
+              total={totalWeightSets}
+            />
+            <ZoneBar
+              label="Hypertrophy (6-12)"
+              count={hypertrophySets}
+              total={totalWeightSets}
+            />
+            <ZoneBar
+              label="Endurance (13+)"
+              count={enduranceSets}
+              total={totalWeightSets}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
