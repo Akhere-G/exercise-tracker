@@ -6,6 +6,7 @@ import { Check } from "lucide-react";
 import { ActiveSet, Exercise, useWorkout } from "@/src/features/workout/store";
 import { Routine, RoutineItem } from "@/src/features/routines/types";
 import {
+  isCardioExercise,
   isDurationExercise,
   isRepsExercise,
   isWeightsExercise,
@@ -64,9 +65,16 @@ interface SetRowProps {
   hasReps: boolean;
   hasWeight: boolean;
   hasDuration: boolean;
+  hasDistance: boolean;
 }
 
-function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
+function SetRow({
+  set,
+  hasReps,
+  hasWeight,
+  hasDuration,
+  hasDistance,
+}: SetRowProps) {
   const { setWorkoutData, exercises, currentExerciseId } = useWorkout();
   const { start, clear } = useTimer();
 
@@ -154,6 +162,14 @@ function SetRow({ set, hasReps, hasWeight, hasDuration }: SetRowProps) {
           />
         </td>
       )}
+      {hasDistance && (
+        <td>
+          <SetInput
+            value={set.distanceMeters ?? ""}
+            onChange={(value) => updateSetData("distanceMeters", value)}
+          />
+        </td>
+      )}
       <td className="py-3 px-2">
         <Button
           variant="ghost"
@@ -174,8 +190,9 @@ export default function SetList({ routine }: { routine: Routine | null }) {
   const sets = currentExercise?.sets ?? [];
 
   const hasReps = !!currentExercise && isRepsExercise(currentExercise);
-  const hasDuration = !!currentExercise && isDurationExercise(currentExercise);
   const hasWeight = !!currentExercise && isWeightsExercise(currentExercise);
+  const hasDuration = !!currentExercise && isDurationExercise(currentExercise);
+  const hasDistance = !!currentExercise && isCardioExercise(currentExercise);
 
   const addSet = () => {
     if (!currentExercise) return;
@@ -204,6 +221,7 @@ export default function SetList({ routine }: { routine: Routine | null }) {
             {hasReps && <th className="pb-3 px-2">Reps</th>}
             {hasWeight && <th className="pb-3 px-2">kg</th>}
             {hasDuration && <th className="pb-3 px-2">Mins</th>}
+            {hasDistance && <th className="pb-3 px-2">Meters</th>}
             <th className="pb-3 px-2 w-16"></th>
           </tr>
         </thead>
@@ -215,6 +233,7 @@ export default function SetList({ routine }: { routine: Routine | null }) {
               hasReps={hasReps}
               hasWeight={hasWeight}
               hasDuration={hasDuration}
+              hasDistance={hasDistance}
             />
           ))}
         </tbody>

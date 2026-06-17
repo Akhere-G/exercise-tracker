@@ -15,6 +15,20 @@ def infer_metrics(item: Dict[str, Any]) -> str:
     category = item.get("category", "").lower()
     body_part = item.get("body_part", "").lower()
 
+    distance_keywords = [
+        "run",
+        "walk",
+        "stepmill",
+        "treadmill",
+        "cross trainer",
+        "cycle",
+        "elliptical",
+    ]
+    if (category == "cardio" or body_part == "cardio") and any(
+        k in name for k in distance_keywords
+    ):
+        return "duration+distance"
+
     duration_keywords = ["plank", "hold", "stretch", "static", "hang"]
     if (
         category == "cardio"

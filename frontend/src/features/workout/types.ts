@@ -10,6 +10,7 @@ export interface WorkoutSet {
   reps?: number;
   weight?: number;
   durationSecs?: number;
+  distanceMeters?: number;
 }
 export interface Workout {
   id: number;

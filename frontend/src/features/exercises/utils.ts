@@ -12,7 +12,12 @@ export const isWeightsExercise = (exercise: Exercise) =>
   MetricsType.REPS_WEIGHT === exercise.metrics;
 
 export const isDurationExercise = (exercise: Exercise) =>
-  MetricsType.DURATION === exercise.metrics;
+  ([MetricsType.DURATION, MetricsType.DURATION_DISTANCE] as Metrics[]).includes(
+    exercise.metrics,
+  );
+
+export const isCardioExercise = (exercise: Exercise) =>
+  MetricsType.DURATION_DISTANCE === exercise.metrics;
 
 export const getMuscleMapData = (exercises: Exercise[]) => {
   const muscles: Record<string, number> = {};
