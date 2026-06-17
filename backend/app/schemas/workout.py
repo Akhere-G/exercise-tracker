@@ -10,6 +10,7 @@ class WorkoutSetBase(BaseModel):
     set_index: int = 1
     reps: Optional[int] = None
     weight: Optional[float] = None
+    distance_meters: Optional[float] = None
     duration_secs: Optional[int] = None
 
     @model_validator(mode="after")

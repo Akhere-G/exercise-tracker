@@ -56,7 +56,7 @@ function ExerciseDetail({
   exercise: Exercise;
   workoutSets: workoutSetWithDate[];
 }) {
-  const { videoUrl, name, equipment, muscles, metrics } = exercise;
+  const { videoUrl, name, equipment, muscles } = exercise;
 
   const groupedSets = workoutSets.reduce(
     (acc, set) => {
@@ -87,14 +87,17 @@ function ExerciseDetail({
         <h2 className="text-2xl">{name}</h2>
         <div className="flex justify-between">
           <p className="flex items-center text-muted-foreground capitalize ">
-            <span>{equipment}</span>
-            <Dot className="w-3 h-3 opacity-60 shrink-0" />
-            <span className="truncate">
-              {muscles.map((m) => m.name).join(", ")}
+            <span className="flex flex-wrap items-center ">
+              {equipment}
+              <Dot className="w-3 h-3 opacity-60 shrink-0" />
+
+              {muscles.map((m, i) => (
+                <span key={m.name} className="mr-1">
+                  {m.name}
+                  {i !== muscles.length - 1 ? ", " : ""}
+                </span>
+              ))}
             </span>
-          </p>
-          <p className="flex items-center text-muted-foreground capitalize ">
-            {metrics}
           </p>
         </div>
 
