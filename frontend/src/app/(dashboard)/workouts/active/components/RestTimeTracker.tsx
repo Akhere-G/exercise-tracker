@@ -19,10 +19,14 @@ export default function RestTimeTracker() {
 
   const Icon = isRunning ? Pause : Play;
 
+  function playSound() {
+    const audio = new Audio("/alert.wav");
+    audio.play();
+  }
   useEffect(() => {
     if (currentTime === 0 && isRunning) {
       toast("Rest complete!");
-      // TODO: Add sound
+      playSound();
     }
   }, [currentTime, isRunning]);
 
