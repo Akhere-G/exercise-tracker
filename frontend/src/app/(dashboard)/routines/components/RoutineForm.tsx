@@ -12,7 +12,6 @@ import { ExercisePickerModal } from "./ExercisePickerModal";
 import { useRouter } from "next/navigation";
 import { Routine } from "@/src/features/routines/types";
 import { toast } from "sonner";
-import { Toaster } from "@/src/components/ui/sonner";
 import { ActionResponse } from "@/src/lib/apiTypes";
 
 export default function RoutineForm({
@@ -170,7 +169,7 @@ export default function RoutineForm({
           <Button type="submit">{sumbitText}</Button>
         </div>
       </form>
-      <Toaster position="top-right" richColors closeButton />
+
       <ExercisePickerModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

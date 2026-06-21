@@ -17,7 +17,6 @@ import {
   isWorkoutCompleted,
 } from "@/src/features/workout/utils";
 import { toast } from "sonner";
-import { Toaster } from "@/src/components/ui/sonner";
 import { Button } from "@/src/components/ui/button";
 import { WorkoutSchema } from "@/src/features/workout/schema";
 import { createWorkout } from "@/src/features/workout/actions";
@@ -95,8 +94,6 @@ export default function WorkoutClientProvider({
   return (
     <div className="relative  h-[90vh] flex flex-1 flex-col justify-between">
       <div>
-        <Toaster position="top-right" richColors closeButton />
-
         <ExerciseList />
         <ExerciseDetails
           completeWorkout={completeWorkout}

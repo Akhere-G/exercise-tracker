@@ -2,6 +2,7 @@ import { getAllRoutines } from "@/src/features/routines/queries";
 import RoutineCard from "./components/RoutineCard";
 import Link from "next/link";
 import StoredWorkout from "./components/StoredWorkout";
+import NotificationsPrompt from "@/src/features/notifications/components/NotificationsPrompt";
 
 export default async function Routines() {
   const response = await getAllRoutines();
@@ -28,6 +29,7 @@ export default async function Routines() {
         Add New Routine
       </Link>
       <StoredWorkout />
+      <NotificationsPrompt />
     </div>
   );
 }
