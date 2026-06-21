@@ -50,6 +50,7 @@ export function ExercisePickerModal({
   submitBtnText = "Add",
   defaultMuscle = "",
 }: ExercisePickerModalProps) {
+  const [error, setError] = useState("");
   const [equipment, setEquipment] = useState("");
   const [muscle, setMuscle] = useState(defaultMuscle);
   const [query, setQuery] = useState("");
@@ -76,6 +77,7 @@ export function ExercisePickerModal({
         setExercisesToAdd({});
         setPage(1);
         setHasMore(true);
+        setError("");
       }
     }
 
@@ -87,6 +89,7 @@ export function ExercisePickerModal({
       setPage(1);
       setHasMore(true);
       setExercises([]);
+      setError("");
     }
     resetOnParamChange();
   }, [deferredQuery, equipment, muscle]);
@@ -99,7 +102,7 @@ export function ExercisePickerModal({
   }, [defaultMuscle]);
 
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || error) return;
 
     const controller = new AbortController();
 
@@ -125,6 +128,7 @@ export function ExercisePickerModal({
       } catch (error) {
         if (!controller.signal.aborted) {
           console.error("Failed to load modal exercises:", error);
+          setError(error as string);
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -139,7 +143,7 @@ export function ExercisePickerModal({
       clearTimeout(timeoutId);
       controller.abort();
     };
-  }, [isOpen, deferredQuery, page, equipment, muscle]);
+  }, [isOpen, deferredQuery, page, equipment, muscle, error]);
 
   const lastElementRef = useCallback(
     (node: HTMLDivElement | null) => {
