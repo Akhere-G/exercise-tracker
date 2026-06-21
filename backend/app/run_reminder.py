@@ -1,3 +1,6 @@
+import os
+
+print(f"DEBUG: Environment variables present: {list(os.environ.keys())}")
 from app.workers.scheduler import check_routine_reminders
 
 if __name__ == "__main__":
