@@ -31,6 +31,11 @@ def save_subscription(db: Session, user_id: int, endpoint: str, p256dh: str, aut
     existing_sub = db.execute(stmt).scalar_one_or_none()
 
     if existing_sub:
+        existing_sub.user_id = user_id
+        existing_sub.p256dh = p256dh
+        existing_sub.auth = auth
+        db.commit()
+        db.refresh(existing_sub)
         return existing_sub
 
     new_sub = NotificationSubscription(
