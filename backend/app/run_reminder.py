@@ -1,14 +1,12 @@
 import os
+import sys
 
-print(f"DEBUG: Environment variables present: {list(os.environ.keys())}")
+sys.path.append(os.getcwd())
 
 from app.workers.scheduler import check_routine_reminders
-from app.database import SessionLocal
 
 if __name__ == "__main__":
-    db = None
     try:
-        db = SessionLocal()
         print("Starting routine reminder check job...")
         check_routine_reminders()
         print("Job completed successfully.")
@@ -18,6 +16,3 @@ if __name__ == "__main__":
         print("CRITICAL ERROR IN SCHEDULER:")
         print(traceback.format_exc())
         raise e
-    finally:
-        if db:
-            db.close()
