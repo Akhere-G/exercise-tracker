@@ -13,6 +13,6 @@ if __name__ == "__main__":
     except Exception as e:
         import traceback
 
-        print("CRITICAL ERROR IN SCHEDULER:")
+        print("CRITICAL ERROR IN RUN_REMINDER:")
         print(traceback.format_exc())
         raise e
