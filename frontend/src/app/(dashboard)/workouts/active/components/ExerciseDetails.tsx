@@ -101,84 +101,93 @@ export default function ExerciseDetails({
     router.push("/routines");
   }
 
-  if (!currentExercise)
-    return (
-      <div className="p-8 text-center">
-        <h2 className="mb-4">No Exercise selected</h2>
-
-        <Button variant="destructive" onClick={() => setCancelModalOpen(true)}>
-          Cancel Workout
-        </Button>
-      </div>
-    );
-
   return (
     <div className="mt-4 px-2">
       <div className="flex gap-2 justify-between items-start">
-        <div className="">
-          <h2>{currentExercise.name}</h2>
-          <div className="flex items-center">
-            <p className="capitalize text-sm text-secondary-foreground">
-              {currentExercise.equipment}
-            </p>
-            <Dot width={16} />
-            <p className="capitalize text-sm text-secondary-foreground">
-              {currentExercise.muscles.map((m) => m.name).join(", ")}
-            </p>
-          </div>
-        </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <MoreVertical size={16} />
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem
-              onClick={() => router.push(`/exercises/${currentExerciseId}`)}
-            >
-              Details
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={removeLastSet}>
-              Remove Last set
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setIsExerciseModalOpen(true)}>
-              Replace Exercise
-            </DropdownMenuItem>
-            <DropdownMenuItem
+        {!currentExercise ? (
+          <div className="p-8 text-center flex flex-col items-center w-full ">
+            <h2 className="mb-4">No exercises</h2>
+
+            <Button
               variant="destructive"
-              onClick={() => setRemoveModalOpen(true)}
-            >
-              Remove Exercise
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              variant="destructive"
-              onClick={() => setCancelModalOpen(true)}
+              onClick={() => {
+                console.log("clicked");
+                setCancelModalOpen(true);
+              }}
             >
               Cancel Workout
-            </DropdownMenuItem>
-            {canComplete && (
-              <DropdownMenuItem onClick={() => setFinishModalOpen(true)}>
-                Finish Workout
-              </DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <Dialog
-          open={removeModalOpen}
-          onOpenChange={(open) => setRemoveModalOpen(open)}
-        >
-          <DialogContent onClick={(e) => e.stopPropagation()}>
-            <DialogTitle>Delete {currentExercise.name}?</DialogTitle>
-            <DialogDescription>
-              Delete {currentExercise.name} and all its sets?
-            </DialogDescription>
-            <DialogFooter>
-              <DialogClose>Close</DialogClose>
-              <Button variant="destructive" onClick={removeExercise}>
-                Delete
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div>
+              <h2>{currentExercise.name}</h2>
+              <div className="flex items-center">
+                <p className="capitalize text-sm text-secondary-foreground">
+                  {currentExercise.equipment}
+                </p>
+                <Dot width={16} />
+                <p className="capitalize text-sm text-secondary-foreground">
+                  {currentExercise.muscles.map((m) => m.name).join(", ")}
+                </p>
+              </div>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <MoreVertical size={16} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  onClick={() => router.push(`/exercises/${currentExerciseId}`)}
+                >
+                  Details
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={removeLastSet}>
+                  Remove Last set
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setIsExerciseModalOpen(true)}>
+                  Replace Exercise
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setRemoveModalOpen(true)}
+                >
+                  Remove Exercise
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setCancelModalOpen(true)}
+                >
+                  Cancel Workout
+                </DropdownMenuItem>
+                {canComplete && (
+                  <DropdownMenuItem onClick={() => setFinishModalOpen(true)}>
+                    Finish Workout
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </>
+        )}
+        {currentExercise && (
+          <Dialog
+            open={removeModalOpen}
+            onOpenChange={(open) => setRemoveModalOpen(open)}
+          >
+            <DialogContent onClick={(e) => e.stopPropagation()}>
+              <DialogTitle>Delete {currentExercise.name}?</DialogTitle>
+              <DialogDescription>
+                Delete {currentExercise.name} and all its sets?
+              </DialogDescription>
+              <DialogFooter>
+                <DialogClose>Close</DialogClose>
+                <Button variant="destructive" onClick={removeExercise}>
+                  Delete
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        )}
 
         <Dialog
           open={finishModalOpen}
@@ -214,16 +223,18 @@ export default function ExerciseDetails({
           </DialogContent>
         </Dialog>
 
-        <ExercisePickerModal
-          addedExercises={[currentExercise]}
-          isOpen={isExerciseModalOpen}
-          onClose={() => setIsExerciseModalOpen(false)}
-          onSelect={replaceExercise}
-          selectMany={false}
-          title="Replace Exercise"
-          submitBtnText="Replace"
-          defaultMuscle={currentExercise.muscles[0].name}
-        />
+        {currentExercise && (
+          <ExercisePickerModal
+            addedExercises={[currentExercise]}
+            isOpen={isExerciseModalOpen}
+            onClose={() => setIsExerciseModalOpen(false)}
+            onSelect={replaceExercise}
+            selectMany={false}
+            title="Replace Exercise"
+            submitBtnText="Replace"
+            defaultMuscle={currentExercise.muscles[0].name}
+          />
+        )}
       </div>
     </div>
   );
