@@ -101,6 +101,7 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
             alt={exercise.name}
             fill
             className="object-scale-down"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
         </div>
         <CardHeader className="px-3 pb-2  gap-0.5 flex-1">

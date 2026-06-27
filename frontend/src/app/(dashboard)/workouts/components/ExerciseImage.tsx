@@ -10,6 +10,7 @@ export function ExerciseImage({ exercise }: { exercise: Exercise }) {
         alt={exercise.name}
         fill
         className="object-scale-down"
+        sizes="68px"
       />
     </div>
   );

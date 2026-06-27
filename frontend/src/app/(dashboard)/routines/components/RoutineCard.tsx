@@ -51,6 +51,7 @@ export default function RoutineCard({ routine }: { routine: Routine }) {
               alt={item.exercise.name}
               fill
               className="object-scale-down"
+              sizes="68px"
             />
           </div>
         ))}

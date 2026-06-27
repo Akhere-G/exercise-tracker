@@ -6,7 +6,6 @@ import { NotificationCreate } from "./types";
 export async function subscribe(
   sub: NotificationCreate,
 ): Promise<ActionResponse<null>> {
-  console.log("clicked!");
   try {
     api.post("/notifications/subscribe", sub);
     return { success: true, data: null };
