@@ -3,6 +3,7 @@ import RoutineCard from "./components/RoutineCard";
 import Link from "next/link";
 import StoredWorkout from "./components/StoredWorkout";
 import NotificationsPrompt from "@/src/features/notifications/components/NotificationsPrompt";
+import StartEmptyWorkoutButton from "../components/StartEmptyWorkoutButton";
 
 export default async function Routines() {
   const response = await getAllRoutines();
@@ -22,9 +23,8 @@ export default async function Routines() {
           ))
         )}
       </div>
-      <Link className="text-center text-foreground" href="/workouts/active">
-        Start Empty Workout
-      </Link>
+      <StartEmptyWorkoutButton />
+
       <Link className="text-center" href="/routines/create">
         Add New Routine
       </Link>
