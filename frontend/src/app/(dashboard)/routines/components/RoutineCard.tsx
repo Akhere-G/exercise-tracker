@@ -1,22 +1,15 @@
 "use client";
 import { Card } from "@/src/components/card";
-import { Button, buttonVariants } from "@/src/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import { Routine } from "@/src/features/routines/types";
 import Image from "next/image";
-import Link from "next/link";
 import RoutineModal from "../RoutineModal";
-import { useWorkout, workoutStorageKey } from "@/src/features/workout/store";
+import { useWorkout } from "@/src/features/workout/store";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-} from "@/src/components/ui/dialog";
+
 import { getImageUrl } from "@/src/features/exercises/utils";
+import StartWorkoutDialog from "./StartWorkoutDialog";
 
 export default function RoutineCard({ routine }: { routine: Routine }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -66,33 +59,11 @@ export default function RoutineCard({ routine }: { routine: Routine }) {
       <Button variant="default" onClick={startWorkout}>
         Start
       </Button>
-
-      <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
-        <DialogContent>
-          <DialogTitle>You have a workout in progress</DialogTitle>
-          <DialogDescription>
-            If you start a new workout, your current one will be permanently
-            deleted
-          </DialogDescription>
-          <DialogFooter>
-            <Button
-              onClick={() => router.push(`/workouts/active?routineId=${id}`)}
-            >
-              Resume current workout
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                localStorage.removeItem(workoutStorageKey);
-                router.push(`/workouts/active?routineId=${id}`);
-              }}
-            >
-              Start new workout
-            </Button>
-            <DialogClose>Cancel</DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <StartWorkoutDialog
+        isOpen={isOpen}
+        routineId={id}
+        setIsOpen={setIsOpen}
+      />
     </Card>
   );
 }
