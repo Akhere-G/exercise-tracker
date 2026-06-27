@@ -27,10 +27,8 @@ export default function RoutineModal({ routine }: { routine: Routine }) {
   return (
     <div>
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <button className="p-2">
-            <MoreVertical size={16} />
-          </button>
+        <DropdownMenuTrigger className="p-2">
+          <MoreVertical size={16} />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem

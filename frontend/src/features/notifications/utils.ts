@@ -1,4 +1,4 @@
-import { NotificationCreate } from "./types";
+import { type NotificationCreate } from "./types";
 
 const VAPID_PUBLIC_KEY =
   "BOHYHJJvVcPYiTtnJJzhGPl9qAQe5dj2HAXEx7Of7HvbCy5GFp15ciA4ZkrhFDEn3HSemEt2zoa6ItR40ajHeOo";
