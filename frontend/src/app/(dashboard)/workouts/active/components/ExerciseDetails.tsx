@@ -39,7 +39,8 @@ export default function ExerciseDetails({
 
   const router = useRouter();
 
-  const { currentExerciseId, exercises, setWorkoutData } = useWorkout();
+  const { currentExerciseId, exercises, setWorkoutData, resetState } =
+    useWorkout();
 
   const currentExercise = exercises.find((e) => e.id === currentExerciseId);
 
@@ -95,6 +96,7 @@ export default function ExerciseDetails({
   }
 
   function cancelWorkout() {
+    resetState();
     localStorage.removeItem(workoutStorageKey);
     router.push("/routines");
   }
