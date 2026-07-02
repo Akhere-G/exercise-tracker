@@ -136,14 +136,7 @@ function SetRow({
       <td className="py-3 px-2 font-semibold text-secondary-foreground">
         {set.setIndex}
       </td>
-      {hasReps && (
-        <td>
-          <SetInput
-            value={set.reps ?? ""}
-            onChange={(value) => updateSetData("reps", value)}
-          />
-        </td>
-      )}
+
       {hasWeight && (
         <td>
           <SetInput
@@ -151,6 +144,14 @@ function SetRow({
             onChange={(value) => updateSetData("weight", value)}
             canBeZero
             canBeNegative
+          />
+        </td>
+      )}
+      {hasReps && (
+        <td>
+          <SetInput
+            value={set.reps ?? ""}
+            onChange={(value) => updateSetData("reps", value)}
           />
         </td>
       )}
@@ -218,8 +219,8 @@ export default function SetList({ routine }: { routine: Routine | null }) {
         <thead className="table-header-group">
           <tr className="text-secondary-foreground font-medium uppercase tracking-wider text-xs text-left">
             <th className="pb-3 px-2">Set</th>
-            {hasReps && <th className="pb-3 px-2">Reps</th>}
             {hasWeight && <th className="pb-3 px-2">kg</th>}
+            {hasReps && <th className="pb-3 px-2">Reps</th>}
             {hasDuration && <th className="pb-3 px-2">Mins</th>}
             {hasDistance && <th className="pb-3 px-2">Meters</th>}
             <th className="pb-3 px-2 w-16"></th>
