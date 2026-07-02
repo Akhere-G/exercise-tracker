@@ -111,7 +111,6 @@ export default function ExerciseDetails({
             <Button
               variant="destructive"
               onClick={() => {
-                console.log("clicked");
                 setCancelModalOpen(true);
               }}
             >

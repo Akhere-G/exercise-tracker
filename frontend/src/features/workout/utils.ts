@@ -161,6 +161,10 @@ export function getGreyShadeCSS(intensity: number): string {
 }
 
 export const getSetVolume = (exercise: BaseExercise, set: WorkoutSetSchema) => {
+  if (isCardioExercise(exercise)) {
+    return `${set.distanceMeters}m in ${getTime(set.durationSecs!)} mins`;
+  }
+
   if (isDurationExercise(exercise)) {
     return getTime(set.durationSecs!) + " mins";
   }

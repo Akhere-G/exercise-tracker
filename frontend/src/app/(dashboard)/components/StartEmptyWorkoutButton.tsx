@@ -10,7 +10,6 @@ export default function StartEmptyWorkoutButton() {
   const { routineId, startedAt, resetState } = useWorkout();
   const router = useRouter();
 
-  console.log(routineId, startedAt);
   const handleClick = () => {
     if (!startedAt) {
       resetState();
