@@ -44,8 +44,8 @@ export default function StartWorkoutDialog({
             className="flex-1"
             variant="destructive"
             onClick={() => {
-              localStorage.removeItem(workoutStorageKey);
               resetState();
+              localStorage.removeItem(workoutStorageKey);
               router.push(`/workouts/active?routineId=${routineId}`);
             }}
           >
