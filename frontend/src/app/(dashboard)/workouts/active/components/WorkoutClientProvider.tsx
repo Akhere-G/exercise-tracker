@@ -22,6 +22,7 @@ import { WorkoutSchema } from "@/src/features/workout/schema";
 import { createWorkout } from "@/src/features/workout/actions";
 
 import { useRouter } from "next/navigation";
+import PreviousSets from "./PreviousSets";
 
 export default function WorkoutClientProvider({
   routine,
@@ -104,6 +105,7 @@ export default function WorkoutClientProvider({
             .some((s) => s.isCompleted)}
         />
         <SetList routine={routine} />
+        <PreviousSets />
       </div>
       <RestTimeTracker />
 

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from app.models import User
-from app.schemas.workout import Workout, WorkoutCreate, WorkoutUpdate
+from app.schemas.workout import Workout, WorkoutCreate, WorkoutUpdate, WorkoutSet
 from typing import Annotated
 from app.database import get_db
 from app.services import (
@@ -30,6 +30,15 @@ def get_workouts(
     routineId: Optional[int] = None,
 ):
     return workout_service.get_workouts(db, user.id, routineId)
+
+
+@router.get("/previous/{exercise_id}", response_model=List[WorkoutSet])
+def get_previous_workout(
+    user: Annotated[User, Depends(user_service.get_current_user)],
+    db: Annotated[Session, Depends(get_db)],
+    exercise_id: int,
+):
+    return workout_service.get_previous_workouts(db, user.id, exercise_id)
 
 
 @router.get("/{workout_id}", response_model=Workout)

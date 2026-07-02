@@ -1,12 +1,16 @@
 from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import select
-from app.models import Workout, WorkoutSet, Routine, Exercise, ExerciseMuscle
+from app.models import Workout, WorkoutSet, Exercise, ExerciseMuscle
 from typing import Optional
 from app.schemas.workout import WorkoutCreate, WorkoutUpdate
 from datetime import datetime, timedelta
 
 
-def get_workouts(db: Session, user_id: int, routine_id: Optional[int] = None):
+def get_workouts(
+    db: Session,
+    user_id: int,
+    routine_id: Optional[int] = None,
+):
     stmt = (
         select(Workout)
         .options(
@@ -17,8 +21,38 @@ def get_workouts(db: Session, user_id: int, routine_id: Optional[int] = None):
         )
         .where(Workout.user_id == user_id)
     )
+
     if routine_id:
         stmt = stmt.where(Workout.routine_id == routine_id)
+
+    return db.execute(stmt).scalars().all()
+
+
+def get_previous_workouts(
+    db: Session,
+    user_id: int,
+    exercise_id: int,
+):
+    latest_workout_id = (
+        select(Workout.id)
+        .join(WorkoutSet)
+        .where(
+            Workout.user_id == user_id,
+            WorkoutSet.exercise_id == exercise_id,
+        )
+        .order_by(Workout.completed_at.desc())
+        .limit(1)
+        .scalar_subquery()
+    )
+
+    stmt = (
+        select(WorkoutSet)
+        .where(
+            WorkoutSet.workout_id == latest_workout_id,
+            WorkoutSet.exercise_id == exercise_id,
+        )
+        .order_by(WorkoutSet.set_index)
+    )
 
     return db.execute(stmt).scalars().all()
 

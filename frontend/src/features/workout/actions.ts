@@ -2,7 +2,7 @@
 import { api, handleApiError } from "@/src/lib/axios";
 import { WorkoutSchema } from "./schema";
 import { ActionResponse } from "@/src/lib/apiTypes";
-import { Workout } from "./types";
+import { Workout, WorkoutSet } from "./types";
 
 export const createWorkout = async (
   workout: WorkoutSchema,
@@ -20,5 +20,19 @@ export const createWorkout = async (
     return { success: true, data: repsonse.data };
   } catch (err) {
     return handleApiError<Workout>(err);
+  }
+};
+
+export const getPreviousSets = async (
+  exerciseId: number,
+): Promise<ActionResponse<WorkoutSet[]>> => {
+  try {
+    const response = await api.get<WorkoutSet[]>(
+      `/workouts/previous/${exerciseId}`,
+    );
+
+    return { success: true, data: response.data };
+  } catch (err) {
+    return handleApiError<WorkoutSet[]>(err);
   }
 };
