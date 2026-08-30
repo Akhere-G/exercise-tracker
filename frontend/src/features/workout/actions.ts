@@ -16,8 +16,8 @@ export const createWorkout = async (
       })),
     };
 
-    const repsonse = await api.post<Workout>("/workouts", formattedWorkout);
-    return { success: true, data: repsonse.data };
+    const response = await api.post<Workout>("/workouts", formattedWorkout);
+    return { success: true, data: response.data };
   } catch (err) {
     return handleApiError<Workout>(err);
   }

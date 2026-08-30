@@ -22,7 +22,7 @@ class UserCreate(UserBase):
     @classmethod
     def validate_password(cls, value: str) -> str:
         if not re.search(r"\d", value):
-            raise ValueError("Must contain at least one character.")
+            raise ValueError("Must contain at least one digit.")
 
         if not re.search(r"[a-z]", value):
             raise ValueError("Must contain at least one lowercase character.")

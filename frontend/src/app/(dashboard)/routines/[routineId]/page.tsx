@@ -21,9 +21,9 @@ export default async function RoutineData({
 
   const routineReponse = await getRoutineById(routineId);
   const routine = routineReponse.success ? routineReponse.data : null;
-  const repsonse = await getWorkouts(routineId);
+  const response = await getWorkouts(routineId);
 
-  const workouts = repsonse.success ? repsonse.data : [];
+  const workouts = response.success ? response.data : [];
 
   const statsResponse = await getWorkoutStats(routineId);
 

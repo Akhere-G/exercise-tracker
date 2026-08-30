@@ -35,7 +35,7 @@ export default function Login() {
         router.push("/routines");
       }
     } catch {
-      setErrorMessage("Sorry... Somthing went wrong.");
+      setErrorMessage("Sorry... Something went wrong.");
     }
   };
   return (

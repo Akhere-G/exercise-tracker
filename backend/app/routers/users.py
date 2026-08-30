@@ -11,8 +11,8 @@ router = APIRouter(prefix="/api/auth", tags=["Users"])
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
-    exisiting_user = user_service.get_user_by_email(db, email=user_in.email)
-    if exisiting_user:
+    existing_user = user_service.get_user_by_email(db, email=user_in.email)
+    if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="A user with this email address already exists.",
@@ -38,15 +38,15 @@ def login(
 
 @router.post("/login", status_code=status.HTTP_200_OK)
 def login_user(user_in: UserLogin, db: Session = Depends(get_db)):
-    exisiting_user = user_service.get_user_by_email(db, email=user_in.email)
-    if not exisiting_user or not user_service.check_password_hash(
-        user_in.password, exisiting_user.password_hash
+    existing_user = user_service.get_user_by_email(db, email=user_in.email)
+    if not existing_user or not user_service.check_password_hash(
+        user_in.password, existing_user.password_hash
     ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect password or email",
         )
-    return user_service.get_access_token(exisiting_user.email)
+    return user_service.get_access_token(existing_user.email)
 
 
 @router.get("/me")
