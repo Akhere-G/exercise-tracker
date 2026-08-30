@@ -120,6 +120,7 @@ def create_workout(db: Session, user_id: int, workout_in: WorkoutCreate):
                 reps=set_data.reps,
                 weight=set_data.weight,
                 duration_secs=set_data.duration_secs,
+                distance_meters=set_data.distance_meters,
             )
             db.add(set_item)
 
@@ -159,6 +160,7 @@ def update_workout(
                     reps=set_data.reps,
                     weight=set_data.weight,
                     duration_secs=set_data.duration_secs,
+                    distance_meters=set_data.distance_meters,
                 )
 
                 workout.sets.append(set_item)
