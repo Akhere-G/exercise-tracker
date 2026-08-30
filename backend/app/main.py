@@ -1,10 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import users, exercises, routines, workouts, notifications
-from app.database import engine, Base
 import os
-
-Base.metadata.create_all(bind=engine)
 
 
 def create_app() -> FastAPI:
@@ -17,7 +14,6 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[
-            "http://127.0.0.1:8000",
             os.getenv("FRONTEND_ORIGIN", "http://localhost:3000"),
         ],
         allow_credentials=True,
