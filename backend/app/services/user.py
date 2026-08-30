@@ -91,7 +91,7 @@ def create_user(db: Session, user_in: UserCreate):
         db.commit()
         db.refresh(user)
         return user
-    except:
+    except Exception:
         db.rollback()
         raise
 

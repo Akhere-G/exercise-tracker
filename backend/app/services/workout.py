@@ -128,7 +128,7 @@ def create_workout(db: Session, user_id: int, workout_in: WorkoutCreate):
         db.refresh(new_workout)
 
         return new_workout
-    except:
+    except Exception:
         db.rollback()
         raise
 
@@ -169,7 +169,7 @@ def update_workout(
         db.refresh(workout)
 
         return workout
-    except:
+    except Exception:
         db.rollback()
         raise
 
@@ -186,6 +186,6 @@ def delete_workout(db: Session, user_id: int, workout_id: int):
         db.commit()
 
         return workout_id
-    except:
+    except Exception:
         db.rollback()
         raise
