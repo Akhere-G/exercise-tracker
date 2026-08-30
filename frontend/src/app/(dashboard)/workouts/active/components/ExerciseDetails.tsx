@@ -29,7 +29,7 @@ export default function ExerciseDetails({
   completeWorkout,
   canComplete,
 }: {
-  completeWorkout: () => Promise<void>;
+  completeWorkout: (onComplete: () => void) => Promise<void>;
   canComplete: boolean;
 }) {
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
@@ -199,7 +199,10 @@ export default function ExerciseDetails({
             </DialogDescription>
             <DialogFooter>
               <DialogClose>Cancel</DialogClose>
-              <Button variant="default" onClick={() => completeWorkout()}>
+              <Button
+                variant="default"
+                onClick={() => completeWorkout(() => setFinishModalOpen(false))}
+              >
                 Finish
               </Button>
             </DialogFooter>
