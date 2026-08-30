@@ -49,7 +49,7 @@ export default function Register() {
     } catch {
       setErrorMessage((prev) => ({
         ...prev,
-        general: "Sorry... Somthing went wrong.",
+        general: "Sorry... Something went wrong.",
       }));
     }
   };

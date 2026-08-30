@@ -12,16 +12,16 @@ def read_notifications(db: Session, user_id: int, notification_id: int):
     stmt = select(Notification).where(
         Notification.id == notification_id, Notification.user_id == user_id
     )
-    notificaiton = db.execute(stmt).scalar_one_or_none()
+    notification = db.execute(stmt).scalar_one_or_none()
 
-    if not notificaiton:
+    if not notification:
         return None
 
-    notificaiton.is_read = True
+    notification.is_read = True
 
     db.commit()
 
-    return notificaiton
+    return notification
 
 
 def save_subscription(db: Session, user_id: int, endpoint: str, p256dh: str, auth: str):

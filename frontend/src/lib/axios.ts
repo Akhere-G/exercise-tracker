@@ -37,6 +37,6 @@ export function handleApiError<T>(err: unknown): ActionResponse<T> {
   }
   return {
     success: false,
-    error: "An unexpected error occured",
+    error: "An unexpected error occurred",
   };
 }

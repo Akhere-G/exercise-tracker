@@ -28,12 +28,12 @@ export const sameMetrics = (
 };
 export const getDefaultSets = (
   exercise: BaseExercise,
-  oldExercse?: Exercise,
+  oldExercise?: Exercise,
 ) => {
   const sets: ActiveSet[] = [];
 
-  if (oldExercse && sameMetrics(oldExercse, exercise)) {
-    return oldExercse.sets;
+  if (oldExercise && sameMetrics(oldExercise, exercise)) {
+    return oldExercise.sets;
   }
 
   for (let i = 1; i <= DEFAULT_TOTAL_SETS; i++) {
