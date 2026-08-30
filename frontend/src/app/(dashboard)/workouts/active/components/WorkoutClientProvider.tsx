@@ -68,7 +68,7 @@ export default function WorkoutClientProvider({
     }
   }, [routine, setWorkoutData]);
 
-  async function completeWorkout() {
+  async function completeWorkout(onComplete?: () => void) {
     const completedAt = new Date();
     const durationInMs = completedAt.getTime() - new Date(startedAt!).getTime();
     const duration = Math.floor(durationInMs / 1000);
@@ -84,7 +84,10 @@ export default function WorkoutClientProvider({
         const newWorkout = response.data;
         resetState();
         localStorage.removeItem(workoutStorageKey);
-        router.push(`/workouts/summary/${newWorkout.id}?first=true`);
+        onComplete?.();
+        setTimeout(() =>
+          router.push(`/workouts/summary/${newWorkout.id}?first=true`),
+        );
       } else {
         toast.error(response.error);
       }
@@ -112,7 +115,7 @@ export default function WorkoutClientProvider({
       <div
         className={`fixed left-0 w-full px-4 transition-all duration-300 ${canComplete ? "bottom-32 opacity-100" : "-bottom-full opacity-0"}`}
       >
-        <Button onClick={completeWorkout} className="w-full shadow-2xl">
+        <Button onClick={() => completeWorkout()} className="w-full shadow-2xl">
           Complete Workout
         </Button>
       </div>
