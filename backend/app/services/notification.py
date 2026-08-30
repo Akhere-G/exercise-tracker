@@ -5,7 +5,7 @@ from ..models import Notification, NotificationSubscription
 
 def get_notifications(db: Session, user_id: int):
     stmt = select(Notification).where(Notification.user_id == user_id)
-    return db.execute(stmt).scalars()
+    return db.execute(stmt).scalars().all()
 
 
 def read_notifications(db: Session, user_id: int, notification_id: int):

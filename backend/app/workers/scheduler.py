@@ -8,12 +8,14 @@ from app.models import Routine, NotificationSubscription, Notification
 from dotenv import load_dotenv
 import os
 from typing import Dict
-
+import logging
 
 load_dotenv()
 
 VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
 VAPID_CLAIMS: Dict[str, str | int] = {"sub": "mailto:101akhere5@gmail.com"}
+
+logger = logging.getLogger(__name__)
 
 
 def send_push_to_user_subscriptions(
@@ -54,7 +56,7 @@ def send_push_to_user_subscriptions(
             if ex.response is not None and ex.response.status_code in [404, 410]:
                 db.delete(sub)
                 db.commit()
-            raise ex
+            logger.exception(ex)  # noqa: TRY401
     return total_subscriptions
 
 
