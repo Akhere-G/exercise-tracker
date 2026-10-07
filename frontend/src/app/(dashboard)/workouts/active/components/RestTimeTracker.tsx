@@ -1,12 +1,13 @@
 "use client";
 import { Button } from "@/src/components/ui/button";
 import { useTimer } from "@/src/features/timer/store";
+import { startTimer, cancelTimer, modifyTimer } from "@/src/features/timers/actions";
 import { Pause, Play, RefreshCcw } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
 export default function RestTimeTracker() {
-  const { currentTime, isRunning, start, pause, play, setTime, restTime } =
+  const { currentTime, isRunning, start, pause, play, setTime, clear, restTime } =
     useTimer();
 
   const mins =
@@ -30,6 +31,38 @@ export default function RestTimeTracker() {
     }
   }, [currentTime, isRunning]);
 
+  const handleStart = () => {
+    start();
+    startTimer(restTime);
+  };
+
+  const handlePause = () => {
+    pause();
+    cancelTimer();
+  };
+
+  const handlePlay = () => {
+    play();
+    startTimer(currentTime > 0 ? currentTime : restTime);
+  };
+
+  const handleClear = () => {
+    clear();
+    cancelTimer();
+  };
+
+  const handleDecreaseTime = () => {
+    const newTime = currentTime - 15;
+    setTime(newTime);
+    modifyTimer(newTime > 0 ? newTime : 10);
+  };
+
+  const handleIncreaseTime = () => {
+    const newTime = currentTime + 15;
+    setTime(newTime);
+    modifyTimer(newTime);
+  };
+
   return (
     <div className="relative bottom-0 pt-4 flex flex-col">
       <progress className="progress-bar" value={currentTime} max={restTime}>
@@ -39,12 +72,12 @@ export default function RestTimeTracker() {
         <p className="text-lg flex-1 text-center   ">
           {mins}:{secs}
         </p>
-        <Button onClick={() => setTime(currentTime - 15)}>- 15</Button>
-        <Button onClick={() => (isRunning ? pause() : play())}>
+        <Button onClick={handleDecreaseTime}>- 15</Button>
+        <Button onClick={() => (isRunning ? handlePause() : handlePlay())}>
           <Icon />
         </Button>
-        <Button onClick={() => setTime(currentTime + 15)}>+ 15</Button>
-        <Button onClick={start}>
+        <Button onClick={handleIncreaseTime}>+ 15</Button>
+        <Button onClick={handleClear}>
           <RefreshCcw />
         </Button>
       </div>
