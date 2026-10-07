@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import users, exercises, routines, workouts, notifications
+from app.routers import users, exercises, routines, workouts, notifications, timers
 import os
 
 
@@ -26,6 +26,7 @@ def create_app() -> FastAPI:
     app.include_router(exercises.router)
     app.include_router(routines.router)
     app.include_router(notifications.router)
+    app.include_router(timers.router)
 
     @app.get("/", tags=["Health"])
     async def health_check():

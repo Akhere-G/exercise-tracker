@@ -25,3 +25,4 @@ ca.pem
 .vscode*
 .idea/
 *.swp
+AGENTS.md

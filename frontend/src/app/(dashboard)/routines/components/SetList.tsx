@@ -13,8 +13,11 @@ import {
 } from "@/src/features/exercises/utils";
 import { getNewSet, isExerciseCompleted } from "@/src/features/workout/utils";
 import { useTimer } from "@/src/features/timer/store";
+import { startTimer, cancelTimer } from "@/src/features/timers/actions";
 import { toast } from "sonner";
 import { useState } from "react";
+
+const DEFAULT_REST_TIME = 20;
 
 function SetInput({
   value,
@@ -120,8 +123,10 @@ function SetRow({
     if (!set.isCompleted) {
       if (newExercises.some((e) => !isExerciseCompleted(e))) {
         start();
+        startTimer(DEFAULT_REST_TIME);
       } else {
         clear();
+        cancelTimer();
       }
     }
     checkIsCompleted(newExercises);
