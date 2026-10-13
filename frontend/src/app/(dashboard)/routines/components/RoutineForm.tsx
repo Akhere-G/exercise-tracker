@@ -157,6 +157,7 @@ export default function RoutineForm({
             register={register}
             remove={remove}
             errors={formState.errors}
+            control={control}
           />
           <Button
             type="button"

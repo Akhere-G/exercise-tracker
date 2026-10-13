@@ -12,9 +12,7 @@ export const createRoutine = async (
       ...routine,
       routineItems: routine.routineItems.map((r) => ({
         ...r,
-        targetDurationSecs: r.targetDuration
-          ? r.targetDuration * 60
-          : undefined,
+        targetDurationSecs: r.targetDuration ? r.targetDuration : undefined,
       })),
     };
     const response = await api.post<Routine>("/routines", formattedRoutine);
@@ -37,7 +35,7 @@ export const editRoutine = async (
         const { exercise, targetDuration, ...pureItemFields } = item;
         return {
           ...pureItemFields,
-          targetDurationSecs: targetDuration ? targetDuration * 60 : undefined,
+          targetDurationSecs: targetDuration ? targetDuration : undefined,
         };
       }),
     };

@@ -14,7 +14,7 @@ import { Workout, WorkoutSet } from "./types";
 const DEFAULT_TOTAL_SETS = 3;
 const DEFAULT_REPS = 10;
 const DEFAULT_WEIGHT = 25;
-const DEFAULT_DURATION = 10;
+const DEFAULT_DURATION = 10 * 60;
 const DEFAULT_DISTANCE = 500;
 
 export const sameMetrics = (
@@ -61,7 +61,7 @@ export const getNewSet = (
       exerciseId: exercise.id,
       setIndex: exercise.sets.length + 1,
       durationSecs: isDurationExercise(exercise)
-        ? routineItem.targetDurationSecs! / 60
+        ? routineItem.targetDurationSecs!
         : undefined,
       reps: isRepsExercise(exercise) ? routineItem.targetReps : undefined,
       weight: isWeightsExercise(exercise) ? DEFAULT_WEIGHT : undefined,

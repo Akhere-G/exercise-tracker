@@ -20,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
 import SetInput from "./SetInput";
+import TimeInput from "@/src/components/ui/timeInput";
 import { useState } from "react";
 import { ExerciseGroup, FormSetRow } from "./types";
 
@@ -134,7 +135,7 @@ export default function ExerciseSection({
                 )}
                 {hasDuration && (
                   <td>
-                    <SetInput
+                    <TimeInput
                       value={set.durationSecs ?? ""}
                       onChange={(v) =>
                         onUpdateSet(set.fieldIndex, "durationSecs", Number(v))
