@@ -23,6 +23,29 @@ export const createWorkout = async (
   }
 };
 
+export const updateWorkout = async (
+  workoutId: number,
+  workout: WorkoutSchema,
+): Promise<ActionResponse<Workout>> => {
+  try {
+    const formattedWorkout: WorkoutSchema = {
+      ...workout,
+      sets: workout.sets.map((s) => ({
+        ...s,
+        durationSecs: s.durationSecs ? s.durationSecs * 60 : null,
+      })),
+    };
+
+    const response = await api.patch<Workout>(
+      `/workouts/${workoutId}`,
+      formattedWorkout,
+    );
+    return { success: true, data: response.data };
+  } catch (err) {
+    return handleApiError<Workout>(err);
+  }
+};
+
 export const getPreviousSets = async (
   exerciseId: number,
 ): Promise<ActionResponse<WorkoutSet[]>> => {
