@@ -17,12 +17,14 @@ import Link from "next/link";
 
 export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { register, formState, handleSubmit } = useForm({
     resolver: yupResolver(loginSchema),
   });
 
   const onSubmit = async (formState: LoginSchema) => {
+    setIsSubmitting(true);
     try {
       const formattedData = {
         ...formState,
@@ -36,6 +38,8 @@ export default function Login() {
       }
     } catch {
       setErrorMessage("Sorry... Something went wrong.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
   return (
@@ -60,7 +64,9 @@ export default function Login() {
               {...register("password")}
               error={formState.errors.password?.message}
             />
-            <Button>Login</Button>
+            <Button disabled={isSubmitting}>
+              {isSubmitting ? "Logging in..." : "Login"}
+            </Button>
             <Link href="/register">Create account?</Link>
           </form>
         </CardContent>

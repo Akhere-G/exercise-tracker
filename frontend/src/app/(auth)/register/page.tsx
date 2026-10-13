@@ -22,12 +22,14 @@ export default function Register() {
     password: "",
     general: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { register, formState, handleSubmit } = useForm({
     resolver: yupResolver(registerSchema),
   });
 
   const onSubmit = async (formState: RegisterSchema) => {
+    setIsSubmitting(true);
     setErrorMessage({
       username: "",
       email: "",
@@ -51,6 +53,8 @@ export default function Register() {
         ...prev,
         general: "Sorry... Something went wrong.",
       }));
+    } finally {
+      setIsSubmitting(false);
     }
   };
   return (
@@ -94,7 +98,9 @@ export default function Register() {
               {...register("repeatPassword")}
               error={formState.errors.repeatPassword?.message}
             />
-            <Button>Login</Button>
+            <Button disabled={isSubmitting}>
+              {isSubmitting ? "Creating account..." : "Login"}
+            </Button>
             <Link href="/login">Have an account already?</Link>
           </form>
         </CardContent>
