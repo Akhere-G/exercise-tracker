@@ -30,6 +30,7 @@ export const updateWorkout = async (
   try {
     const formattedWorkout: WorkoutSchema = {
       ...workout,
+      duration: workout.duration * 60,
       sets: workout.sets.map((s) => ({
         ...s,
         durationSecs: s.durationSecs ? s.durationSecs * 60 : null,
