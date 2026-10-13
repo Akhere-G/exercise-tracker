@@ -6,7 +6,7 @@ import {
   getTotalVolume,
   mapToTargetMuscle,
 } from "@/src/features/workout/utils";
-import { Flame, Timer, Weight } from "lucide-react";
+import { Flame, Pencil, Timer, Weight } from "lucide-react";
 import { ExtendedBodyPart, Slug } from "react-muscle-highlighter";
 import BodyChart from "./components/BodyChart";
 import { Exercise } from "@/src/features/workout/store";
@@ -14,6 +14,7 @@ import ConffettiEffect from "./components/ConffettiEffect";
 import ExerciseStat from "../../../components/ExerciseStat";
 import ExerciseCard from "../../../components/ExerciseCard";
 import Link from "next/link";
+import { Button } from "@/src/components/ui/button";
 
 export default async function WorkoutSummary({
   params,
@@ -63,9 +64,19 @@ export default async function WorkoutSummary({
   return (
     <div className="flex justify-center w-screen">
       <div className="container">
-        <h2 className="text-2xl mb-4">
-          {first ? "Workout Complete" : completedDate}
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl">
+            {first ? "Workout Complete" : completedDate}
+          </h2>
+          {!first && (
+            <Link href={`/workouts/edit/${workoutId}`}>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Pencil size={14} />
+                Edit
+              </Button>
+            </Link>
+          )}
+        </div>
         {first && (
           <span className="text-center block w-full text-2xl p-12 pt-8">
             {stats?.workoutCount}
