@@ -32,7 +32,7 @@ export default async function EditRoutinePage({
     ...routine,
     routineItems: routine.routineItems.map((r) => ({
       ...r,
-      targetDuration: r.targetDurationSecs ? r.targetDurationSecs / 60 : null,
+      targetDuration: r.targetDurationSecs ? r.targetDurationSecs : null,
     })),
   };
 

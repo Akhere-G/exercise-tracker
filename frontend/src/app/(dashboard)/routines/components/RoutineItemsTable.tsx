@@ -1,24 +1,27 @@
 "use client";
 
 import { Button } from "@/src/components/ui/button";
-import { UseFormRegister, FieldErrors } from "react-hook-form";
+import { UseFormRegister, FieldErrors, Control } from "react-hook-form";
 import {
   RoutineItemSchema,
   RoutineSchema,
 } from "@/src/features/routines/schema";
 import { Input } from "@/src/components/ui/input";
+import TimeInput from "@/src/components/ui/timeInput";
 import { Trash2 } from "lucide-react";
 import {
   isDurationExercise,
   isRepsExercise,
 } from "@/src/features/exercises/utils";
 import { Exercise } from "@/src/features/exercises/types";
+import { Controller } from "react-hook-form";
 
 interface RoutineItemsTableProps {
   fields: RoutineItemSchema[];
   register: UseFormRegister<RoutineSchema>;
   remove: (index: number) => void;
   errors: FieldErrors<RoutineSchema>;
+  control: Control<RoutineSchema>;
 }
 
 export function RoutineItemsTable({
@@ -26,6 +29,7 @@ export function RoutineItemsTable({
   register,
   remove,
   errors,
+  control,
 }: RoutineItemsTableProps) {
   return (
     <div>
@@ -107,14 +111,15 @@ export function RoutineItemsTable({
                       <label className="text-[10px] uppercase text-muted-foreground">
                         Mins
                       </label>
-                      <Input
-                        type="number"
-                        className={`text-center ${
-                          errors.routineItems?.[index]?.targetDuration?.message
-                            ? "border border-error!"
-                            : ""
-                        }`}
-                        {...register(`routineItems.${index}.targetDuration`)}
+                      <Controller
+                        name={`routineItems.${index}.targetDuration`}
+                        control={control}
+                        render={({ field }) => (
+                          <TimeInput
+                            value={field.value ?? ""}
+                            onChange={field.onChange}
+                          />
+                        )}
                       />
                     </div>
                   )}
