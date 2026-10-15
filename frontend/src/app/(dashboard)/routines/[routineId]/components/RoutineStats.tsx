@@ -129,7 +129,7 @@ export default function RoutineStats({
         {maxPace > 0 && (
           <ExerciseStat
             Icon={Gauge}
-            title={maxPace}
+            title={maxPace.toFixed(2)}
             subtitle="Max pace (mins/Km)"
           />
         )}

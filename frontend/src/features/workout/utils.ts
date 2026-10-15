@@ -14,7 +14,7 @@ import { Workout, WorkoutSet } from "./types";
 const DEFAULT_TOTAL_SETS = 3;
 const DEFAULT_REPS = 10;
 const DEFAULT_WEIGHT = 25;
-const DEFAULT_DURATION = 10 * 60;
+const DEFAULT_DURATION = 600; // 10 minutes in seconds
 const DEFAULT_DISTANCE = 500;
 
 export const sameMetrics = (

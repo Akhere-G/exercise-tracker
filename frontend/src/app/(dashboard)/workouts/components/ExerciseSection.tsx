@@ -134,8 +134,9 @@ export default function ExerciseSection({
                   </td>
                 )}
                 {hasDuration && (
-                  <td>
+                  <td className=" w-30 ">
                     <TimeInput
+                      className="bg-transparent! border-none max-w-fit"
                       value={set.durationSecs ?? ""}
                       onChange={(v) =>
                         onUpdateSet(set.fieldIndex, "durationSecs", Number(v))
