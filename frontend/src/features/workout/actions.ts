@@ -60,3 +60,14 @@ export const getPreviousSets = async (
     return handleApiError<WorkoutSet[]>(err);
   }
 };
+
+export const deleteWorkout = async (
+  workoutId: number,
+): Promise<ActionResponse<number>> => {
+  try {
+    const response = await api.delete<number>(`/workouts/${workoutId}`);
+    return { success: true, data: response.data };
+  } catch (err) {
+    return handleApiError<number>(err);
+  }
+};

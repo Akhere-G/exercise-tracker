@@ -11,6 +11,7 @@ import { ExtendedBodyPart, Slug } from "react-muscle-highlighter";
 import BodyChart from "./components/BodyChart";
 import { Exercise } from "@/src/features/workout/store";
 import ConffettiEffect from "./components/ConffettiEffect";
+import WorkoutDeleteModal from "./components/WorkoutDeleteModal";
 import ExerciseStat from "../../../components/ExerciseStat";
 import ExerciseCard from "../../../components/ExerciseCard";
 import Link from "next/link";
@@ -60,7 +61,9 @@ export default async function WorkoutSummary({
 
   const exercisesList = Object.values(exercises);
 
-  const completedDate = new Date(workout!.completedAt).toDateString();
+  const completedDate = workout
+    ? new Date(workout.completedAt).toDateString()
+    : "";
   return (
     <div className="flex justify-center w-screen">
       <div className="container">
@@ -69,12 +72,15 @@ export default async function WorkoutSummary({
             {first ? "Workout Complete" : completedDate}
           </h2>
           {!first && (
-            <Link href={`/workouts/edit/${workoutId}`}>
-              <Button variant="outline" size="sm" className="gap-2">
-                <Pencil size={14} />
-                Edit
-              </Button>
-            </Link>
+            <div className="flex gap-2">
+              <Link href={`/workouts/edit/${workoutId}`}>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Pencil size={14} />
+                  Edit
+                </Button>
+              </Link>
+              <WorkoutDeleteModal workoutId={Number(workoutId)} />
+            </div>
           )}
         </div>
         {first && (
