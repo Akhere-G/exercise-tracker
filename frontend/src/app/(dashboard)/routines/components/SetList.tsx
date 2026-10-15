@@ -79,7 +79,10 @@ function SetRow({
   const { setWorkoutData, exercises, currentExerciseId } = useWorkout();
   const { start, clear } = useTimer();
 
-  const updateSetData = (name: keyof ActiveSet, value: string | boolean) => {
+  const updateSetData = (
+    name: keyof ActiveSet,
+    value: string | number | boolean,
+  ) => {
     const newExercises = exercises.map((e) =>
       e.id === currentExerciseId
         ? {
@@ -159,8 +162,9 @@ function SetRow({
       {hasDuration && (
         <td>
           <TimeInput
+            className="bg-transparent! border-none! w-auto!"
             value={set.durationSecs ?? ""}
-            onChange={(value) => updateSetData("durationSecs", String(value))}
+            onChange={(value) => updateSetData("durationSecs", value)}
           />
         </td>
       )}

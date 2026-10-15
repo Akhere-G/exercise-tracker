@@ -29,7 +29,7 @@ export function buildSetsFromWorkout(workout: Workout): FormSetRow[] {
     setIndex: s.setIndex,
     reps: s.reps ?? undefined,
     weight: s.weight ?? undefined,
-    durationSecs: s.durationSecs ? s.durationSecs / 60 : undefined,
+    durationSecs: s.durationSecs,
     distanceMeters: s.distanceMeters ?? undefined,
     exercise: s.exercise,
   }));

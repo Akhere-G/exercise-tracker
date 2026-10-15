@@ -12,7 +12,7 @@ export const createWorkout = async (
       ...workout,
       sets: workout.sets.map((s) => ({
         ...s,
-        durationSecs: s.durationSecs ? s.durationSecs * 60 : null,
+        durationSecs: s.durationSecs,
       })),
     };
 
@@ -33,7 +33,7 @@ export const updateWorkout = async (
       duration: workout.duration * 60,
       sets: workout.sets.map((s) => ({
         ...s,
-        durationSecs: s.durationSecs ? s.durationSecs * 60 : null,
+        durationSecs: s.durationSecs,
       })),
     };
 

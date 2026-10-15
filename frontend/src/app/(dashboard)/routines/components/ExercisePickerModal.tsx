@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useDeferredValue,
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  useMemo,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Exercise } from "@/src/features/exercises/types";
 import { getAllExercises } from "@/src/features/exercises/actions";
 import { Button } from "@/src/components/ui/button";
@@ -50,137 +43,132 @@ export function ExercisePickerModal({
   submitBtnText = "Add",
   defaultMuscle = "",
 }: ExercisePickerModalProps) {
-  const [error, setError] = useState("");
+  const [query, setQuery] = useState("");
   const [equipment, setEquipment] = useState("");
   const [muscle, setMuscle] = useState(defaultMuscle);
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
+
   const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [exercisesToAdd, setExercisesToAdd] = useState<
-    Record<number, Exercise>
-  >({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const deferredQuery = useDeferredValue(query);
-  const observer = useRef<IntersectionObserver | null>(null);
+  const [selected, setSelected] = useState<Record<number, Exercise>>({});
 
-  // Derived state: replacing redundant useState/useEffect combinations
-  const addedExerciseIds = useMemo(
+  const listRef = useRef<HTMLDivElement>(null);
+
+  const addedIds = useMemo(
     () => new Set(addedExercises.map((e) => e.id)),
     [addedExercises],
   );
 
-  useEffect(() => {
-    function resetOnOpen() {
-      if (isOpen) {
-        setExercisesToAdd({});
-        setPage(1);
-        setHasMore(true);
-        setError("");
-      }
-    }
-
-    resetOnOpen();
-  }, [isOpen]);
+  const resetList = useCallback(() => {
+    setExercises([]);
+    setPage(1);
+    setHasMore(true);
+    setLoading(true);
+    setError("");
+  }, []);
 
   useEffect(() => {
-    function resetOnParamChange() {
-      setPage(1);
-      setHasMore(true);
-      setExercises([]);
-      setError("");
-    }
-    resetOnParamChange();
-  }, [deferredQuery, equipment, muscle]);
-
-  useEffect(() => {
-    function resetMuscle() {
+    if (!isOpen) return;
+    function reset() {
+      setSelected({});
       setMuscle(defaultMuscle);
+      resetList();
     }
-    resetMuscle();
-  }, [defaultMuscle]);
+    reset();
+  }, [isOpen, defaultMuscle, resetList]);
 
   useEffect(() => {
-    if (!isOpen || error) return;
+    if (!isOpen) return;
 
-    const controller = new AbortController();
+    let cancelled = false;
 
-    async function fetchExercises() {
-      setLoading(true);
+    const timeoutId = setTimeout(async () => {
       try {
-        const fetchedExercises = await getAllExercises({
-          search: deferredQuery,
+        const results = await getAllExercises({
+          search: query,
           equipment,
           muscle,
           page,
         });
+        if (cancelled) return;
 
-        if (controller.signal.aborted) return;
-
-        if (fetchedExercises.length === 0) {
-          setHasMore(false);
-        }
-
-        setExercises((prev) =>
-          page === 1 ? fetchedExercises : [...prev, ...fetchedExercises],
-        );
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error("Failed to load modal exercises:", error);
-          setError(error as string);
-        }
+        setHasMore(results.length > 0);
+        setExercises((prev) => (page === 1 ? results : [...prev, ...results]));
+      } catch (err) {
+        if (cancelled) return;
+        console.error("Failed to load exercises:", err);
+        setError("Failed to load exercises.");
+        setHasMore(false);
       } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
+        if (!cancelled) setLoading(false);
       }
-    }
-
-    const timeoutId = setTimeout(() => fetchExercises(), 300);
+    }, 300);
 
     return () => {
+      cancelled = true;
       clearTimeout(timeoutId);
-      controller.abort();
     };
-  }, [isOpen, deferredQuery, page, equipment, muscle, error]);
+  }, [isOpen, query, equipment, muscle, page]);
 
-  const lastElementRef = useCallback(
-    (node: HTMLDivElement | null) => {
-      if (loading || !hasMore) return;
-      if (observer.current) observer.current.disconnect();
+  const canLoadMore = hasMore && !loading && !error && exercises.length > 0;
 
-      observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          setPage((prev) => prev + 1);
-        }
-      });
+  function loadMore() {
+    if (!canLoadMore) return;
 
-      if (node) observer.current.observe(node);
-    },
-    [loading, hasMore],
-  );
+    setLoading(true);
+    setPage((p) => p + 1);
+  }
 
-  function handleToggleExercise(exercise: Exercise) {
-    if (addedExerciseIds.has(exercise.id)) return;
+  function handleScroll(e: React.UIEvent<HTMLDivElement>) {
+    const el = e.currentTarget;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 200) loadMore();
+  }
 
-    setExercisesToAdd((prev) => {
-      const next = { ...prev };
-      if (next[exercise.id]) {
-        delete next[exercise.id];
-      } else {
-        if (!selectMany) {
-          return { [exercise.id]: exercise };
-        }
-        next[exercise.id] = exercise;
+  useEffect(() => {
+    const el = listRef.current;
+    if (el && el.scrollHeight <= el.clientHeight) loadMore();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exercises, canLoadMore]);
+
+  function handleQueryChange(value: string) {
+    setQuery(value);
+    resetList();
+  }
+
+  function handleEquipmentChange(value: string) {
+    setEquipment(value);
+    resetList();
+  }
+
+  function handleMuscleChange(value: string) {
+    setMuscle(value);
+    resetList();
+  }
+
+  function toggleExercise(exercise: Exercise) {
+    if (addedIds.has(exercise.id)) return;
+
+    setSelected((prev) => {
+      if (prev[exercise.id]) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { [exercise.id]: _removed, ...rest } = prev;
+        return rest;
       }
-      return next;
+      return selectMany
+        ? { ...prev, [exercise.id]: exercise }
+        : { [exercise.id]: exercise };
     });
   }
 
-  if (!isOpen) return null;
+  function handleSubmit() {
+    onSelect(Object.values(selected));
+    setSelected({});
+  }
 
-  const selectedCount = Object.keys(exercisesToAdd).length;
+  const selectedCount = Object.keys(selected).length;
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -195,16 +183,17 @@ export function ExercisePickerModal({
             <X size={16} />
           </button>
         </div>
+
         <div className="p-5 pt-0">
           <Input
             placeholder="Search"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => handleQueryChange(e.target.value)}
           />
         </div>
 
         <div className="flex px-5 gap-4">
-          <Select value={equipment} onValueChange={setEquipment}>
+          <Select value={equipment} onValueChange={handleEquipmentChange}>
             <SelectTrigger className="flex-1 w-full">
               <SelectValue placeholder="Equipment" />
             </SelectTrigger>
@@ -217,7 +206,7 @@ export function ExercisePickerModal({
             </SelectContent>
           </Select>
 
-          <Select value={muscle} onValueChange={setMuscle}>
+          <Select value={muscle} onValueChange={handleMuscleChange}>
             <SelectTrigger className="flex-1 w-full">
               <SelectValue placeholder="Muscle" />
             </SelectTrigger>
@@ -231,26 +220,27 @@ export function ExercisePickerModal({
           </Select>
         </div>
 
-        <div className="p-4 overflow-y-auto flex flex-col gap-2 max-h-[60vh]">
-          {exercises.length === 0 && loading ? (
-            <p className="text-sm text-muted-foreground text-center py-4">
-              Loading exercises...
-            </p>
+        <div
+          ref={listRef}
+          onScroll={handleScroll}
+          className="p-4 overflow-y-auto flex flex-col gap-2 h-[60vh]"
+        >
+          {error ? (
+            <p className="text-sm text-destructive text-center py-4">{error}</p>
           ) : exercises.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-4">
-              No exercises found.
+            <p className="text-sm text-muted-foreground text-center my-auto">
+              {loading ? "Loading exercises..." : "No exercises found."}
             </p>
           ) : (
             exercises.map((exercise) => {
               const isSelected =
-                !!exercisesToAdd[exercise.id] ||
-                addedExerciseIds.has(exercise.id);
+                !!selected[exercise.id] || addedIds.has(exercise.id);
 
               return (
                 <button
                   key={exercise.id}
                   type="button"
-                  onClick={() => handleToggleExercise(exercise)}
+                  onClick={() => toggleExercise(exercise)}
                   className={`w-full text-left p-2 rounded-xl border transition-all flex justify-between items-center ${
                     isSelected
                       ? "bg-secondary border-transparent"
@@ -285,8 +275,6 @@ export function ExercisePickerModal({
             })
           )}
 
-          <div ref={lastElementRef} className="h-1" />
-
           {loading && exercises.length > 0 && (
             <p className="text-sm text-muted-foreground text-center py-2">
               Loading more exercises...
@@ -295,13 +283,7 @@ export function ExercisePickerModal({
         </div>
 
         <div className="p-4">
-          <Button
-            className="w-full"
-            onClick={() => {
-              onSelect(Object.values(exercisesToAdd));
-              setExercisesToAdd({});
-            }}
-          >
+          <Button className="w-full" onClick={handleSubmit}>
             {submitBtnText} {selectedCount > 0 && `(${selectedCount})`}
           </Button>
         </div>
