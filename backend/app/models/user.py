@@ -1,7 +1,8 @@
 from ..database import Base
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import String, Integer
 from .audit_mixin import AuditMixin
+from typing import List
 
 
 class User(Base, AuditMixin):
@@ -10,3 +11,6 @@ class User(Base, AuditMixin):
     username: Mapped[str] = mapped_column(String(50))
     email: Mapped[str] = mapped_column(String(50), unique=True)
     password_hash: Mapped[str] = mapped_column(String(256))
+    user_achievements: Mapped[List["UserAchievement"]] = relationship(
+        "UserAchievement", back_populates="user"
+    )

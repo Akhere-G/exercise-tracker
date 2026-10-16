@@ -16,6 +16,8 @@ from app.models import (
     RoutineItem,
     Workout,
     WorkoutSet,
+    Achievement,
+    UserAchievement,
 )
 
 load_dotenv()
