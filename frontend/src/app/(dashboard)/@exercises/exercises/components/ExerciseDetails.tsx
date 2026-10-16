@@ -9,20 +9,25 @@ import {
 import { Exercise } from "@/src/features/exercises/types";
 import { Dot } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import ExerciseInstructions from "./ExerciseInstructions";
 import ExerciseHistory from "./ExerciseHistory";
 import ExerciseStats from "./ExerciseStats";
 import { useRouter } from "next/navigation";
 import { workoutSetWithDate } from "@/src/features/workout/types";
 import { getImageUrl } from "@/src/features/exercises/utils";
+import ExerciseAchievements from "./ExerciseAchievements";
+import { ActionResponse } from "@/src/lib/apiTypes";
+import { UserAchievement } from "@/src/features/achievements/type";
 
 export default function ExerciseDetails({
   exercise,
   workoutSets,
+  achievementsPromise,
 }: {
   exercise: Exercise | null;
   workoutSets: workoutSetWithDate[] | null;
+  achievementsPromise: Promise<ActionResponse<UserAchievement[]>>;
 }) {
   const [isOpen, setIsOpen] = useState(true);
   const router = useRouter();
@@ -37,7 +42,11 @@ export default function ExerciseDetails({
       >
         <DrawerContent className="border-secondary">
           {exercise && workoutSets ? (
-            <ExerciseDetail exercise={exercise} workoutSets={workoutSets} />
+            <ExerciseDetail
+              exercise={exercise}
+              workoutSets={workoutSets}
+              achievementsPromise={achievementsPromise}
+            />
           ) : (
             <div className="container">
               <p>Not Found</p>
@@ -52,9 +61,11 @@ export default function ExerciseDetails({
 function ExerciseDetail({
   exercise,
   workoutSets,
+  achievementsPromise,
 }: {
   exercise: Exercise;
   workoutSets: workoutSetWithDate[];
+  achievementsPromise: Promise<ActionResponse<UserAchievement[]>>;
 }) {
   const { videoUrl, name, equipment, muscles } = exercise;
 
@@ -112,8 +123,11 @@ function ExerciseDetail({
             <TabsTrigger value="stats" className={tabClasses}>
               Stats
             </TabsTrigger>
+            <TabsTrigger value="achievements" className={tabClasses}>
+              Achievements
+            </TabsTrigger>
           </TabsList>
-          <div className="no-scrollbar overflow-y-auto max-h-[40vh]">
+          <div className="no-scrollbar overflow-y-auto max-h-[40vh] pb-8">
             <TabsContent value="details">
               <ExerciseInstructions exercise={exercise} />
             </TabsContent>
@@ -122,6 +136,15 @@ function ExerciseDetail({
             </TabsContent>
             <TabsContent value="stats">
               <ExerciseStats exercise={exercise} groupedSets={groupedSets} />
+            </TabsContent>
+            <TabsContent value="achievements">
+              <Suspense fallback={<p>Loading...</p>}>
+                <ExerciseAchievements
+                  achievementsPromise={achievementsPromise}
+                  exercise={exercise}
+                  groupedSets={groupedSets}
+                />
+              </Suspense>
             </TabsContent>
           </div>
         </Tabs>

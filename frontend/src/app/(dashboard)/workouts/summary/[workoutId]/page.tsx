@@ -16,6 +16,9 @@ import ExerciseStat from "../../../components/ExerciseStat";
 import ExerciseCard from "../../../components/ExerciseCard";
 import Link from "next/link";
 import { Button } from "@/src/components/ui/button";
+import { getUserAchievementsForWorkout } from "@/src/features/achievements/actions";
+import AchievementList from "@/src/features/achievements/components/AchievementList";
+import { Suspense } from "react";
 
 export default async function WorkoutSummary({
   params,
@@ -28,6 +31,7 @@ export default async function WorkoutSummary({
   const { first } = await searchParams;
 
   const response = await getWorkout(Number(workoutId));
+  const achievementsPromise = getUserAchievementsForWorkout(Number(workoutId));
   const workout = response.success ? response.data : null;
 
   const muscles: Record<string, number> = {};
@@ -117,6 +121,12 @@ export default async function WorkoutSummary({
               <ExerciseCard exercise={exercise} />
             </Link>
           ))}
+        </div>
+        <div className="mt-6">
+          <h2 className="text-2xl">Achievements</h2>
+          <Suspense fallback={<p>Loading...</p>}>
+            <AchievementList achievementsPromise={achievementsPromise} />
+          </Suspense>
         </div>
         {first && <ConffettiEffect />}
       </div>

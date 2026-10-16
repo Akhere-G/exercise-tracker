@@ -14,3 +14,15 @@ export interface Exercise {
   equipment: string;
   muscles: Muscle[];
 }
+
+export interface ExerciseNoMuscles {
+  id: number;
+  name: string;
+  instructions: string;
+  videoUrl: string;
+  imageUrl: string;
+  metrics: Metrics;
+  equipment: string;
+}
+
+export const PR_TYPES = ["pr_weight", "pr_distance", "pr_reps", "pr_duration"];

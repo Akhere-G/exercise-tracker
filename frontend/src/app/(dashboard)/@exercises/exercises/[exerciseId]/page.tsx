@@ -1,3 +1,4 @@
+import { getUserAchievementsForExercise } from "@/src/features/achievements/actions";
 import ExerciseDetails from "../components/ExerciseDetails";
 import {
   getExerciseById,
@@ -14,6 +15,12 @@ export default async function ExerciseDetailsPage({
   const workoutReponse = await getWorkoutsForExercise(exerciseId);
   const exercise = response.success ? response.data : null;
   const workoutSets = workoutReponse.success ? workoutReponse.data : null;
-
-  return <ExerciseDetails exercise={exercise} workoutSets={workoutSets} />;
+  const achievementsPromise = getUserAchievementsForExercise(exerciseId);
+  return (
+    <ExerciseDetails
+      exercise={exercise}
+      workoutSets={workoutSets}
+      achievementsPromise={achievementsPromise}
+    />
+  );
 }

@@ -1,5 +1,5 @@
 from pydantic import field_validator
-from typing import List
+
 from .base import BaseModel
 
 
@@ -15,7 +15,7 @@ class ExerciseBase(BaseModel):
     video_url: str
     equipment: str
     metrics: str
-    muscles: List[Muscle]
+    muscles: list[Muscle]
     priority: int
 
     @field_validator("muscles", mode="before")
@@ -33,3 +33,13 @@ class ExerciseBase(BaseModel):
 
 class Exercise(ExerciseBase):
     id: int
+
+
+class ExerciseResponseSimple(BaseModel):
+    name: str
+    instructions: str
+    image_url: str
+    video_url: str
+    equipment: str
+    metrics: str
+    priority: int

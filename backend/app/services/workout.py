@@ -66,10 +66,14 @@ def get_stats(db: Session, user_id: int, routine_id: int | None = None):
 
 
 def calculate_current_frequency_streaks(
-    db: Session, user_id: int, routine_id: int | None = None
+    db: Session,
+    user_id: int,
+    routine_id: int | None = None,
+    this_week: date | None = None,
 ) -> dict[int, int]:
     week_counts = _recent_week_counts(db, user_id, routine_id)
-    this_week = _week_start(date.today())
+    if not this_week:
+        this_week = _week_start(date.today())
 
     streaks = {}
     for frequency in achievement_service.FREQUENCIES:

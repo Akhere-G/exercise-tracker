@@ -7,7 +7,7 @@ import {
 import "../globals.css";
 import { Toaster } from "@/src/components/ui/sonner";
 
-import { Calendar, Cog, House } from "lucide-react";
+import { Calendar, Cog, House, Trophy } from "lucide-react";
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 
@@ -53,7 +53,11 @@ export default function RootLayout({
                 <Calendar style={{ width: "24px", height: "24px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
-
+            <NavigationMenuItem>
+              <NavigationMenuLink href="/achievements">
+                <Trophy style={{ width: "24px", height: "24px" }} />
+              </NavigationMenuLink>
+            </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink href="/settings">
                 <Cog style={{ width: "24px", height: "24px" }} />
