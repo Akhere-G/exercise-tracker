@@ -5,7 +5,13 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const authPaths = ["/login", "/register"];
-  const protectedPaths = ["/routines", "/workouts", "/exercises", "/stats"];
+  const protectedPaths = [
+    "/routines",
+    "/workouts",
+    "/exercises",
+    "/stats",
+    "/achievements",
+  ];
 
   const isAuthPage = authPaths.some((path) => pathname === path);
   const isProtectedPage = protectedPaths.some(

@@ -4,6 +4,9 @@ from typing import TYPE_CHECKING
 from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.database import Base
+from app.schemas.exercise import Exercise
+
 from .audit_mixin import AuditMixin
 
 if TYPE_CHECKING:
@@ -22,7 +25,7 @@ class AchievementType:
     FREQ_STREAK_5 = "freq_streak_5"
 
 
-class Achievement(AuditMixin):
+class Achievement(Base, AuditMixin):
     __tablename__ = "achievements"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(100))
@@ -35,7 +38,7 @@ class Achievement(AuditMixin):
     )
 
 
-class UserAchievement(AuditMixin):
+class UserAchievement(Base, AuditMixin):
     __tablename__ = "user_achievements"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(
@@ -58,4 +61,5 @@ class UserAchievement(AuditMixin):
     achievement: Mapped[Achievement] = relationship(
         "Achievement", back_populates="user_achievements"
     )
+    exercise: Mapped["Exercise"] = relationship("Exercise")
     user: Mapped["User"] = relationship("User", back_populates="user_achievements")

@@ -1,6 +1,7 @@
-from pydantic import BaseModel
-from typing import Optional, List
 from datetime import datetime
+
+from app.schemas.exercise import ExerciseResponseSimple
+from pydantic import BaseModel
 
 
 class AchievementBase(BaseModel):
@@ -8,7 +9,7 @@ class AchievementBase(BaseModel):
     description: str
     type: str
     icon: str
-    criteria: Optional[str] = None
+    criteria: str | None = None
 
 
 class AchievementCreate(AchievementBase):
@@ -28,11 +29,12 @@ class UserAchievementResponse(BaseModel):
     id: int
     user_id: int
     achievement_id: int
-    value: Optional[float] = None
-    exercise_id: Optional[int] = None
-    workout_id: Optional[int] = None
+    value: float | None = None
+    exercise_id: int | None = None
+    workout_id: int | None = None
     unlocked_at: datetime
     achievement: AchievementResponse
+    exercise: ExerciseResponseSimple | None = None
 
     class Config:
         from_attributes = True
@@ -40,4 +42,4 @@ class UserAchievementResponse(BaseModel):
 
 class WorkoutAchievementsResponse(BaseModel):
     workout_id: int
-    achievements: List[UserAchievementResponse]
+    achievements: list[UserAchievementResponse]

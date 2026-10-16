@@ -1,8 +1,8 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from app.models import Achievement, Exercise, UserAchievement, Workout
 from app.schemas.achievement import UserAchievementResponse
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 FREQUENCIES = range(1, 6)
@@ -92,7 +92,7 @@ def seed_achievements(db: Session) -> None:
 
 
 def check_and_award_prs(
-    db: Session, user_id: int, workout_id: int, workout: Workout
+    db: Session, user_id: int, workout_id: int, workout: Workout, commit: bool = True
 ) -> list[UserAchievementResponse]:
     """Award or update personal-record achievements for the sets in a workout."""
     sets_by_exercise = {}
@@ -106,22 +106,44 @@ def check_and_award_prs(
     exercises = _get_exercises(db, exercise_ids)
     achievements = _get_achievements_by_type(db, PR_TYPES)
 
-    existing_prs = {}
-    stmt = (
-        select(UserAchievement)
+    ranked_prs = (
+        select(
+            UserAchievement,
+            func.row_number()
+            .over(
+                partition_by=(
+                    UserAchievement.achievement_id,
+                    UserAchievement.exercise_id,
+                ),
+                order_by=UserAchievement.value.desc(),
+            )
+            .label("rn"),
+        )
         .join(Achievement, UserAchievement.achievement_id == Achievement.id)
         .where(
             UserAchievement.user_id == user_id,
             UserAchievement.exercise_id.in_(exercise_ids),
             Achievement.type.in_(PR_TYPES),
         )
+        .subquery()
     )
+
+    stmt = (
+        select(UserAchievement)
+        .join(
+            ranked_prs,
+            UserAchievement.id == ranked_prs.c.id,
+        )
+        .where(ranked_prs.c.rn == 1)
+    )
+
+    existing_prs = {}
     for user_achievement in db.execute(stmt).scalars():
         key = (user_achievement.achievement_id, user_achievement.exercise_id)
         existing_prs[key] = user_achievement
 
     now = datetime.now(timezone.utc)
-    changed = []
+    changed: list[UserAchievement] = []
 
     for exercise_id, sets in sets_by_exercise.items():
         exercise = exercises.get(exercise_id)
@@ -146,17 +168,28 @@ def check_and_award_prs(
             if row is not None:
                 db.add(row)
                 changed.append(row)
+    if commit:
+        return _commit_and_serialize(db, changed)
 
-    return _commit_and_serialize(db, changed)
+    if not changed:
+        return []
+    db.flush()
+    for row in changed:
+        db.refresh(row)
+    return _serialize(changed)
 
 
 def check_and_award_frequency_streaks(
-    db: Session, user_id: int, workout_id: int
+    db: Session,
+    user_id: int,
+    workout_id: int,
+    this_week: date | None = None,
+    commit: bool = True,
 ) -> list[UserAchievementResponse]:
     """Award or update weekly-frequency streak achievements."""
     from app.services.workout import calculate_current_frequency_streaks
 
-    streaks = calculate_current_frequency_streaks(db, user_id)
+    streaks = calculate_current_frequency_streaks(db, user_id, None, this_week)
 
     streak_types = []
     for frequency in FREQUENCIES:
@@ -169,12 +202,25 @@ def check_and_award_frequency_streaks(
     achievements = _get_achievements_by_type(db, streak_types)
 
     existing_streaks = {}
+    ranked_streaks = (
+        select(
+            UserAchievement,
+            func.row_number()
+            .over(
+                partition_by=(UserAchievement.achievement_id),
+                order_by=UserAchievement.value.desc(),
+            )
+            .label("rn"),
+        )
+        .join(Achievement, UserAchievement.achievement_id == Achievement.id)
+        .where(UserAchievement.user_id == user_id, Achievement.type.in_(streak_types))
+        .subquery()
+    )
     stmt = (
         select(UserAchievement)
-        .join(Achievement, UserAchievement.achievement_id == Achievement.id)
+        .join(ranked_streaks, UserAchievement.id == ranked_streaks.c.id)
         .where(
-            UserAchievement.user_id == user_id,
-            Achievement.type.in_(streak_types),
+            ranked_streaks.c.rn == 1,
         )
     )
     for user_achievement in db.execute(stmt).scalars():
@@ -200,14 +246,23 @@ def check_and_award_frequency_streaks(
         if row is not None:
             db.add(row)
             changed.append(row)
-
-    return _commit_and_serialize(db, changed)
+    if commit:
+        return _commit_and_serialize(db, changed)
+    if not changed:
+        return []
+    db.flush()
+    for row in changed:
+        db.refresh(row)
+    return _serialize(changed)
 
 
 def get_user_achievements(db: Session, user_id: int) -> list[UserAchievementResponse]:
     stmt = (
         select(UserAchievement)
-        .options(selectinload(UserAchievement.achievement))
+        .options(
+            selectinload(UserAchievement.achievement),
+            selectinload(UserAchievement.exercise),
+        )
         .where(UserAchievement.user_id == user_id)
         .order_by(UserAchievement.unlocked_at.desc())
     )
@@ -219,7 +274,10 @@ def get_achievements_for_exercise(
 ) -> list[UserAchievementResponse]:
     stmt = (
         select(UserAchievement)
-        .options(selectinload(UserAchievement.achievement))
+        .options(
+            selectinload(UserAchievement.achievement),
+            selectinload(UserAchievement.exercise),
+        )
         .where(
             UserAchievement.user_id == user_id,
             UserAchievement.exercise_id == exercise_id,
@@ -233,7 +291,10 @@ def get_achievements_for_workout(
 ) -> list[UserAchievementResponse]:
     stmt = (
         select(UserAchievement)
-        .options(selectinload(UserAchievement.achievement))
+        .options(
+            selectinload(UserAchievement.achievement),
+            selectinload(UserAchievement.exercise),
+        )
         .where(
             UserAchievement.user_id == user_id,
             UserAchievement.workout_id == workout_id,
@@ -282,23 +343,17 @@ def _record_if_better(
     exercise_id: int | None = None,
 ) -> UserAchievement | None:
     """Return a new or updated row on a first award or a new record, else None."""
-    if existing is None:
-        return UserAchievement(
-            user_id=user_id,
-            achievement_id=achievement_id,
-            exercise_id=exercise_id,
-            value=value,
-            workout_id=workout_id,
-            unlocked_at=now,
-        )
+    if existing is not None and value <= existing.value:
+        return None
 
-    if value > existing.value:
-        existing.value = value
-        existing.workout_id = workout_id
-        existing.unlocked_at = now
-        return existing
-
-    return None
+    return UserAchievement(
+        user_id=user_id,
+        achievement_id=achievement_id,
+        exercise_id=exercise_id,
+        value=value,
+        workout_id=workout_id,
+        unlocked_at=now,
+    )
 
 
 def _commit_and_serialize(
