@@ -257,14 +257,34 @@ def check_and_award_frequency_streaks(
 
 
 def get_user_achievements(db: Session, user_id: int) -> list[UserAchievementResponse]:
-    stmt = (
-        select(UserAchievement)
-        .options(
-            selectinload(UserAchievement.achievement),
-            selectinload(UserAchievement.exercise),
+    ranked_achievements = (
+        select(
+            UserAchievement.id.label("user_achievement_id"),
+            func.row_number()
+            .over(
+                partition_by=(Achievement.id, UserAchievement.exercise_id),
+                order_by=(
+                    UserAchievement.unlocked_at.desc(),
+                    UserAchievement.id.desc(),
+                ),
+            )
+            .label("rn"),
+        )
+        .join(
+            Achievement,
+            UserAchievement.achievement_id == Achievement.id,
         )
         .where(UserAchievement.user_id == user_id)
-        .order_by(UserAchievement.unlocked_at.desc())
+        .subquery()
+    )
+
+    stmt = (
+        select(UserAchievement)
+        .join(
+            ranked_achievements,
+            UserAchievement.id == ranked_achievements.c.user_achievement_id,
+        )
+        .where(ranked_achievements.c.rn == 1)
     )
     return _serialize(db.execute(stmt).scalars().all())
 
@@ -272,16 +292,37 @@ def get_user_achievements(db: Session, user_id: int) -> list[UserAchievementResp
 def get_achievements_for_exercise(
     db: Session, user_id: int, exercise_id: int
 ) -> list[UserAchievementResponse]:
-    stmt = (
-        select(UserAchievement)
-        .options(
-            selectinload(UserAchievement.achievement),
-            selectinload(UserAchievement.exercise),
+    ranked_exercise_achievements = (
+        select(
+            UserAchievement.id.label("user_achievement_id"),
+            func.row_number()
+            .over(
+                partition_by=Achievement.id,
+                order_by=(
+                    UserAchievement.unlocked_at.desc(),
+                    UserAchievement.id.desc(),
+                ),
+            )
+            .label("rn"),
+        )
+        .join(
+            Achievement,
+            UserAchievement.achievement_id == Achievement.id,
         )
         .where(
             UserAchievement.user_id == user_id,
             UserAchievement.exercise_id == exercise_id,
         )
+        .subquery()
+    )
+
+    stmt = (
+        select(UserAchievement)
+        .join(
+            ranked_exercise_achievements,
+            UserAchievement.id == ranked_exercise_achievements.c.user_achievement_id,
+        )
+        .where(ranked_exercise_achievements.c.rn == 1)
     )
     return _serialize(db.execute(stmt).scalars().all())
 
@@ -289,16 +330,40 @@ def get_achievements_for_exercise(
 def get_achievements_for_workout(
     db: Session, user_id: int, workout_id: int
 ) -> list[UserAchievementResponse]:
-    stmt = (
-        select(UserAchievement)
-        .options(
-            selectinload(UserAchievement.achievement),
-            selectinload(UserAchievement.exercise),
+    ranked_workout_achievements = (
+        select(
+            UserAchievement.id.label("user_achievement_id"),
+            func.row_number()
+            .over(
+                partition_by=(
+                    Achievement.id,
+                    UserAchievement.exercise_id,
+                ),
+                order_by=(
+                    UserAchievement.unlocked_at.desc(),
+                    UserAchievement.id.desc(),
+                ),
+            )
+            .label("rn"),
+        )
+        .join(
+            Achievement,
+            UserAchievement.achievement_id == Achievement.id,
         )
         .where(
             UserAchievement.user_id == user_id,
             UserAchievement.workout_id == workout_id,
         )
+        .subquery()
+    )
+
+    stmt = (
+        select(UserAchievement)
+        .join(
+            ranked_workout_achievements,
+            UserAchievement.id == ranked_workout_achievements.c.user_achievement_id,
+        )
+        .where(ranked_workout_achievements.c.rn == 1)
     )
     return _serialize(db.execute(stmt).scalars().all())
 
