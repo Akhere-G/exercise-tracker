@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import users, exercises, routines, workouts, notifications
+from app.routers import users, exercises, routines, workouts, notifications, achievements
+from app.database import get_db
+from app.services import achievement as achievement_service
 import os
 
 
@@ -26,6 +28,16 @@ def create_app() -> FastAPI:
     app.include_router(exercises.router)
     app.include_router(routines.router)
     app.include_router(notifications.router)
+    app.include_router(achievements.router)
+
+    @app.on_event("startup")
+    async def startup_event():
+        """Seed achievements on startup"""
+        db = next(get_db())
+        try:
+            achievement_service.seed_achievements(db)
+        finally:
+            db.close()
 
     @app.get("/", tags=["Health"])
     async def health_check():
