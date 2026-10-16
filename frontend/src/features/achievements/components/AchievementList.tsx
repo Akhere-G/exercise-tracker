@@ -21,6 +21,11 @@ export default function AchievementList({
 
   return (
     <div className="flex gap-4 flex-wrap mt-4">
+      {response.data.length === 0 && (
+        <div className="px-4 py-14 w-full text-center border-2 border-muted rounded-md text-secondary-foreground text-2xl">
+          <p>None</p>
+        </div>
+      )}
       {response.data.map((achievement) => (
         <AchievementCard key={achievement.id} achievement={achievement} />
       ))}
