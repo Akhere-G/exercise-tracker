@@ -1,5 +1,5 @@
 import { api, handleApiError } from "@/src/lib/axios";
-import { Achievement, UserAchievement } from "./type";
+import { Achievement, UserAchievement } from "./types";
 import { ActionResponse } from "@/src/lib/apiTypes";
 
 export async function getAchievements(): Promise<

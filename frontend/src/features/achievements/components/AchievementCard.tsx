@@ -1,22 +1,13 @@
 import React from "react";
-import {
-  Award,
-  Calendar,
-  Crown,
-  Flame,
-  Medal,
-  Route,
-  Tally5,
-  Timer,
-  Trophy,
-  type LucideIcon,
-} from "lucide-react";
+import { Trophy } from "lucide-react";
 import {
   achievementFreqTypes,
   achievementTypes,
   AchievementTypes,
   UserAchievement,
-} from "../type";
+  ACCENTS,
+  ICONS,
+} from "../types";
 import {
   Card,
   CardContent,
@@ -25,45 +16,6 @@ import {
   CardTitle,
 } from "@/src/components/card";
 import { PR_TYPES } from "../../exercises/types";
-
-const ICONS: Record<string, LucideIcon> = {
-  trophy: Trophy,
-  route: Route,
-  "tally-5": Tally5,
-  timer: Timer,
-  flame: Flame,
-  calendar: Calendar,
-  award: Award,
-  medal: Medal,
-  crown: Crown,
-};
-
-const ACCENTS = {
-  pr_weight: {
-    border: "border-l-amber-500",
-    badge:
-      "bg-amber-100 text-amber-600 dark:bg-amber-500/15 dark:text-amber-400",
-  },
-  pr_reps: {
-    border: "border-l-violet-500",
-    badge:
-      "bg-violet-100 text-violet-600 dark:bg-violet-500/15 dark:text-violet-400",
-  },
-  pr_distance: {
-    border: "border-l-sky-500",
-    badge: "bg-sky-100 text-sky-600 dark:bg-sky-500/15 dark:text-sky-400",
-  },
-  pr_duration: {
-    border: "border-l-emerald-500",
-    badge:
-      "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400",
-  },
-  streak: {
-    border: "border-l-orange-500",
-    badge:
-      "bg-orange-100 text-orange-600 dark:bg-orange-500/15 dark:text-orange-400",
-  },
-};
 
 function getAccent(type: string) {
   if (type in ACCENTS) {
@@ -113,9 +65,9 @@ export default function AchievementCard({
 
   return (
     <Card
-      className={`overflow-hidden border-l-4 min-w-[calc(50%-0.5rem)] ${accent.border}`}
+      className={`overflow-hidden border-l-4 w-full h-full flex flex-col justify-between ${accent.border}`}
     >
-      <CardHeader className="flex flex-row items-start gap-3 space-y-0 pb-3">
+      <CardHeader className="flex flex-row items-start gap-3 space-y-0 pb-3 ">
         <div
           className={`flex size-10 shrink-0 items-center justify-center rounded-full ${accent.badge}`}
         >
@@ -126,12 +78,12 @@ export default function AchievementCard({
           <CardDescription className="mt-1">{criteria}</CardDescription>
         </div>
       </CardHeader>
-      <CardContent className="flex items-end justify-between gap-3">
+      <CardContent className="flex items-end justify-between gap-3 ">
         <p className="text-3xl font-bold tabular-nums tracking-tight">
           {formatValue(value, type as AchievementTypes)}
         </p>
         {chip && (
-          <span className="max-w-[50%] truncate rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
+          <span className="truncate rounded-full bg-muted px-2.5 py-1 text-sm font-medium text-muted-foreground">
             {chip}
           </span>
         )}
