@@ -14,6 +14,11 @@ export interface Exercise {
   equipment: string;
   muscles: Muscle[];
 }
+export interface RankedExercise extends Exercise {
+  setCount: number;
+  workoutCount: number;
+  lastUser: string | null;
+}
 
 export interface ExerciseNoMuscles {
   id: number;

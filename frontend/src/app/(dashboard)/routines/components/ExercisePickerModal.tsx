@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Exercise } from "@/src/features/exercises/types";
+import { Exercise, RankedExercise } from "@/src/features/exercises/types";
 import { getAllExercises } from "@/src/features/exercises/actions";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
@@ -47,7 +47,7 @@ export function ExercisePickerModal({
   const [equipment, setEquipment] = useState("");
   const [muscle, setMuscle] = useState(defaultMuscle);
 
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [exercises, setExercises] = useState<RankedExercise[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -241,13 +241,13 @@ export function ExercisePickerModal({
                   key={exercise.id}
                   type="button"
                   onClick={() => toggleExercise(exercise)}
-                  className={`w-full text-left p-2 rounded-xl border transition-all flex justify-between items-center ${
+                  className={`w-full  text-left p-2 rounded-xl border transition-all flex justify-between items-center ${
                     isSelected
                       ? "bg-secondary border-transparent"
                       : "hover:bg-secondary border-transparent hover:border-border"
                   }`}
                 >
-                  <span className="flex gap-4">
+                  <span className="flex gap-4 w-full">
                     <Link
                       onClick={(e) => e.stopPropagation()}
                       href={`/exercises/${exercise.id}`}
@@ -260,14 +260,17 @@ export function ExercisePickerModal({
                         height={40}
                       />
                     </Link>
-                    <span>
-                      <p className="font-semibold text-foreground">
-                        {exercise.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground capitalize">
-                        {exercise.equipment} •{" "}
-                        {exercise.muscles.map(({ name }) => name).join(", ")}
-                      </p>
+                    <span className="flex gap-2 justify-between items-center w-full">
+                      <span>
+                        <p className="font-semibold text-foreground">
+                          {exercise.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground capitalize">
+                          {exercise.equipment} •{" "}
+                          {exercise.muscles.map(({ name }) => name).join(", ")}
+                        </p>
+                      </span>
+                      <p>workouts {exercise.workoutCount}</p>
                     </span>
                   </span>
                 </button>

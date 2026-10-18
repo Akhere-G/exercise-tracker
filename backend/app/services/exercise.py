@@ -1,28 +1,50 @@
 from sqlalchemy.orm import Session, selectinload
-from sqlalchemy import select
+from sqlalchemy import select, func, case
 from app.models import Exercise, Muscle, ExerciseMuscle, Workout, Routine, WorkoutSet
 from typing import Optional
 
 
 def get_exercises(
     db: Session,
+    user_id: int,
     search: Optional[str] = None,
     equipment: Optional[str] = None,
     muscle: Optional[str] = None,
     page: int = 1,
     limit: int = 10,
 ):
-    stmt = select(Exercise).options(
-        selectinload(Exercise.muscles).selectinload(ExerciseMuscle.muscle)
+
+    usage = (
+        select(
+            WorkoutSet.exercise_id.label("exercise_id"),
+            func.count(WorkoutSet.id).label("set_count"),
+            func.count(func.distinct(Workout.id)).label("workout_count"),
+            func.max(Workout.completed_at).label("last_used"),
+        )
+        .join(Workout, Workout.id == WorkoutSet.workout_id)
+        .where(Workout.user_id == user_id)
+        .group_by(WorkoutSet.exercise_id)
+        .subquery()
     )
 
-    if search:
-        stmt = stmt.where(Exercise.name.ilike(f"%{search.strip()}%"))
+    stmt = (
+        select(
+            Exercise,
+            func.coalesce(usage.c.set_count, 0).label("set_count"),
+            func.coalesce(usage.c.workout_count, 0).label("workout_count"),
+            usage.c.last_used.label("last_used"),
+        )
+        .options(selectinload(Exercise.muscles).selectinload(ExerciseMuscle.muscle))
+        .outerjoin(
+            usage,
+            usage.c.exercise_id == Exercise.id,
+        )
+    )
 
-    if equipment and not equipment == "all":
+    if equipment and equipment != "all":
         stmt = stmt.where(Exercise.equipment.ilike(f"%{equipment.strip()}%"))
 
-    if muscle and not muscle == "all":
+    if muscle and muscle != "all":
         stmt = (
             stmt.join(ExerciseMuscle)
             .join(Muscle)
@@ -31,12 +53,31 @@ def get_exercises(
 
         stmt = stmt.distinct()
 
-    stmt = stmt.order_by(Exercise.priority)
+    if search:
+        stmt = stmt.where(Exercise.name.ilike(f"%{search.strip()}%"))
 
+        stmt = stmt.order_by(
+            case(
+                (Exercise.name.ilike(search), 0),
+                (Exercise.name.ilike(f"%{search}%"), 1),
+                else_=2,
+            ),
+            func.coalesce(usage.c.workout_count, 0).desc(),
+            func.coalesce(usage.c.set_count, 0).desc(),
+            usage.c.last_used.desc().nulls_last(),
+            Exercise.priority.asc(),
+        )
+    else:
+        stmt = stmt.order_by(
+            func.coalesce(usage.c.workout_count, 0).desc(),
+            func.coalesce(usage.c.set_count, 0).desc(),
+            usage.c.last_used.desc().nulls_last(),
+            Exercise.priority.asc(),
+        )
     offset = limit * (page - 1)
     stmt = stmt.limit(limit).offset(offset)
 
-    exercises = db.execute(stmt).scalars().all()
+    exercises = db.execute(stmt).all()
     return exercises
 
 
