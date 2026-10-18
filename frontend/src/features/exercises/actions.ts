@@ -1,6 +1,6 @@
 "use server";
 import { api } from "@/src/lib/axios";
-import type { Exercise } from "./types";
+import type { RankedExercise } from "./types";
 
 interface GetAllExercisesProps {
   search?: string;
@@ -10,9 +10,9 @@ interface GetAllExercisesProps {
 }
 export const getAllExercises = async (
   params: GetAllExercisesProps,
-): Promise<Exercise[]> => {
+): Promise<RankedExercise[]> => {
   const searchParams = new URLSearchParams(params as Record<string, string>);
-  const response = await api.get<Exercise[]>(
+  const response = await api.get<RankedExercise[]>(
     "/exercises?" + searchParams.toString(),
   );
   return response.data;

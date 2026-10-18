@@ -1,18 +1,21 @@
+from typing import Annotated, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.database import get_db
+from app.models import User
+from app.schemas.exercise import Exercise, RankedExercise
+from app.schemas.workout import WorkoutSetWithDate
 from app.services import exercise as exercise_service
 from app.services import user as user_service
-from app.models import User
-from app.database import get_db
-from sqlalchemy.orm import Session
-from typing import Optional, Annotated
-from app.schemas.exercise import Exercise
-from app.schemas.workout import WorkoutSetWithDate
-from typing import List
+from pprint import pprint
+
 
 router = APIRouter(prefix="/api/exercises", tags=["Exercises"])
 
 
-@router.get("", response_model=List[Exercise])
+@router.get("", response_model=list[RankedExercise])
 def get_exercises(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Session = Depends(get_db),
@@ -22,7 +25,9 @@ def get_exercises(
     page: int = 1,
     limit: int = 10,
 ):
-    return exercise_service.get_exercises(db, search, equipment, muscle, page, limit)
+    return exercise_service.get_exercises(
+        db, user.id, search, equipment, muscle, page, limit
+    )
 
 
 @router.get("/{exercise_id}", response_model=Exercise)
@@ -41,7 +46,7 @@ def get_exercise(
     return exercise
 
 
-@router.get("/{exercise_id}/workouts", response_model=List[WorkoutSetWithDate])
+@router.get("/{exercise_id}/workouts", response_model=list[WorkoutSetWithDate])
 def get_exercise_workouts(
     user: Annotated[User, Depends(user_service.get_current_user)],
     exercise_id: int,
