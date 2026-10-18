@@ -2,7 +2,12 @@ export default function ActiveWorkoutSkeleton() {
   return (
     <div className="relative h-[90vh] flex flex-1 flex-col justify-between">
       <div>
-        <div className="h-16 w-full bg-muted animate-pulse rounded mb-4" />
+        <div className="h-20 w-full bg-muted animate-pulse rounded mb-4" />
+        <div className="ml-4 mt-6 h-6 w-32 bg-muted animate-pulse rounded" />
+        <div className="flex gap-4 ml-4 my-2 mb-4">
+          <div className="h-4 w-7 bg-muted animate-pulse rounded" />
+          <div className="h-4 w-10 bg-muted animate-pulse rounded" />
+        </div>
         <div className="h-48 w-full bg-muted animate-pulse rounded mb-4" />
         <div className="h-64 w-full bg-muted animate-pulse rounded mb-4" />
         <div className="h-32 w-full bg-muted animate-pulse rounded" />

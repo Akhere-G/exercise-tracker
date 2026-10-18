@@ -15,7 +15,10 @@ export default function WorkoutsSkeleton() {
       <div className="mx-1 mb-4 border border-border bg-card rounded-2xl overflow-hidden shadow-sm">
         <div className="grid grid-cols-7 border-b border-border bg-muted/30 text-center py-3">
           {[1, 2, 3, 4, 5, 6, 7].map((i) => (
-            <div key={i} className="h-4 w-8 bg-muted animate-pulse rounded mx-auto" />
+            <div
+              key={i}
+              className="h-4 w-8 bg-muted animate-pulse rounded mx-auto"
+            />
           ))}
         </div>
 
