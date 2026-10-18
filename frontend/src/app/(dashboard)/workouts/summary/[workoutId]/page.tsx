@@ -19,6 +19,7 @@ import { Button } from "@/src/components/ui/button";
 import { getUserAchievementsForWorkout } from "@/src/features/achievements/actions";
 import AchievementList from "@/src/features/achievements/components/AchievementList";
 import { Suspense } from "react";
+import AchievementSkeleton from "@/src/features/achievements/components/AchievementSkeleton";
 
 export default async function WorkoutSummary({
   params,
@@ -124,7 +125,7 @@ export default async function WorkoutSummary({
         </div>
         <div className="mt-6">
           <h2 className="text-2xl">Achievements</h2>
-          <Suspense fallback={<p>Loading...</p>}>
+          <Suspense fallback={<AchievementSkeleton />}>
             <AchievementList achievementsPromise={achievementsPromise} />
           </Suspense>
         </div>

@@ -5,6 +5,8 @@ import { workoutSetWithDate } from "@/src/features/workout/types";
 import AchievementList from "@/src/features/achievements/components/AchievementList";
 import { ActionResponse } from "@/src/lib/apiTypes";
 import { UserAchievement } from "@/src/features/achievements/types";
+import { Suspense } from "react";
+import AchievementSkeleton from "@/src/features/achievements/components/AchievementSkeleton";
 
 export default function ExerciseAchievements({
   achievementsPromise,
@@ -15,7 +17,9 @@ export default function ExerciseAchievements({
 }) {
   return (
     <div className="container p-0.5">
-      <AchievementList achievementsPromise={achievementsPromise} />
+      <Suspense fallback={<AchievementSkeleton />}>
+        <AchievementList achievementsPromise={achievementsPromise} />
+      </Suspense>
     </div>
   );
 }

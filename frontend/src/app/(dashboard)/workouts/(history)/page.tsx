@@ -1,5 +1,5 @@
 import React from "react";
-import WorkoutsCalendar from "../components/WorkoutCalendar";
+import WorkoutsCalendar from "../../components/WorkoutCalendar";
 import { getWorkouts } from "@/src/features/workout/queries";
 
 export default async function WorkoutCalendarPage() {

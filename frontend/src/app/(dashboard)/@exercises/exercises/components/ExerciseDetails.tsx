@@ -9,7 +9,7 @@ import {
 import { Exercise } from "@/src/features/exercises/types";
 import { Dot } from "lucide-react";
 import Image from "next/image";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import ExerciseInstructions from "./ExerciseInstructions";
 import ExerciseHistory from "./ExerciseHistory";
 import ExerciseStats from "./ExerciseStats";
@@ -138,13 +138,11 @@ function ExerciseDetail({
               <ExerciseStats exercise={exercise} groupedSets={groupedSets} />
             </TabsContent>
             <TabsContent value="achievements">
-              <Suspense fallback={<p>Loading...</p>}>
-                <ExerciseAchievements
-                  achievementsPromise={achievementsPromise}
-                  exercise={exercise}
-                  groupedSets={groupedSets}
-                />
-              </Suspense>
+              <ExerciseAchievements
+                achievementsPromise={achievementsPromise}
+                exercise={exercise}
+                groupedSets={groupedSets}
+              />
             </TabsContent>
           </div>
         </Tabs>
