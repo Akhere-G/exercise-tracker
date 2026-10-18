@@ -18,7 +18,7 @@ import { workoutSetWithDate } from "@/src/features/workout/types";
 import { getImageUrl } from "@/src/features/exercises/utils";
 import ExerciseAchievements from "./ExerciseAchievements";
 import { ActionResponse } from "@/src/lib/apiTypes";
-import { UserAchievement } from "@/src/features/achievements/type";
+import { UserAchievement } from "@/src/features/achievements/types";
 
 export default function ExerciseDetails({
   exercise,
