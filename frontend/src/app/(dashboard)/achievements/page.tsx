@@ -8,12 +8,12 @@ export default function page() {
 
   return (
     <div className="flex justify-center w-screen">
-      <div className="container">
-        <h2 className="text-2xl">Achievements</h2>
-        <Suspense fallback={<AchievementSkeleton />}>
+      <Suspense fallback={<AchievementSkeleton />}>
+        <div className="container">
+          <h2 className="text-2xl">Achievements</h2>
           <AchievementList achievementsPromise={achievementsPromise} />
-        </Suspense>
-      </div>
+        </div>
+      </Suspense>
     </div>
   );
 }
