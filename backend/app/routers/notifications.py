@@ -40,6 +40,12 @@ def save_subscription_route(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Annotated[Session, Depends(get_db)],
 ):
+    if user.is_demo:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Notifications are disabled in demo mode.",
+        )
+
     notification_service.save_subscription(
         db=db,
         user_id=user.id,

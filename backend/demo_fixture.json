@@ -1,0 +1,2684 @@
+{
+  "schemaVersion": 1,
+  "user": {
+    "username": "Alex Demo",
+    "email": "demo@gains-demo.app"
+  },
+  "exercises": [
+    {
+      "id": 9,
+      "name": "Assisted Chest Dip (Kneeling)",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 11,
+      "name": "Assisted Hanging Knee Raise",
+      "metrics": "duration"
+    },
+    {
+      "id": 30,
+      "name": "Barbell Close-Grip Bench Press",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 32,
+      "name": "Barbell Deadlift",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 43,
+      "name": "Barbell Full Squat",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 50,
+      "name": "Barbell Incline Shoulder Raise",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 58,
+      "name": "Barbell Lying Lifting (On Hip)",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 171,
+      "name": "Cable Incline Fly",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 285,
+      "name": "Dumbbell Alternate Biceps Curl",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 294,
+      "name": "Dumbbell Biceps Curl",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 312,
+      "name": "Dumbbell Hammer Curl V. 2",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 334,
+      "name": "Dumbbell Lateral Raise",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 491,
+      "name": "Incline Leg Hip Raise (Leg Straight)",
+      "metrics": "reps"
+    },
+    {
+      "id": 572,
+      "name": "Lever Assisted Chin-Up",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 577,
+      "name": "Lever Chest Press",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 586,
+      "name": "Lever Lying Leg Curl",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 596,
+      "name": "Lever Seated Fly",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 597,
+      "name": "Lever Seated Hip Abduction",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 602,
+      "name": "Lever Seated Reverse Fly",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 968,
+      "name": "Band Alternating Biceps Curl",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 1347,
+      "name": "Lever One Arm Lateral Wide Pulldown",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 1350,
+      "name": "Lever Seated Row",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 1452,
+      "name": "Lever Seated Crunch",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 1723,
+      "name": "Cable One Arm Tricep Pushdown",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 1761,
+      "name": "Hanging Oblique Knee Raise",
+      "metrics": "duration"
+    },
+    {
+      "id": 2311,
+      "name": "Walking On Stepmill",
+      "metrics": "duration+distance"
+    },
+    {
+      "id": 2318,
+      "name": "Lever Shoulder Press V. 3",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 2330,
+      "name": "Cable Lat Pulldown Full Range Of Motion",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 2406,
+      "name": "Cable Reverse Grip Triceps Pushdown (Sz-Bar) (With Arm Blaster)",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 2611,
+      "name": "Lever Horizontal One Leg Press",
+      "metrics": "reps+weight"
+    },
+    {
+      "id": 2963,
+      "name": "Captains Chair Straight Leg Raise",
+      "metrics": "reps"
+    },
+    {
+      "id": 3666,
+      "name": "Walking On Incline Treadmill",
+      "metrics": "duration+distance"
+    }
+  ],
+  "routines": [
+    {
+      "key": "push",
+      "name": "Push Day",
+      "day": 0,
+      "startTime": null,
+      "items": [
+        {
+          "exerciseId": 577,
+          "order": 1,
+          "targetSets": 4,
+          "targetReps": 10,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 2318,
+          "order": 2,
+          "targetSets": 3,
+          "targetReps": 10,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 171,
+          "order": 3,
+          "targetSets": 3,
+          "targetReps": 12,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 334,
+          "order": 4,
+          "targetSets": 3,
+          "targetReps": 15,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 1723,
+          "order": 5,
+          "targetSets": 3,
+          "targetReps": 12,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 9,
+          "order": 6,
+          "targetSets": 3,
+          "targetReps": 8,
+          "targetDurationSecs": null
+        }
+      ]
+    },
+    {
+      "key": "pull",
+      "name": "Pull Day",
+      "day": 2,
+      "startTime": null,
+      "items": [
+        {
+          "exerciseId": 1350,
+          "order": 1,
+          "targetSets": 4,
+          "targetReps": 10,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 2330,
+          "order": 2,
+          "targetSets": 3,
+          "targetReps": 10,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 1347,
+          "order": 3,
+          "targetSets": 3,
+          "targetReps": 10,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 572,
+          "order": 4,
+          "targetSets": 3,
+          "targetReps": 8,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 602,
+          "order": 5,
+          "targetSets": 3,
+          "targetReps": 12,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 294,
+          "order": 6,
+          "targetSets": 3,
+          "targetReps": 12,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 312,
+          "order": 7,
+          "targetSets": 3,
+          "targetReps": 12,
+          "targetDurationSecs": null
+        }
+      ]
+    },
+    {
+      "key": "legs",
+      "name": "Legs & Core",
+      "day": 4,
+      "startTime": null,
+      "items": [
+        {
+          "exerciseId": 43,
+          "order": 1,
+          "targetSets": 4,
+          "targetReps": 8,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 32,
+          "order": 2,
+          "targetSets": 3,
+          "targetReps": 5,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 2611,
+          "order": 3,
+          "targetSets": 3,
+          "targetReps": 12,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 586,
+          "order": 4,
+          "targetSets": 3,
+          "targetReps": 12,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 597,
+          "order": 5,
+          "targetSets": 3,
+          "targetReps": 15,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 1452,
+          "order": 6,
+          "targetSets": 3,
+          "targetReps": 15,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 1761,
+          "order": 7,
+          "targetSets": 3,
+          "targetReps": null,
+          "targetDurationSecs": 30
+        }
+      ]
+    },
+    {
+      "key": "cardio",
+      "name": "Cardio & Core",
+      "day": 5,
+      "startTime": null,
+      "items": [
+        {
+          "exerciseId": 2311,
+          "order": 1,
+          "targetSets": 1,
+          "targetReps": null,
+          "targetDurationSecs": 900
+        },
+        {
+          "exerciseId": 3666,
+          "order": 2,
+          "targetSets": 1,
+          "targetReps": null,
+          "targetDurationSecs": 1200
+        },
+        {
+          "exerciseId": 1761,
+          "order": 3,
+          "targetSets": 3,
+          "targetReps": null,
+          "targetDurationSecs": 30
+        },
+        {
+          "exerciseId": 11,
+          "order": 4,
+          "targetSets": 3,
+          "targetReps": null,
+          "targetDurationSecs": 30
+        },
+        {
+          "exerciseId": 2963,
+          "order": 5,
+          "targetSets": 3,
+          "targetReps": 10,
+          "targetDurationSecs": null
+        },
+        {
+          "exerciseId": 491,
+          "order": 6,
+          "targetSets": 3,
+          "targetReps": 12,
+          "targetDurationSecs": null
+        }
+      ]
+    }
+  ],
+  "workouts": [
+    {
+      "key": "s01",
+      "routineKey": "push",
+      "weekOffset": -5,
+      "weekday": 2,
+      "completedTime": "12:20",
+      "durationSecs": 3180,
+      "sets": [
+        {
+          "exerciseId": 577,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 577,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 577,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 577,
+          "setIndex": 4,
+          "reps": 10,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2318,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2318,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2318,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 171,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 171,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 171,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 1,
+          "reps": 15,
+          "weight": 4,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 2,
+          "reps": 15,
+          "weight": 4,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 3,
+          "reps": 15,
+          "weight": 4,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1723,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 8,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1723,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 8,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1723,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 8,
+          "durationSecs": null,
+          "distanceMeters": null
+        }
+      ]
+    },
+    {
+      "key": "s02",
+      "routineKey": "legs",
+      "weekOffset": -5,
+      "weekday": 4,
+      "completedTime": "12:45",
+      "durationSecs": 3420,
+      "sets": [
+        {
+          "exerciseId": 43,
+          "setIndex": 1,
+          "reps": 8,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 43,
+          "setIndex": 2,
+          "reps": 8,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 43,
+          "setIndex": 3,
+          "reps": 8,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 43,
+          "setIndex": 4,
+          "reps": 8,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2611,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2611,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2611,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 586,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 586,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 586,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 597,
+          "setIndex": 1,
+          "reps": 15,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 597,
+          "setIndex": 2,
+          "reps": 15,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 597,
+          "setIndex": 3,
+          "reps": 15,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1452,
+          "setIndex": 1,
+          "reps": 15,
+          "weight": 20,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1452,
+          "setIndex": 2,
+          "reps": 15,
+          "weight": 20,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1452,
+          "setIndex": 3,
+          "reps": 15,
+          "weight": 20,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1761,
+          "setIndex": 1,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 20,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1761,
+          "setIndex": 2,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 20,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1761,
+          "setIndex": 3,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 20,
+          "distanceMeters": null
+        }
+      ]
+    },
+    {
+      "key": "s03",
+      "routineKey": "push",
+      "weekOffset": -4,
+      "weekday": 0,
+      "completedTime": "12:10",
+      "durationSecs": 3720,
+      "sets": [
+        {
+          "exerciseId": 577,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 577,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 577,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 577,
+          "setIndex": 4,
+          "reps": 9,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2318,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2318,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2318,
+          "setIndex": 3,
+          "reps": 9,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 596,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 596,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 596,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 1,
+          "reps": 15,
+          "weight": 4,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 2,
+          "reps": 15,
+          "weight": 4,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 3,
+          "reps": 15,
+          "weight": 4,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1723,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1723,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1723,
+          "setIndex": 3,
+          "reps": 11,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2406,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 15,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2406,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 15,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2406,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 15,
+          "durationSecs": null,
+          "distanceMeters": null
+        }
+      ]
+    },
+    {
+      "key": "s04",
+      "routineKey": "pull",
+      "weekOffset": -4,
+      "weekday": 2,
+      "completedTime": "12:30",
+      "durationSecs": 3540,
+      "sets": [
+        {
+          "exerciseId": 1350,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1350,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1350,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1350,
+          "setIndex": 4,
+          "reps": 10,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2330,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2330,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2330,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1347,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 20,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1347,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 20,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1347,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 20,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 572,
+          "setIndex": 1,
+          "reps": 5,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 572,
+          "setIndex": 2,
+          "reps": 5,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 572,
+          "setIndex": 3,
+          "reps": 4,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 602,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 602,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 602,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 294,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 294,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 294,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        }
+      ]
+    },
+    {
+      "key": "s05",
+      "routineKey": "legs",
+      "weekOffset": -4,
+      "weekday": 4,
+      "completedTime": "12:40",
+      "durationSecs": 3900,
+      "sets": [
+        {
+          "exerciseId": 43,
+          "setIndex": 1,
+          "reps": 8,
+          "weight": 60,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 43,
+          "setIndex": 2,
+          "reps": 8,
+          "weight": 60,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 43,
+          "setIndex": 3,
+          "reps": 8,
+          "weight": 60,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 43,
+          "setIndex": 4,
+          "reps": 7,
+          "weight": 60,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 32,
+          "setIndex": 1,
+          "reps": 5,
+          "weight": 70,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 32,
+          "setIndex": 2,
+          "reps": 5,
+          "weight": 70,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 32,
+          "setIndex": 3,
+          "reps": 5,
+          "weight": 70,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2611,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2611,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2611,
+          "setIndex": 3,
+          "reps": 11,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 586,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 586,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 586,
+          "setIndex": 3,
+          "reps": 11,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 597,
+          "setIndex": 1,
+          "reps": 15,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 597,
+          "setIndex": 2,
+          "reps": 15,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 597,
+          "setIndex": 3,
+          "reps": 14,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1452,
+          "setIndex": 1,
+          "reps": 15,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1452,
+          "setIndex": 2,
+          "reps": 15,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1452,
+          "setIndex": 3,
+          "reps": 14,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 11,
+          "setIndex": 1,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 30,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 11,
+          "setIndex": 2,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 30,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 11,
+          "setIndex": 3,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 25,
+          "distanceMeters": null
+        }
+      ]
+    },
+    {
+      "key": "s06",
+      "routineKey": "push",
+      "weekOffset": -3,
+      "weekday": 0,
+      "completedTime": "12:15",
+      "durationSecs": 3780,
+      "sets": [
+        {
+          "exerciseId": 30,
+          "setIndex": 1,
+          "reps": 8,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 30,
+          "setIndex": 2,
+          "reps": 8,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 30,
+          "setIndex": 3,
+          "reps": 8,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 30,
+          "setIndex": 4,
+          "reps": 7,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2318,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2318,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2318,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 171,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 12,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 171,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 12,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 171,
+          "setIndex": 3,
+          "reps": 11,
+          "weight": 12,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 1,
+          "reps": 15,
+          "weight": 6,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 2,
+          "reps": 15,
+          "weight": 6,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 3,
+          "reps": 14,
+          "weight": 6,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1723,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1723,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1723,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 9,
+          "setIndex": 1,
+          "reps": 6,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 9,
+          "setIndex": 2,
+          "reps": 6,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 9,
+          "setIndex": 3,
+          "reps": 5,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        }
+      ]
+    },
+    {
+      "key": "s07",
+      "routineKey": "pull",
+      "weekOffset": -3,
+      "weekday": 2,
+      "completedTime": "12:35",
+      "durationSecs": 3660,
+      "sets": [
+        {
+          "exerciseId": 1350,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1350,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1350,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1350,
+          "setIndex": 4,
+          "reps": 9,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2330,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2330,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2330,
+          "setIndex": 3,
+          "reps": 9,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1347,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1347,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1347,
+          "setIndex": 3,
+          "reps": 9,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 572,
+          "setIndex": 1,
+          "reps": 6,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 572,
+          "setIndex": 2,
+          "reps": 6,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 572,
+          "setIndex": 3,
+          "reps": 5,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 602,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 602,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 602,
+          "setIndex": 3,
+          "reps": 11,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 294,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 294,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 294,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 312,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 312,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 312,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        }
+      ]
+    },
+    {
+      "key": "s08",
+      "routineKey": null,
+      "weekOffset": -3,
+      "weekday": 5,
+      "completedTime": "11:20",
+      "durationSecs": 2880,
+      "sets": [
+        {
+          "exerciseId": 32,
+          "setIndex": 1,
+          "reps": 5,
+          "weight": 80,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 32,
+          "setIndex": 2,
+          "reps": 5,
+          "weight": 80,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 32,
+          "setIndex": 3,
+          "reps": 4,
+          "weight": 80,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 58,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 58,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 58,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 3666,
+          "setIndex": 1,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 1200,
+          "distanceMeters": 1700
+        },
+        {
+          "exerciseId": 491,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": null,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 491,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": null,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 491,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": null,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2963,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": null,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2963,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": null,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2963,
+          "setIndex": 3,
+          "reps": 8,
+          "weight": null,
+          "durationSecs": null,
+          "distanceMeters": null
+        }
+      ]
+    },
+    {
+      "key": "s09",
+      "routineKey": "push",
+      "weekOffset": -2,
+      "weekday": 1,
+      "completedTime": "12:25",
+      "durationSecs": 3600,
+      "sets": [
+        {
+          "exerciseId": 577,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 577,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 577,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 577,
+          "setIndex": 4,
+          "reps": 9,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 50,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 50,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 50,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 171,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 14,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 171,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 14,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 171,
+          "setIndex": 3,
+          "reps": 11,
+          "weight": 14,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 1,
+          "reps": 15,
+          "weight": 6,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 2,
+          "reps": 15,
+          "weight": 6,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 3,
+          "reps": 15,
+          "weight": 6,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2406,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 20,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2406,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 20,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2406,
+          "setIndex": 3,
+          "reps": 11,
+          "weight": 20,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 9,
+          "setIndex": 1,
+          "reps": 7,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 9,
+          "setIndex": 2,
+          "reps": 7,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 9,
+          "setIndex": 3,
+          "reps": 6,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        }
+      ]
+    },
+    {
+      "key": "s10",
+      "routineKey": "pull",
+      "weekOffset": -2,
+      "weekday": 3,
+      "completedTime": "12:30",
+      "durationSecs": 3480,
+      "sets": [
+        {
+          "exerciseId": 1350,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1350,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1350,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1350,
+          "setIndex": 4,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2330,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2330,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2330,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1347,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1347,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1347,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 25,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 572,
+          "setIndex": 1,
+          "reps": 7,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 572,
+          "setIndex": 2,
+          "reps": 7,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 572,
+          "setIndex": 3,
+          "reps": 6,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 285,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 285,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 285,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 968,
+          "setIndex": 1,
+          "reps": 15,
+          "weight": 7,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 968,
+          "setIndex": 2,
+          "reps": 15,
+          "weight": 7,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 968,
+          "setIndex": 3,
+          "reps": 15,
+          "weight": 7,
+          "durationSecs": null,
+          "distanceMeters": null
+        }
+      ]
+    },
+    {
+      "key": "s11",
+      "routineKey": "cardio",
+      "weekOffset": -2,
+      "weekday": 5,
+      "completedTime": "11:45",
+      "durationSecs": 3300,
+      "sets": [
+        {
+          "exerciseId": 2311,
+          "setIndex": 1,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 900,
+          "distanceMeters": 550
+        },
+        {
+          "exerciseId": 3666,
+          "setIndex": 1,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 1500,
+          "distanceMeters": 2200
+        },
+        {
+          "exerciseId": 1761,
+          "setIndex": 1,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 30,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1761,
+          "setIndex": 2,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 30,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1761,
+          "setIndex": 3,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 25,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 11,
+          "setIndex": 1,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 40,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 11,
+          "setIndex": 2,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 35,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 11,
+          "setIndex": 3,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 35,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2963,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": null,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2963,
+          "setIndex": 2,
+          "reps": 11,
+          "weight": null,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2963,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": null,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 491,
+          "setIndex": 1,
+          "reps": 14,
+          "weight": null,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 491,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": null,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 491,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": null,
+          "durationSecs": null,
+          "distanceMeters": null
+        }
+      ]
+    },
+    {
+      "key": "s12",
+      "routineKey": "push",
+      "weekOffset": -1,
+      "weekday": 0,
+      "completedTime": "12:10",
+      "durationSecs": 3840,
+      "sets": [
+        {
+          "exerciseId": 577,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 55,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 577,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 55,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 577,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 55,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 577,
+          "setIndex": 4,
+          "reps": 9,
+          "weight": 55,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2318,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2318,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2318,
+          "setIndex": 3,
+          "reps": 9,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 596,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 596,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 596,
+          "setIndex": 3,
+          "reps": 11,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 1,
+          "reps": 15,
+          "weight": 8,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 2,
+          "reps": 15,
+          "weight": 8,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 334,
+          "setIndex": 3,
+          "reps": 14,
+          "weight": 8,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1723,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 12,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1723,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 12,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1723,
+          "setIndex": 3,
+          "reps": 11,
+          "weight": 12,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 9,
+          "setIndex": 1,
+          "reps": 8,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 9,
+          "setIndex": 2,
+          "reps": 8,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 9,
+          "setIndex": 3,
+          "reps": 7,
+          "weight": 40,
+          "durationSecs": null,
+          "distanceMeters": null
+        }
+      ]
+    },
+    {
+      "key": "s13",
+      "routineKey": "pull",
+      "weekOffset": -1,
+      "weekday": 2,
+      "completedTime": "12:30",
+      "durationSecs": 3720,
+      "sets": [
+        {
+          "exerciseId": 1350,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 55,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1350,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 55,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1350,
+          "setIndex": 3,
+          "reps": 10,
+          "weight": 55,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1350,
+          "setIndex": 4,
+          "reps": 9,
+          "weight": 55,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2330,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2330,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2330,
+          "setIndex": 3,
+          "reps": 9,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1347,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1347,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1347,
+          "setIndex": 3,
+          "reps": 9,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 572,
+          "setIndex": 1,
+          "reps": 8,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 572,
+          "setIndex": 2,
+          "reps": 8,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 572,
+          "setIndex": 3,
+          "reps": 7,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 602,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 602,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 602,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 294,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 12,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 294,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 12,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 294,
+          "setIndex": 3,
+          "reps": 11,
+          "weight": 12,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 312,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 312,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 312,
+          "setIndex": 3,
+          "reps": 12,
+          "weight": 10,
+          "durationSecs": null,
+          "distanceMeters": null
+        }
+      ]
+    },
+    {
+      "key": "s14",
+      "routineKey": "legs",
+      "weekOffset": -1,
+      "weekday": 4,
+      "completedTime": "12:50",
+      "durationSecs": 4080,
+      "sets": [
+        {
+          "exerciseId": 43,
+          "setIndex": 1,
+          "reps": 8,
+          "weight": 70,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 43,
+          "setIndex": 2,
+          "reps": 8,
+          "weight": 70,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 43,
+          "setIndex": 3,
+          "reps": 8,
+          "weight": 70,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 43,
+          "setIndex": 4,
+          "reps": 7,
+          "weight": 70,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 32,
+          "setIndex": 1,
+          "reps": 5,
+          "weight": 90,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 32,
+          "setIndex": 2,
+          "reps": 5,
+          "weight": 90,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 32,
+          "setIndex": 3,
+          "reps": 4,
+          "weight": 90,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2611,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 55,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2611,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 55,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 2611,
+          "setIndex": 3,
+          "reps": 11,
+          "weight": 55,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 586,
+          "setIndex": 1,
+          "reps": 12,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 586,
+          "setIndex": 2,
+          "reps": 12,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 586,
+          "setIndex": 3,
+          "reps": 11,
+          "weight": 35,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 58,
+          "setIndex": 1,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 58,
+          "setIndex": 2,
+          "reps": 10,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 58,
+          "setIndex": 3,
+          "reps": 9,
+          "weight": 50,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 597,
+          "setIndex": 1,
+          "reps": 15,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 597,
+          "setIndex": 2,
+          "reps": 15,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 597,
+          "setIndex": 3,
+          "reps": 14,
+          "weight": 45,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1452,
+          "setIndex": 1,
+          "reps": 15,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1452,
+          "setIndex": 2,
+          "reps": 15,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1452,
+          "setIndex": 3,
+          "reps": 14,
+          "weight": 30,
+          "durationSecs": null,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1761,
+          "setIndex": 1,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 40,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1761,
+          "setIndex": 2,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 35,
+          "distanceMeters": null
+        },
+        {
+          "exerciseId": 1761,
+          "setIndex": 3,
+          "reps": null,
+          "weight": null,
+          "durationSecs": 35,
+          "distanceMeters": null
+        }
+      ]
+    }
+  ],
+  "expectations": {
+    "workoutCount": 14,
+    "weeklyStreak": 5,
+    "frequencyStreaks": {
+      "1": 5,
+      "2": 5,
+      "3": 4,
+      "4": 0,
+      "5": 0
+    },
+    "prExerciseIds": [
+      577,
+      2318,
+      32,
+      43,
+      1350,
+      2963,
+      1761,
+      3666
+    ]
+  }
+}

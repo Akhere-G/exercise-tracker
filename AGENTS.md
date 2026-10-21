@@ -223,6 +223,7 @@ npm start
 * `ALGORITHM`
 * `FRONTEND_ORIGIN`
 * `DB_CA_CERT_PATH` (PostgreSQL)
+* `DEMO_MODE_ENABLED` (`true` enables `POST /api/auth/demo`; default off)
 
 ### Frontend
 

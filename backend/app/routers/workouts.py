@@ -7,6 +7,7 @@ from app.services import (
     user as user_service,
     workout as workout_service,
     routine as routine_service,
+    demo as demo_service,
 )
 from sqlalchemy.orm import Session
 from typing import Optional, List
@@ -61,6 +62,12 @@ def create_workout(
     db: Annotated[Session, Depends(get_db)],
     workout_in: WorkoutCreate,
 ):
+    if demo_service.is_quota_exceeded(db, user)["workouts"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Demo accounts are limited in size. Create an account to log more.",
+        )
+
     if workout_in.routine_id:
         routine = routine_service.get_routine(db, user.id, workout_in.routine_id)
 

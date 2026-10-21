@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BarChart3, Dumbbell, PlusCircle } from "lucide-react";
+import { DemoLoginButton } from "@/src/features/auth/components/DemoLoginButton";
 
 export default function HomePage() {
   return (
@@ -40,7 +41,8 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 w-full justify-center items-start">
+          <DemoLoginButton className="w-full sm:w-auto" />
           <Link
             href="/register"
             className="bg-primary text-primary-foreground font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors shadow-sm text-center"
