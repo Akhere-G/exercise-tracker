@@ -17,6 +17,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY", "")
 ALGORITHM = os.getenv("ALGORITHM", "")
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
+DEMO_TOKEN_TTL = timedelta(hours=2)
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
@@ -100,5 +101,12 @@ def get_access_token(email: str):
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": email}, expires_delta=access_token_expires
+    )
+    return Token(access_token=access_token, token_type="bearer")
+
+
+def get_demo_access_token(user: User):
+    access_token = create_access_token(
+        data={"sub": user.email, "demo": True}, expires_delta=DEMO_TOKEN_TTL
     )
     return Token(access_token=access_token, token_type="bearer")

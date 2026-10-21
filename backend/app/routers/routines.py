@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from ..services import routine as routine_service, user as user_service
+from ..services import demo as demo_service, routine as routine_service, user as user_service
 from typing import Annotated
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -39,6 +39,12 @@ def create_routine(
     routine: RoutineCreate,
     db: Session = Depends(get_db),
 ):
+    if demo_service.is_quota_exceeded(db, user)["routines"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Demo accounts are limited in size. Create an account to add more.",
+        )
+
     new_routine = routine_service.create_routine(
         db,
         user.id,

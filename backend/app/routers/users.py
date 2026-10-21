@@ -2,7 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.schemas.user import User, UserCreate, UserLogin
 from app.database import get_db
 from sqlalchemy.orm import Session
+from app.services import demo as demo_service
 from app.services import user as user_service
+import os
 from typing import Annotated
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -52,3 +54,17 @@ def login_user(user_in: UserLogin, db: Session = Depends(get_db)):
 @router.get("/me")
 def check_auth(user: Annotated[User, Depends(user_service.get_current_user)]):
     return user
+
+
+@router.post("/demo", status_code=status.HTTP_200_OK)
+def demo_login(db: Annotated[Session, Depends(get_db)]):
+    if os.getenv("DEMO_MODE_ENABLED", "").lower() != "true":
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
+
+    demo_user = demo_service.get_demo_user(db)
+    if demo_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Demo is temporarily unavailable.",
+        )
+    return user_service.get_demo_access_token(demo_user)

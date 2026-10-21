@@ -1,5 +1,5 @@
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from dotenv import load_dotenv
 from sqlalchemy.orm import DeclarativeBase
 import os
@@ -19,6 +19,22 @@ else:
             "sslrootcert": cert_path,
         },
     )
+
+
+
+def enable_sqlite_foreign_keys(target_engine) -> None:
+    """Enforce foreign keys (and so ON DELETE rules) on every SQLite connection."""
+    if target_engine.dialect.name != "sqlite":
+        return
+
+    @event.listens_for(target_engine, "connect")
+    def _set_sqlite_pragma(dbapi_connection, connection_record):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
+
+enable_sqlite_foreign_keys(engine)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

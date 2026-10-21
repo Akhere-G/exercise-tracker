@@ -1,4 +1,12 @@
-import { Scale, Download, Upload, Paintbrush, Sliders } from "lucide-react";
+import {
+  Scale,
+  Download,
+  Upload,
+  Paintbrush,
+  Sliders,
+  UserRound,
+} from "lucide-react";
+import { LogoutButton } from "@/src/features/auth/components/LogoutButton";
 
 export default function SettingsPage() {
   return (
@@ -76,6 +84,18 @@ export default function SettingsPage() {
               <Upload className="h-4 w-4" />
               Import Data (.json)
             </button>
+          </div>
+        </div>
+
+        <div className="bg-card border border-border rounded-2xl p-6 md:col-span-2 flex flex-col gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <UserRound className="h-5 w-5" />
+            </div>
+            <h3 className="text-lg font-bold">Account</h3>
+          </div>
+          <div>
+            <LogoutButton />
           </div>
         </div>
       </div>

@@ -9,7 +9,8 @@ import { Toaster } from "@/src/components/ui/sonner";
 
 import { Calendar, Cog, House, Trophy } from "lucide-react";
 import type { Metadata, Viewport } from "next";
-import Link from "next/link";
+import { cookies } from "next/headers";
+import { DemoBanner } from "@/src/features/auth/components/DemoBanner";
 
 export const metadata: Metadata = {
   manifest: "/manifest.json",
@@ -24,18 +25,24 @@ export const viewport: Viewport = {
   maximumScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
   exercises,
 }: Readonly<{
   children: React.ReactNode;
   exercises: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const isDemo = cookieStore.get("demo_session")?.value === "1";
+
   return (
     <div>
       <Toaster position="top-right" richColors closeButton />
 
-      <div className="h-[90vh]  overflow-auto no-scrollbar">{children}</div>
+      <div className="h-[90vh]  overflow-auto no-scrollbar">
+        {isDemo && <DemoBanner />}
+        {children}
+      </div>
 
       {exercises}
 

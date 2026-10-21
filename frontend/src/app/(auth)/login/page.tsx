@@ -14,6 +14,7 @@ import { loginAction } from "../../../features/auth/actions";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import { DemoLoginButton } from "@/src/features/auth/components/DemoLoginButton";
 
 export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
@@ -69,6 +70,7 @@ export default function Login() {
             </Button>
             <Link href="/register">Create account?</Link>
           </form>
+          <DemoLoginButton variant="secondary" className="mt-4" />
         </CardContent>
       </Card>
     </div>

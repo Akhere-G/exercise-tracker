@@ -1,8 +1,8 @@
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 from app.models import Achievement, Exercise, UserAchievement, Workout
 from app.schemas.achievement import UserAchievementResponse
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session, selectinload
 
 FREQUENCIES = range(1, 6)
@@ -254,6 +254,55 @@ def check_and_award_frequency_streaks(
     for row in changed:
         db.refresh(row)
     return _serialize(changed)
+
+
+def backfill_user_achievements(
+    db: Session,
+    user_id: int,
+) -> list[UserAchievementResponse]:
+    """Rebuild a user's achievement records from their workout history."""
+
+    # Remove existing records so the backfill can rebuild them cleanly.
+    db.execute(delete(UserAchievement).where(UserAchievement.user_id == user_id))
+    db.flush()
+
+    workouts = (
+        db.execute(
+            select(Workout)
+            .options(selectinload(Workout.sets))
+            .where(Workout.user_id == user_id)
+            .order_by(Workout.completed_at.asc(), Workout.id.asc())
+        )
+        .scalars()
+        .all()
+    )
+
+    created = []
+
+    # Process PRs chronologically so each improvement is recorded.
+    for workout in workouts:
+        created.extend(
+            check_and_award_prs(
+                db,
+                user_id=user_id,
+                workout_id=workout.id,
+                workout=workout,
+                commit=False,
+            )
+        )
+        day = workout.completed_at.date()
+        created.extend(
+            check_and_award_frequency_streaks(
+                db,
+                user_id=user_id,
+                workout_id=workout.id,
+                this_week=day - timedelta(days=day.weekday()),
+                commit=False,
+            )
+        )
+        db.flush()
+
+    return created
 
 
 def get_user_achievements(db: Session, user_id: int) -> list[UserAchievementResponse]:

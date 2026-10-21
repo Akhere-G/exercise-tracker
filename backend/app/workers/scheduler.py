@@ -4,7 +4,7 @@ from pywebpush import webpush, WebPushException
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from app.database import SessionLocal
-from app.models import Routine, NotificationSubscription, Notification
+from app.models import Routine, NotificationSubscription, Notification, User
 from dotenv import load_dotenv
 import os
 from typing import Dict
@@ -71,10 +71,15 @@ def check_routine_reminders():
         print(f"Server time: {datetime.now().time()}")
         print(f"Querying for day: {current_day}")
 
-        stmt = select(Routine).where(
-            Routine.start_time >= current_time,
-            Routine.start_time <= one_hour_ahead,
-            Routine.day == current_day,
+        stmt = (
+            select(Routine)
+            .join(User, User.id == Routine.user_id)
+            .where(User.is_demo.is_(False))
+            .where(
+                Routine.start_time >= current_time,
+                Routine.start_time <= one_hour_ahead,
+                Routine.day == current_day,
+            )
         )
         active_routines = db.execute(stmt).scalars().all()
 
