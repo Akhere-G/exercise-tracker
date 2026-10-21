@@ -38,8 +38,7 @@ export function DemoLoginButton({
       <Button
         type="button"
         variant={variant}
-        size="lg"
-        className="w-full"
+        className="text-xl w-full h-12.5 rounded-xl px-6"
         disabled={isLoading}
         onClick={onClick}
       >

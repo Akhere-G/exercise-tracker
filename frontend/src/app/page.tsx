@@ -42,16 +42,16 @@ export default function HomePage() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full justify-center items-start">
-          <DemoLoginButton className="w-full sm:w-auto" />
+          <DemoLoginButton className="w-full md:w-auto" />
           <Link
             href="/register"
-            className="bg-primary text-primary-foreground font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors shadow-sm text-center"
+            className="bg-primary w-full md:w-auto text-primary-foreground font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors shadow-sm text-center"
           >
             Create Your Account
           </Link>
           <Link
             href="/routines"
-            className="bg-muted border border-border text-foreground font-semibold px-6 py-3 rounded-xl hover:bg-muted/80 transition-colors text-center"
+            className="bg-muted w-full md:w-auto border border-border text-foreground font-semibold px-6 py-3 rounded-xl hover:bg-muted/80 transition-colors text-center"
           >
             Go to Dashboard
           </Link>
