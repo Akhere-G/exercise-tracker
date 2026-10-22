@@ -15,7 +15,7 @@ class Routine(Base, AuditMixin):
         Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
     day: Mapped[int] = mapped_column(Integer)
-    start_time: Mapped[Optional[time]] = mapped_column(Time)
+    start_time: Mapped[Optional[time]] = mapped_column(Time(timezone=True))
 
     routine_items: Mapped[List["RoutineItem"]] = relationship(
         "RoutineItem",
