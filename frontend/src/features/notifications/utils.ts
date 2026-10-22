@@ -22,7 +22,6 @@ export async function ensureServiceWorker(): Promise<ServiceWorkerRegistration> 
   let registration = await navigator.serviceWorker.getRegistration();
   if (!registration) {
     registration = await navigator.serviceWorker.register("/sw.js");
-    console.log("Service Worker registered successfully.");
   }
   return registration;
 }
