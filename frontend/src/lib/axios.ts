@@ -1,4 +1,5 @@
 import axios, { isAxiosError } from "axios";
+import { redirect } from "next/navigation";
 import { ActionResponse, ValidationError } from "./apiTypes";
 
 const baseURL =
@@ -11,6 +12,15 @@ export const api = axios.create({
   baseURL,
 });
 
+// Credential endpoints are called without a session, so never attach a
+// (possibly stale) token to them.
+const PUBLIC_AUTH_PATHS = [
+  "/auth/login",
+  "/auth/register",
+  "/auth/demo",
+  "/auth/token",
+];
+
 api.interceptors.request.use(async (config) => {
   if (typeof window === "undefined") {
     try {
@@ -18,7 +28,10 @@ api.interceptors.request.use(async (config) => {
       const cookieStore = await cookies();
       const token = cookieStore.get("access_token")?.value;
 
-      if (token && config.headers) {
+      const isPublicAuthCall = PUBLIC_AUTH_PATHS.some((path) =>
+        config.url?.startsWith(path),
+      );
+      if (token && config.headers && !isPublicAuthCall) {
         config.headers.Authorization = `Bearer ${token}`;
       }
 
@@ -60,6 +73,17 @@ function describeApiError(detail: unknown): string {
 }
 
 export function handleApiError<T>(err: unknown): ActionResponse<T> {
+  // The API rejected our session token (expired, or signed with another key).
+  // Cookies cannot be changed from a Server Component, so hand over to a route
+  // that clears them and returns to the login page.
+  if (
+    isAxiosError(err) &&
+    err.response?.status === 401 &&
+    err.config?.headers?.has("Authorization")
+  ) {
+    redirect("/api/session/expired");
+  }
+
   if (isAxiosError(err)) {
     if (!err.response) {
       return {
