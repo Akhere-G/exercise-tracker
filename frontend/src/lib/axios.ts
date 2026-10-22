@@ -1,5 +1,5 @@
 import axios, { isAxiosError } from "axios";
-import { ActionResponse } from "./apiTypes";
+import { ActionResponse, ValidationError } from "./apiTypes";
 
 const baseURL =
   process.env.NEXT_PUBLIC_BASE_URL ||
@@ -43,11 +43,37 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
+const FALLBACK_ERROR = "Something went wrong. Please try again.";
+
+function describeApiError(detail: unknown): string {
+  if (typeof detail === "string" && detail) return detail;
+
+  if (Array.isArray(detail) && detail.length > 0) {
+    const first = detail[0] as Partial<ValidationError>;
+    if (typeof first?.msg === "string") {
+      const field = first.loc?.at(-1);
+      return typeof field === "string" ? `${field}: ${first.msg}` : first.msg;
+    }
+  }
+
+  return FALLBACK_ERROR;
+}
+
 export function handleApiError<T>(err: unknown): ActionResponse<T> {
   if (isAxiosError(err)) {
+    if (!err.response) {
+      return {
+        success: false,
+        error: "Could not reach the server. Check your connection.",
+      };
+    }
+
+    const detail: unknown = err.response.data?.detail;
     return {
       success: false,
-      errors: err.response?.data.detail,
+      error: describeApiError(detail),
+      errors: detail as ValidationError[] | string | undefined,
+      status: err.response.status,
     };
   }
   return {

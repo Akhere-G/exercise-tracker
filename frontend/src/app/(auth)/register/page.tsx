@@ -47,6 +47,10 @@ export default function Register() {
 
       if (!response.success) {
         track("register_failed", { reason: getFailureReason(response) });
+        setErrorMessage((prev) => ({
+          ...prev,
+          general: response.error ?? "Sorry... Something went wrong.",
+        }));
       } else {
         track("register");
         router.push("/routines");
