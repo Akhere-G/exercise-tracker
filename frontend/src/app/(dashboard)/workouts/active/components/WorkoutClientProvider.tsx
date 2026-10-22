@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import ExerciseDetails from "./ExerciseDetails";
 import SetList from "../../../routines/components/SetList";
@@ -33,6 +33,8 @@ export default function WorkoutClientProvider({
   const { setWorkoutData, exercises, startedAt, resetState } = useWorkout();
   const router = useRouter();
   const hasTrackedStart = useRef(false);
+  const isSubmittingRef = useRef(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     try {
@@ -76,6 +78,12 @@ export default function WorkoutClientProvider({
   }, [routine, setWorkoutData]);
 
   async function completeWorkout(onComplete?: () => void) {
+    // The ref blocks a second call in the same tick; state drives the UI.
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
+
+    let saved = false;
     const completedAt = new Date();
     const durationInMs = completedAt.getTime() - new Date(startedAt!).getTime();
     const duration = Math.floor(durationInMs / 1000);
@@ -98,6 +106,7 @@ export default function WorkoutClientProvider({
           ).length,
           has_routine: routine !== null,
         });
+        saved = true;
         resetState();
         localStorage.removeItem(workoutStorageKey);
         onComplete?.();
@@ -111,6 +120,13 @@ export default function WorkoutClientProvider({
     } catch {
       track("create_workout_failed", { reason: "exception" });
       toast.error("Could not save workout.");
+    } finally {
+      // After a save the page navigates away, so keep the guard on; after a
+      // failure let the user retry.
+      if (!saved) {
+        isSubmittingRef.current = false;
+        setIsSubmitting(false);
+      }
     }
   }
 
@@ -121,6 +137,7 @@ export default function WorkoutClientProvider({
         <ExerciseList />
         <ExerciseDetails
           completeWorkout={completeWorkout}
+          isCompleting={isSubmitting}
           canComplete={exercises
             .flatMap((e) => e.sets)
             .some((s) => s.isCompleted)}
@@ -133,7 +150,11 @@ export default function WorkoutClientProvider({
       <div
         className={`fixed left-0 w-full px-4 transition-all duration-300 ${canComplete ? "bottom-32 opacity-100" : "-bottom-full opacity-0"}`}
       >
-        <Button onClick={() => completeWorkout()} className="w-full shadow-2xl">
+        <Button
+          onClick={() => completeWorkout()}
+          disabled={isSubmitting}
+          className="w-full shadow-2xl"
+        >
           Complete Workout
         </Button>
       </div>
