@@ -47,6 +47,20 @@ export const updateWorkout = async (
   }
 };
 
+export const getWorkoutsInRange = async (
+  start: string,
+  end: string,
+): Promise<ActionResponse<Workout[]>> => {
+  try {
+    const response = await api.get<Workout[]>("/workouts", {
+      params: { start, end },
+    });
+    return { success: true, data: response.data };
+  } catch (err) {
+    return handleApiError<Workout[]>(err);
+  }
+};
+
 export const getPreviousSets = async (
   exerciseId: number,
 ): Promise<ActionResponse<WorkoutSet[]>> => {

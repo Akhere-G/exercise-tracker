@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Workout } from "@/src/features/workout/types";
+import { getWorkoutsInRange } from "@/src/features/workout/actions";
+import { toast } from "sonner";
 import {
   ChevronLeft,
   ChevronRight,
@@ -10,15 +12,16 @@ import {
   Dot,
 } from "lucide-react";
 
-export default function WorkoutsCalendar({
-  workouts,
-}: {
-  workouts: Workout[];
-}) {
+export default function WorkoutsCalendar() {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [loaded, setLoaded] = useState<{
+    month: string;
+    workouts: Workout[];
+  } | null>(null);
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
+  const monthKey = `${year}-${String(month + 1).padStart(2, "0")}`;
 
   // Calendar calculations
   const firstDayOfMonth = new Date(year, month, 1).getDay();
@@ -28,6 +31,28 @@ export default function WorkoutsCalendar({
 
   const daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
   const blanksArray = Array.from({ length: blankDaysCount }, (_, i) => i);
+
+  useEffect(() => {
+    let ignore = false;
+    const lastDay = String(daysInMonth).padStart(2, "0");
+
+    getWorkoutsInRange(`${monthKey}-01`, `${monthKey}-${lastDay}`).then(
+      (response) => {
+        if (ignore) return;
+        if (response.success) {
+          setLoaded({ month: monthKey, workouts: response.data });
+        } else {
+          toast.error(response.error);
+        }
+      },
+    );
+
+    return () => {
+      ignore = true;
+    };
+  }, [monthKey, daysInMonth]);
+
+  const workouts = loaded?.month === monthKey ? loaded.workouts : [];
 
   // Group workouts by date string (YYYY-MM-DD) for O(1) calendar cell lookup
   const workoutsByDate = workouts.reduce<Record<string, Workout[]>>(
