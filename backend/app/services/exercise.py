@@ -1,7 +1,35 @@
+from fastapi import HTTPException, status
 from sqlalchemy.orm import Session, selectinload
 from sqlalchemy import select, func, case
 from app.models import Exercise, Muscle, ExerciseMuscle, Workout, Routine, WorkoutSet
 from typing import Optional
+
+
+def _escape_like(term: str) -> str:
+    """Escape the term's own LIKE wildcards (use with escape="\\")."""
+    return (
+        term.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    )
+
+
+def _like_pattern(term: str) -> str:
+    return f"%{_escape_like(term)}%"
+
+
+def ensure_exercises_exist(db: Session, exercise_ids) -> None:
+    """Raise 422 if any of the given exercise ids does not exist."""
+    wanted = set(exercise_ids)
+    if not wanted:
+        return
+    found = set(
+        db.execute(select(Exercise.id).where(Exercise.id.in_(wanted))).scalars()
+    )
+    missing = sorted(wanted - found)
+    if missing:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Unknown exercise id(s): {missing}",
+        )
 
 
 def get_exercises(
@@ -42,24 +70,24 @@ def get_exercises(
     )
 
     if equipment and equipment != "all":
-        stmt = stmt.where(Exercise.equipment.ilike(f"%{equipment.strip()}%"))
+        stmt = stmt.where(Exercise.equipment.ilike(_like_pattern(equipment), escape="\\"))
 
     if muscle and muscle != "all":
         stmt = (
             stmt.join(ExerciseMuscle)
             .join(Muscle)
-            .where(Muscle.name.ilike(f"%{muscle}%"))
+            .where(Muscle.name.ilike(_like_pattern(muscle), escape="\\"))
         )
 
         stmt = stmt.distinct()
 
     if search:
-        stmt = stmt.where(Exercise.name.ilike(f"%{search.strip()}%"))
+        stmt = stmt.where(Exercise.name.ilike(_like_pattern(search), escape="\\"))
 
         stmt = stmt.order_by(
             case(
-                (Exercise.name.ilike(search), 0),
-                (Exercise.name.ilike(f"%{search}%"), 1),
+                (Exercise.name.ilike(_escape_like(search), escape="\\"), 0),
+                (Exercise.name.ilike(_like_pattern(search), escape="\\"), 1),
                 else_=2,
             ),
             func.coalesce(usage.c.workout_count, 0).desc(),

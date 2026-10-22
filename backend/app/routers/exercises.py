@@ -1,6 +1,6 @@
 from typing import Annotated, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -9,7 +9,6 @@ from app.schemas.exercise import Exercise, RankedExercise
 from app.schemas.workout import WorkoutSetWithDate
 from app.services import exercise as exercise_service
 from app.services import user as user_service
-from pprint import pprint
 
 
 router = APIRouter(prefix="/api/exercises", tags=["Exercises"])
@@ -22,8 +21,8 @@ def get_exercises(
     search: Optional[str] = None,
     equipment: Optional[str] = None,
     muscle: Optional[str] = None,
-    page: int = 1,
-    limit: int = 10,
+    page: Annotated[int, Query(ge=1)] = 1,
+    limit: Annotated[int, Query(ge=1, le=100)] = 10,
 ):
     return exercise_service.get_exercises(
         db, user.id, search, equipment, muscle, page, limit
