@@ -1,12 +1,14 @@
 import posthog from "posthog-js";
 
-const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-
-if (key) {
+const KEY = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
+const HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST;
+console.log(`Host is ${HOST}`);
+console.log(`Key is present: ${Boolean(KEY)}`);
+if (KEY) {
   try {
-    posthog.init(key, {
+    posthog.init(KEY, {
       api_host: "/ingest",
-      ui_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+      ui_host: HOST,
       cookieless_mode: "always",
       person_profiles: "never",
       autocapture: false,
