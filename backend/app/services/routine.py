@@ -98,7 +98,7 @@ def update_routine(
         db.refresh(old_routine)
         return old_routine
 
-    except:
+    except Exception:
         db.rollback()
         raise
 
@@ -119,6 +119,6 @@ def delete_routine(
         db.commit()
 
         return routine_id
-    except:
+    except Exception:
         db.rollback()
         raise
