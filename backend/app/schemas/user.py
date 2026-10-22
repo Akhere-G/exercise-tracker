@@ -1,11 +1,41 @@
-from pydantic import EmailStr, ConfigDict, Field, field_validator, BaseModel as Base
+from typing import Annotated
+
+from pydantic import (
+    BaseModel as Base,
+    ConfigDict,
+    EmailStr,
+    Field,
+    StringConstraints,
+    field_validator,
+)
 import re
 from .base import BaseModel
 
 
+def normalize_email(value: str) -> str:
+    return value.strip().lower()
+
+
+MAX_USERNAME_LENGTH = 50
+MAX_EMAIL_LENGTH = 50
+
+
 class UserBase(BaseModel):
-    username: str
+    username: Annotated[
+        str,
+        StringConstraints(
+            strip_whitespace=True, min_length=1, max_length=MAX_USERNAME_LENGTH
+        ),
+    ]
     email: EmailStr = Field(description="Email is required")
+
+    @field_validator("email")
+    @classmethod
+    def lowercase_email(cls, value: str) -> str:
+        email = normalize_email(value)
+        if len(email) > MAX_EMAIL_LENGTH:
+            raise ValueError(f"Must be {MAX_EMAIL_LENGTH} characters or fewer.")
+        return email
 
 
 class User(BaseModel):
@@ -36,6 +66,11 @@ class UserCreate(UserBase):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+    @field_validator("email")
+    @classmethod
+    def lowercase_email(cls, value: str) -> str:
+        return normalize_email(value)
 
 
 class Token(Base):

@@ -1,4 +1,4 @@
-from pydantic import model_validator
+from pydantic import Field, model_validator
 from typing import Optional, List
 from datetime import datetime
 from .exercise import Exercise
@@ -25,8 +25,20 @@ class WorkoutSetBase(BaseModel):
         return self
 
 
+MAX_SETS_PER_WORKOUT = 500
+MAX_WORKOUT_SECS = 7 * 24 * 60 * 60
+
+
 class WorkoutSetCreate(WorkoutSetBase):
-    pass
+    set_index: int = Field(default=1, ge=1, le=1000)
+    reps: Optional[int] = Field(default=None, ge=0, le=10_000)
+    weight: Optional[float] = Field(
+        default=None, ge=0, le=10_000, allow_inf_nan=False
+    )
+    distance_meters: Optional[float] = Field(
+        default=None, ge=0, le=1_000_000, allow_inf_nan=False
+    )
+    duration_secs: Optional[int] = Field(default=None, ge=0, le=24 * 60 * 60)
 
 
 class WorkoutSet(WorkoutSetBase):
@@ -46,13 +58,16 @@ class WorkoutBase(BaseModel):
 
 
 class WorkoutCreate(WorkoutBase):
-    sets: List[WorkoutSetCreate]
+    duration: int = Field(ge=0, le=MAX_WORKOUT_SECS)
+    sets: List[WorkoutSetCreate] = Field(max_length=MAX_SETS_PER_WORKOUT)
 
 
 class WorkoutUpdate(BaseModel):
     completed_at: Optional[datetime] = None
-    duration: Optional[int] = None
-    sets: Optional[List[WorkoutSetCreate]] = None
+    duration: Optional[int] = Field(default=None, ge=0, le=MAX_WORKOUT_SECS)
+    sets: Optional[List[WorkoutSetCreate]] = Field(
+        default=None, max_length=MAX_SETS_PER_WORKOUT
+    )
 
 
 class Workout(WorkoutBase):

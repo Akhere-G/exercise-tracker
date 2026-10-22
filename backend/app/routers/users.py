@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from app.schemas.user import User, UserCreate, UserLogin
+from app.config import settings
 from app.database import get_db
+from app.limiter import limiter
 from sqlalchemy.orm import Session
 from app.services import demo as demo_service
 from app.services import user as user_service
-import os
 from typing import Annotated
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -12,7 +13,10 @@ router = APIRouter(prefix="/api/auth", tags=["Users"])
 
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
-def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
+@limiter.limit("5/hour")
+def register_user(
+    request: Request, user_in: UserCreate, db: Session = Depends(get_db)
+):
     existing_user = user_service.get_user_by_email(db, email=user_in.email)
     if existing_user:
         raise HTTPException(
@@ -25,8 +29,11 @@ def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/token")
+@limiter.limit("10/15 minutes")
 def login(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+    request: Request,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
 ):
     user = user_service.get_user_by_email(db, email=form_data.username)
 
@@ -39,7 +46,8 @@ def login(
 
 
 @router.post("/login", status_code=status.HTTP_200_OK)
-def login_user(user_in: UserLogin, db: Session = Depends(get_db)):
+@limiter.limit("10/15 minutes")
+def login_user(request: Request, user_in: UserLogin, db: Session = Depends(get_db)):
     existing_user = user_service.get_user_by_email(db, email=user_in.email)
     if not existing_user or not user_service.check_password_hash(
         user_in.password, existing_user.password_hash
@@ -57,8 +65,9 @@ def check_auth(user: Annotated[User, Depends(user_service.get_current_user)]):
 
 
 @router.post("/demo", status_code=status.HTTP_200_OK)
-def demo_login(db: Annotated[Session, Depends(get_db)]):
-    if os.getenv("DEMO_MODE_ENABLED", "").lower() != "true":
+@limiter.limit("30/minute")
+def demo_login(request: Request, db: Annotated[Session, Depends(get_db)]):
+    if not settings.demo_mode_enabled:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
 
     demo_user = demo_service.get_demo_user(db)

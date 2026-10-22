@@ -2,7 +2,7 @@ import os
 
 # Must be set before app modules import: never let tests reach a real database.
 os.environ["DATABASE_URL"] = "sqlite://"
-os.environ["SECRET_KEY"] = "test-secret"
+os.environ["SECRET_KEY"] = "test-secret-key-that-is-at-least-32-chars"
 os.environ["ALGORITHM"] = "HS256"
 
 import json
@@ -76,3 +76,57 @@ def freeze(monkeypatch):
         return datetime.combine(day, time(23, 59))
 
     return _freeze
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limits():
+    from app.limiter import limiter
+
+    limiter.reset()
+    yield
+    limiter.reset()
+
+
+@pytest.fixture
+def client(engine, monkeypatch):
+    from app.database import get_db
+    from app.main import create_app
+    from fastapi.testclient import TestClient
+    from sqlalchemy.orm import sessionmaker
+
+    app = create_app()
+    Session = sessionmaker(bind=engine, autoflush=False)
+
+    def override():
+        session = Session()
+        try:
+            yield session
+        finally:
+            session.close()
+
+    app.dependency_overrides[get_db] = override
+    return TestClient(app)
+
+
+@pytest.fixture
+def user(db):
+    from app.models import User
+    from app.services import user as user_service
+    from tests.helpers import PASSWORD
+
+    user = User(
+        username="Test",
+        email="test@example.com",
+        password_hash=user_service.get_password_hash(PASSWORD),
+    )
+    db.add(user)
+    db.commit()
+    return user
+
+
+@pytest.fixture
+def auth_headers(user):
+    from app.services import user as user_service
+
+    token = user_service.get_access_token(user.email).access_token
+    return {"Authorization": f"Bearer {token}"}

@@ -1,7 +1,9 @@
 #!/bin/sh
 
-echo "Running migrations..."
-alembic upgrade head
+if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
+  echo "Running migrations..."
+  alembic upgrade head
+fi
 
 
 echo "Starting Uvicorn..."
