@@ -3,9 +3,18 @@ import re
 from .base import BaseModel
 
 
+def normalize_email(value: str) -> str:
+    return value.strip().lower()
+
+
 class UserBase(BaseModel):
     username: str
     email: EmailStr = Field(description="Email is required")
+
+    @field_validator("email")
+    @classmethod
+    def lowercase_email(cls, value: str) -> str:
+        return normalize_email(value)
 
 
 class User(BaseModel):
@@ -36,6 +45,11 @@ class UserCreate(UserBase):
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
+
+    @field_validator("email")
+    @classmethod
+    def lowercase_email(cls, value: str) -> str:
+        return normalize_email(value)
 
 
 class Token(Base):

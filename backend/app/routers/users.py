@@ -13,14 +13,17 @@ router = APIRouter(prefix="/api/auth", tags=["Users"])
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
-    existing_user = user_service.get_user_by_email(db, email=user_in.email)
-    if existing_user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="A user with this email address already exists.",
-        )
+    already_registered = HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        detail="A user with this email address already exists.",
+    )
+    if user_service.get_user_by_email(db, email=user_in.email):
+        raise already_registered
 
-    user = user_service.create_user(db, user_in)
+    try:
+        user = user_service.create_user(db, user_in)
+    except user_service.EmailAlreadyRegisteredError:
+        raise already_registered
     return user_service.get_access_token(user.email)
 
 
