@@ -1,12 +1,4 @@
-import withPWAInit from "@ducanh2912/next-pwa";
-
-const withPWA = withPWAInit({
-  dest: "public",
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
-  reloadOnOnline: true,
-  disable: process.env.NODE_ENV === "development",
-});
+import type { NextConfig } from "next";
 
 const posthogHost =
   process.env.NEXT_PUBLIC_POSTHOG_HOST ?? "https://eu.i.posthog.com";
@@ -15,7 +7,7 @@ const posthogAssetsHost = posthogHost.replace(
   "-assets.i.posthog.com",
 );
 
-export default withPWA({
+const nextConfig: NextConfig = {
   output: "standalone",
   turbopack: {},
   // Required so PostHog's trailing-slash API requests are proxied untouched.
@@ -43,4 +35,6 @@ export default withPWA({
       ),
     ],
   },
-});
+};
+
+export default nextConfig;
