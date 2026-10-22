@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import pytest
 from app.schemas.routine import RoutineCreate, RoutineItemBase, RoutineUpdate
 from pydantic import ValidationError
@@ -34,3 +36,18 @@ def test_routine_update_rejects_invalid_values(payload):
 
 def test_stored_items_outside_the_input_bounds_can_still_be_read():
     RoutineItemBase(exercise_id=1, target_sets=0, target_reps=1, order=0)
+
+
+@pytest.mark.parametrize("start_time", ["06:00", "06:00:00", "06:00:00+02:00", "06:00:00-05:00"])
+def test_start_time_must_be_utc(start_time):
+    with pytest.raises(ValidationError):
+        RoutineCreate.model_validate(routine_payload(startTime=start_time))
+    with pytest.raises(ValidationError):
+        RoutineUpdate.model_validate({"startTime": start_time})
+
+
+def test_utc_start_time_is_accepted():
+    routine = RoutineCreate.model_validate(routine_payload(startTime="06:00:00Z"))
+
+    assert routine.start_time.utcoffset() == timedelta(0)
+    assert RoutineUpdate.model_validate({"startTime": "06:00:00+00:00"}).start_time

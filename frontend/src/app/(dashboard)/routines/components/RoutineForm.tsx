@@ -11,6 +11,10 @@ import { RoutineItemsTable } from "./RoutineItemsTable";
 import { ExercisePickerModal } from "./ExercisePickerModal";
 import { useRouter } from "next/navigation";
 import { Routine } from "@/src/features/routines/types";
+import {
+  toLocalSchedule,
+  toUtcSchedule,
+} from "@/src/features/routines/utils";
 import { toast } from "sonner";
 import { ActionResponse } from "@/src/lib/apiTypes";
 import { getFailureReason, track } from "@/src/features/analytics/utils";
@@ -44,11 +48,11 @@ export default function RoutineForm({
   useEffect(() => {
     if (initalData) {
       setValue("name", initalData.name);
-      setValue(
-        "startTime",
-        initalData.startTime ? initalData.startTime.substring(0, 5) : "",
-      );
-      setValue("day", initalData.day);
+      const local = initalData.startTime
+        ? toLocalSchedule(initalData.day, initalData.startTime)
+        : null;
+      setValue("startTime", local?.time ?? "");
+      setValue("day", local?.day ?? initalData.day);
       setValue("routineItems", initalData.routineItems);
     }
   }, [initalData, setValue]);
@@ -71,7 +75,10 @@ export default function RoutineForm({
   const onSubmit = async (data: RoutineSchema) => {
     try {
       setErrorMessages({});
-      const response = await submitAction(data);
+      const response = await submitAction({
+        ...data,
+        ...toUtcSchedule(data.day, data.startTime),
+      });
       if (response.success) {
         if (!initalData) {
           track("create_routine", {
