@@ -14,6 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
+import { track } from "@/src/features/analytics/utils";
 import { deleteRoutine } from "@/src/features/routines/actions";
 import { Routine } from "@/src/features/routines/types";
 import { MoreVertical } from "lucide-react";
@@ -64,7 +65,8 @@ export default function RoutineModal({ routine }: { routine: Routine }) {
             <Button
               variant="destructive"
               onClick={async () => {
-                await deleteRoutine(routine.id);
+                const response = await deleteRoutine(routine.id);
+                if (response.success) track("delete_routine");
                 router.refresh();
               }}
             >

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import ExerciseDetails from "./ExerciseDetails";
 import SetList from "../../../routines/components/SetList";
@@ -23,6 +23,7 @@ import { createWorkout } from "@/src/features/workout/actions";
 
 import { useRouter } from "next/navigation";
 import PreviousSets from "./PreviousSets";
+import { getFailureReason, track } from "@/src/features/analytics/utils";
 
 export default function WorkoutClientProvider({
   routine,
@@ -31,6 +32,7 @@ export default function WorkoutClientProvider({
 }) {
   const { setWorkoutData, exercises, startedAt, resetState } = useWorkout();
   const router = useRouter();
+  const hasTrackedStart = useRef(false);
 
   useEffect(() => {
     try {
@@ -65,6 +67,11 @@ export default function WorkoutClientProvider({
         exercises,
         startedAt: new Date(),
       });
+
+      if (!hasTrackedStart.current) {
+        hasTrackedStart.current = true;
+        track("start_workout", { source: "routine" });
+      }
     }
   }, [routine, setWorkoutData]);
 
@@ -82,6 +89,15 @@ export default function WorkoutClientProvider({
       const response = await createWorkout(workout);
       if (response.success) {
         const newWorkout = response.data;
+        track("complete_workout", {
+          workout_id: newWorkout.id,
+          duration_seconds: duration,
+          set_count: workout.sets.length,
+          exercise_count: exercises.filter((e) =>
+            e.sets.some((s) => s.isCompleted),
+          ).length,
+          has_routine: routine !== null,
+        });
         resetState();
         localStorage.removeItem(workoutStorageKey);
         onComplete?.();
@@ -89,9 +105,11 @@ export default function WorkoutClientProvider({
           router.push(`/workouts/summary/${newWorkout.id}?first=true`),
         );
       } else {
+        track("create_workout_failed", { reason: getFailureReason(response) });
         toast.error(response.error);
       }
     } catch {
+      track("create_workout_failed", { reason: "exception" });
       toast.error("Could not save workout.");
     }
   }

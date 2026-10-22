@@ -2,6 +2,7 @@
 
 import { Button } from "@/src/components/ui/button";
 import { demoLoginAction } from "@/src/features/auth/actions";
+import { getFailureReason, track } from "@/src/features/analytics/utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -22,11 +23,17 @@ export function DemoLoginButton({
     try {
       const response = await demoLoginAction();
       if (response.success) {
+        track("login", { method: "demo" });
         router.push("/routines");
       } else {
+        track("login_failed", {
+          method: "demo",
+          reason: getFailureReason(response),
+        });
         setErrorMessage("The demo is temporarily unavailable.");
       }
     } catch {
+      track("login_failed", { method: "demo", reason: "exception" });
       setErrorMessage("Sorry... Something went wrong.");
     } finally {
       setIsLoading(false);

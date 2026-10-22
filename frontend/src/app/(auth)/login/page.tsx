@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
 import { DemoLoginButton } from "@/src/features/auth/components/DemoLoginButton";
+import { getFailureReason, track } from "@/src/features/analytics/utils";
 
 export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
@@ -33,11 +34,17 @@ export default function Login() {
       };
       const response = await loginAction(formattedData);
       if (!response.success) {
+        track("login_failed", {
+          method: "password",
+          reason: getFailureReason(response),
+        });
         setErrorMessage(response.error!);
       } else {
+        track("login", { method: "password" });
         router.push("/routines");
       }
     } catch {
+      track("login_failed", { method: "password", reason: "exception" });
       setErrorMessage("Sorry... Something went wrong.");
     } finally {
       setIsSubmitting(false);

@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { Routine } from "@/src/features/routines/types";
 import { toast } from "sonner";
 import { ActionResponse } from "@/src/lib/apiTypes";
+import { getFailureReason, track } from "@/src/features/analytics/utils";
 
 export default function RoutineForm({
   submitAction,
@@ -72,12 +73,30 @@ export default function RoutineForm({
       setErrorMessages({});
       const response = await submitAction(data);
       if (response.success) {
+        if (!initalData) {
+          track("create_routine", {
+            routine_id: response.data.id,
+            exercise_count: data.routineItems.length,
+            day: data.day,
+            has_duration_target: data.routineItems.some(
+              (item) => (item.targetDuration ?? 0) > 0,
+            ),
+          });
+        }
         router.push("/routines");
       } else {
+        if (!initalData) {
+          track("create_routine_failed", {
+            reason: getFailureReason(response),
+          });
+        }
         // TODO: setErrorMessages(response.);
         toast.error(response.error);
       }
     } catch (err) {
+      if (!initalData) {
+        track("create_routine_failed", { reason: "exception" });
+      }
       console.error(err);
     }
   };

@@ -1,12 +1,11 @@
 import {
   Scale,
-  Download,
-  Upload,
   Paintbrush,
   Sliders,
   UserRound,
 } from "lucide-react";
 import { LogoutButton } from "@/src/features/auth/components/LogoutButton";
+import DataPortabilityButtons from "./components/DataPortabilityButtons";
 
 export default function SettingsPage() {
   return (
@@ -75,16 +74,7 @@ export default function SettingsPage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-3 opacity-40 pointer-events-none select-none border-t border-border pt-4">
-            <button className="flex items-center gap-2 bg-muted border border-border text-sm font-medium px-4 py-2 rounded-xl">
-              <Download className="h-4 w-4" />
-              Export History (.csv)
-            </button>
-            <button className="flex items-center gap-2 bg-muted border border-border text-sm font-medium px-4 py-2 rounded-xl">
-              <Upload className="h-4 w-4" />
-              Import Data (.json)
-            </button>
-          </div>
+          <DataPortabilityButtons />
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-6 md:col-span-2 flex flex-col gap-4">

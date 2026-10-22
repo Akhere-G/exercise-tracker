@@ -24,6 +24,7 @@ import {
   DialogTitle,
 } from "@/src/components/ui/dialog";
 import { useRouter } from "next/navigation";
+import { track } from "@/src/features/analytics/utils";
 
 export default function ExerciseDetails({
   completeWorkout,
@@ -96,6 +97,11 @@ export default function ExerciseDetails({
   }
 
   function cancelWorkout() {
+    track("cancel_workout", {
+      completed_sets: exercises
+        .flatMap((e) => e.sets)
+        .filter((s) => s.isCompleted).length,
+    });
     resetState();
     localStorage.removeItem(workoutStorageKey);
     router.push("/routines");

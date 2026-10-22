@@ -10,6 +10,7 @@ import { useState } from "react";
 
 import { getImageUrl } from "@/src/features/exercises/utils";
 import StartWorkoutDialog from "./StartWorkoutDialog";
+import { track } from "@/src/features/analytics/utils";
 
 export default function RoutineCard({ routine }: { routine: Routine }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,6 +19,7 @@ export default function RoutineCard({ routine }: { routine: Routine }) {
   const maxExercisesShown = 3;
   const router = useRouter();
   function startWorkout() {
+    track("click_start_workout", { source: "routine" });
     if (!startedAt) {
       router.push(`/workouts/active?routineId=${id}`);
     } else {
