@@ -9,8 +9,7 @@ import {
 import RoutineDetails from "./components/RoutineDetails";
 import RoutineStats from "./components/RoutineStats";
 import RoutineHistory from "./components/RoutineHistory";
-import { getDayStr } from "@/src/features/routines/utils";
-import { Dot } from "lucide-react";
+import RoutineSchedule from "./components/RoutineSchedule";
 
 export default async function RoutineData({
   params,
@@ -43,8 +42,7 @@ export default async function RoutineData({
       <div className="container">
         <h2 className="text-2xl">{routine.name}</h2>
         <p className=" flex gap-0 items-center text-sm text-muted-foreground">
-          {getDayStr(routine.day)} <Dot size={20} />
-          {routine.startTime?.substring(0, 5)}
+          <RoutineSchedule day={routine.day} startTime={routine.startTime} />
         </p>
       </div>
       <Tabs defaultValue="details">

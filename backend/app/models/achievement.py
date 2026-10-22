@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -46,7 +46,7 @@ class UserAchievement(Base, AuditMixin):
     achievement_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("achievements.id", ondelete="CASCADE")
     )
-    value: Mapped[float] = mapped_column(Integer, nullable=True)
+    value: Mapped[float] = mapped_column(Float, nullable=True)
     exercise_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("exercises.id", ondelete="SET NULL"), nullable=True
     )
