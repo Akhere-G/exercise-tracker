@@ -5,9 +5,8 @@ from sqlalchemy import DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
-from app.schemas.exercise import Exercise
-
 from .audit_mixin import AuditMixin
+from .exercise import Exercise
 
 if TYPE_CHECKING:
     from .user import User
