@@ -8,4 +8,11 @@ export interface ValidationError {
 
 export type ActionResponse<T> =
   | { success: true; data: T }
-  | { success: false; error?: string; errors?: ValidationError[] };
+  | {
+      success: false;
+      // Always a readable message, ready to show in a toast.
+      error?: string;
+      // The raw API `detail`: a string for most errors, a list for validation.
+      errors?: ValidationError[] | string;
+      status?: number;
+    };

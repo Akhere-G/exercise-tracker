@@ -42,12 +42,7 @@ export default function NotificationsPrompt() {
       const subscriptionData = await registerAndSubscribe();
       const response = await subscribe(subscriptionData);
       if (!response.success) {
-        const detail = response.errors;
-        toast.error(
-          typeof detail === "string"
-            ? detail
-            : (response.error ?? "Could not subscribe."),
-        );
+        toast.error(response.error ?? "Could not subscribe.");
         return;
       }
       track("enable_notifications");
