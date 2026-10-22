@@ -14,12 +14,27 @@ export const api = axios.create({
 api.interceptors.request.use(async (config) => {
   if (typeof window === "undefined") {
     try {
-      const { cookies } = await import("next/headers");
+      const { cookies, headers } = await import("next/headers");
       const cookieStore = await cookies();
       const token = cookieStore.get("access_token")?.value;
 
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
+      }
+
+      // This server calls the API on behalf of the browser, so pass on the
+      // caller's address for the backend's per-client rate limits (it trusts
+      // this header when TRUSTED_PROXY_COUNT is set). Only the last entry is
+      // used: that is the one added by our own proxy, earlier ones come from
+      // the client and can be forged.
+      const forwardedFor = (await headers()).get("x-forwarded-for");
+      const clientIp = forwardedFor
+        ?.split(",")
+        .map((hop) => hop.trim())
+        .filter(Boolean)
+        .at(-1);
+      if (clientIp && config.headers) {
+        config.headers["X-Forwarded-For"] = clientIp;
       }
     } catch {
       console.warn("Skipped server-side cookie parsing.");
