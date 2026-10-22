@@ -12,7 +12,7 @@ class Routine(Base, AuditMixin):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(255))
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE")
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
     day: Mapped[int] = mapped_column(Integer)
     start_time: Mapped[Optional[time]] = mapped_column(Time)

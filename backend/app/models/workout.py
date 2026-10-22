@@ -1,7 +1,7 @@
 from app.database import Base
 from .audit_mixin import AuditMixin
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, Float, DateTime, ForeignKey
+from sqlalchemy import Integer, Float, DateTime, ForeignKey, Index
 from datetime import datetime
 from typing import Optional, List
 from .exercise import Exercise
@@ -11,7 +11,7 @@ class Workout(Base, AuditMixin):
     __tablename__ = "workouts"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     routine_id: Mapped[Optional[int]] = mapped_column(
-        Integer, ForeignKey("routines.id", ondelete="SET NULL")
+        Integer, ForeignKey("routines.id", ondelete="SET NULL"), index=True
     )
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id", ondelete="CASCADE")
@@ -22,15 +22,19 @@ class Workout(Base, AuditMixin):
         "WorkoutSet", back_populates="workout", cascade="all, delete-orphan"
     )
 
+    __table_args__ = (
+        Index("ix_workouts_user_id_completed_at", "user_id", "completed_at"),
+    )
+
 
 class WorkoutSet(Base, AuditMixin):
     __tablename__ = "workout_sets"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     workout_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("workouts.id", ondelete="CASCADE")
+        Integer, ForeignKey("workouts.id", ondelete="CASCADE"), index=True
     )
     exercise_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("exercises.id", ondelete="CASCADE")
+        Integer, ForeignKey("exercises.id", ondelete="CASCADE"), index=True
     )
     set_index: Mapped[int] = mapped_column(Integer, default=1)
     reps: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
