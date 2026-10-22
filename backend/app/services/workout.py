@@ -1,3 +1,4 @@
+import logging
 from datetime import date, timedelta
 from typing import Optional
 
@@ -6,6 +7,8 @@ from app.schemas.workout import WorkoutCreate, WorkoutUpdate
 from app.services import achievement as achievement_service
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
+
+logger = logging.getLogger(__name__)
 
 ONE_WEEK = timedelta(weeks=1)
 
@@ -93,12 +96,12 @@ def create_workout(db: Session, user_id: int, workout_in: WorkoutCreate):
         db.add(workout)
         db.commit()
         db.refresh(workout)
-
-        _award_achievements(db, user_id, workout)
-        return workout
     except Exception:
         db.rollback()
         raise
+
+    _award_achievements_safely(db, user_id, workout)
+    return workout
 
 
 def update_workout(
@@ -121,12 +124,12 @@ def update_workout(
 
         db.commit()
         db.refresh(workout)
-
-        _award_achievements(db, user_id, workout)
-        return workout
     except Exception:
         db.rollback()
         raise
+
+    _award_achievements_safely(db, user_id, workout)
+    return workout
 
 
 def delete_workout(db: Session, user_id: int, workout_id: int):
@@ -173,6 +176,25 @@ def _build_set(set_data) -> WorkoutSet:
 def _award_achievements(db: Session, user_id: int, workout: Workout) -> None:
     achievement_service.check_and_award_prs(db, user_id, workout.id, workout)
     achievement_service.check_and_award_frequency_streaks(db, user_id, workout.id)
+
+
+def _award_achievements_safely(db: Session, user_id: int, workout: Workout) -> None:
+    """Award achievements for a saved workout without ever failing the save.
+
+    The workout is already committed, so an error here must not turn into a
+    failed request (the client would retry and create a duplicate). Missed
+    awards can be rebuilt with `achievement_service.backfill_user_achievements`.
+    """
+    try:
+        _award_achievements(db, user_id, workout)
+    except Exception:
+        db.rollback()
+        logger.exception(
+            "Could not award achievements for workout %s (user %s)",
+            workout.id,
+            user_id,
+        )
+        db.refresh(workout)
 
 
 def _week_start(day: date) -> date:
