@@ -80,11 +80,11 @@ def freeze(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def reset_rate_limits():
-    from app import rate_limit
+    from app.limiter import limiter
 
-    rate_limit.reset_all_limits()
+    limiter.reset()
     yield
-    rate_limit.reset_all_limits()
+    limiter.reset()
 
 
 @pytest.fixture

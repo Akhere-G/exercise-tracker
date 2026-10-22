@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import users, exercises, routines, workouts, notifications, achievements
 from app.database import SessionLocal
+from app.limiter import limiter, rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from app.services import achievement as achievement_service
 import os
 
@@ -23,6 +25,9 @@ def create_app() -> FastAPI:
         version="1.0.0",
         lifespan=lifespan,
     )
+
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
     app.add_middleware(
         CORSMiddleware,

@@ -3,12 +3,10 @@ from app.schemas.user import UserCreate, Token
 from app.models import User
 from sqlalchemy.orm import Session
 from sqlalchemy import func, select
-from sqlalchemy.exc import IntegrityError
 from fastapi import Depends, HTTPException, status
 from app.config import load_signing_config
 from app.database import get_db
 from datetime import datetime, timezone, timedelta
-from functools import cache
 import jwt
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
@@ -67,40 +65,14 @@ def check_password_hash(password: str, hash: str) -> bool:
     return pwd_context.verify(password, hash)
 
 
-@cache
-def _dummy_password_hash() -> str:
-    return pwd_context.hash("not-a-real-password")
-
-
-def authenticate_user(db: Session, email: str, password: str) -> User | None:
-    """Return the user if the credentials are valid, otherwise None.
-
-    A hash is verified even when the email is unknown so both failures take
-    about the same time.
-    """
-    user = get_user_by_email(db, email=email)
-    if user is None:
-        check_password_hash(password, _dummy_password_hash())
-        return None
-    if not check_password_hash(password, user.password_hash):
-        return None
-    return user
-
-
 def get_user(db: Session, user_id: int):
     query = select(User).where(User.id == user_id)
     return db.execute(query).scalars().first()
 
 
 def get_user_by_email(db: Session, email: str):
-    # Case-insensitive so accounts stored before emails were lower-cased
-    # can still be found.
     query = select(User).where(func.lower(User.email) == email.strip().lower())
     return db.execute(query).scalars().first()
-
-
-class EmailAlreadyRegisteredError(Exception):
-    """Raised when an account with this email already exists."""
 
 
 def create_user(db: Session, user_in: UserCreate):
@@ -109,7 +81,7 @@ def create_user(db: Session, user_in: UserCreate):
 
         user = User(
             username=user_in.username,
-            email=user_in.email.strip().lower(),
+            email=user_in.email,
             password_hash=hashed_password,
         )
 
@@ -117,10 +89,6 @@ def create_user(db: Session, user_in: UserCreate):
         db.commit()
         db.refresh(user)
         return user
-    except IntegrityError as error:
-        # Lost a race with a concurrent registration for the same email.
-        db.rollback()
-        raise EmailAlreadyRegisteredError from error
     except Exception:
         db.rollback()
         raise
