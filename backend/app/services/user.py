@@ -4,18 +4,15 @@ from app.models import User
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from fastapi import Depends, HTTPException, status
+from app.config import load_signing_config
 from app.database import get_db
-from dotenv import load_dotenv
-import os
 from datetime import datetime, timezone, timedelta
 import jwt
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 
 
-load_dotenv()
-SECRET_KEY = os.getenv("SECRET_KEY", "")
-ALGORITHM = os.getenv("ALGORITHM", "")
+SECRET_KEY, ALGORITHM = load_signing_config()
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 DEMO_TOKEN_TTL = timedelta(hours=2)
 
