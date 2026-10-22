@@ -25,8 +25,6 @@ class WorkoutSetBase(BaseModel):
         return self
 
 
-# Bounds apply to incoming data only. The shared base classes are also used
-# for responses, and existing rows must always be readable.
 MAX_SETS_PER_WORKOUT = 500
 MAX_WORKOUT_SECS = 7 * 24 * 60 * 60
 

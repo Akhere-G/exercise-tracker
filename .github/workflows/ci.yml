@@ -46,8 +46,6 @@ jobs:
       - run: npm run lint
       - run: npm run build
 
-  # Advisory only for now: known findings are tracked, so these do not fail
-  # the build. Tighten (remove continue-on-error) once the backlog is clear.
   audit:
     name: Dependency audit (advisory)
     runs-on: ubuntu-latest

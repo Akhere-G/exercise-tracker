@@ -20,8 +20,6 @@ async function setAccessToken(token: Token, maxAge = SESSION_SECS) {
   });
 }
 
-// The token only ever lives in the httpOnly cookie; it is never returned to
-// client code.
 export async function loginAction(
   formData: LoginSchema,
 ): Promise<ActionResponse<null>> {

@@ -12,8 +12,6 @@ export const api = axios.create({
   baseURL,
 });
 
-// Credential endpoints are called without a session, so never attach a
-// (possibly stale) token to them.
 const PUBLIC_AUTH_PATHS = [
   "/auth/login",
   "/auth/register",
@@ -35,11 +33,6 @@ api.interceptors.request.use(async (config) => {
         config.headers.Authorization = `Bearer ${token}`;
       }
 
-      // This server calls the API on behalf of the browser, so pass on the
-      // caller's address for the backend's per-client rate limits (it trusts
-      // this header when TRUSTED_PROXY_COUNT is set). Only the last entry is
-      // used: that is the one added by our own proxy, earlier ones come from
-      // the client and can be forged.
       const forwardedFor = (await headers()).get("x-forwarded-for");
       const clientIp = forwardedFor
         ?.split(",")
@@ -73,9 +66,6 @@ function describeApiError(detail: unknown): string {
 }
 
 export function handleApiError<T>(err: unknown): ActionResponse<T> {
-  // The API rejected our session token (expired, or signed with another key).
-  // Cookies cannot be changed from a Server Component, so hand over to a route
-  // that clears them and returns to the login page.
   if (
     isAxiosError(err) &&
     err.response?.status === 401 &&

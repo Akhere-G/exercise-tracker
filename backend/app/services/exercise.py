@@ -6,7 +6,6 @@ from typing import Optional
 
 
 def _escape_like(term: str) -> str:
-    """Escape the term's own LIKE wildcards (use with escape="\\")."""
     return (
         term.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
     )
@@ -17,7 +16,6 @@ def _like_pattern(term: str) -> str:
 
 
 def ensure_exercises_exist(db: Session, exercise_ids) -> None:
-    """Raise 422 if any of the given exercise ids does not exist."""
     wanted = set(exercise_ids)
     if not wanted:
         return

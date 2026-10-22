@@ -25,8 +25,6 @@ class RoutineItemBase(BaseModel):
         return self
 
 
-# Bounds apply to incoming data only; responses use RoutineItemBase so
-# existing rows stay readable.
 class RoutineItemCreate(RoutineItemBase):
     target_sets: int = Field(ge=1, le=100)
     target_reps: Optional[int] = Field(default=None, ge=0, le=10_000)

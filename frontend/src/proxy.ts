@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Only an optimistic check that a session cookie exists; the API validates the
-// token itself and handleApiError clears a rejected one (see api/session/expired).
 export function proxy(request: NextRequest) {
   const token = request.cookies.get("access_token")?.value;
   const { pathname } = request.nextUrl;
