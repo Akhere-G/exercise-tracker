@@ -67,7 +67,8 @@ export default function WorkoutForm({
       "completedAt",
       initialData.completedAt ? new Date(initialData.completedAt) : new Date(),
     );
-    setValue("duration", initialData.duration ?? 0);
+    // The API stores seconds; the form field is in minutes.
+    setValue("duration", Math.round((initialData.duration ?? 0) / 60));
 
     const rows = buildSetsFromWorkout(initialData);
     setValue("sets", rows as WorkoutSetSchema[]);
