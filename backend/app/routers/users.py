@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from app.schemas.user import User, UserCreate, UserLogin
+from app.config import settings
 from app.database import get_db
 from app.limiter import limiter
 from sqlalchemy.orm import Session
 from app.services import demo as demo_service
 from app.services import user as user_service
-import os
 from typing import Annotated
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -67,7 +67,7 @@ def check_auth(user: Annotated[User, Depends(user_service.get_current_user)]):
 @router.post("/demo", status_code=status.HTTP_200_OK)
 @limiter.limit("30/minute")
 def demo_login(request: Request, db: Annotated[Session, Depends(get_db)]):
-    if os.getenv("DEMO_MODE_ENABLED", "").lower() != "true":
+    if not settings.demo_mode_enabled:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not Found")
 
     demo_user = demo_service.get_demo_user(db)

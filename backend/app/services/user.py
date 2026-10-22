@@ -4,7 +4,7 @@ from app.models import User
 from sqlalchemy.orm import Session
 from sqlalchemy import func, select
 from fastapi import Depends, HTTPException, status
-from app.config import load_signing_config
+from app.config import settings
 from app.database import get_db
 from datetime import datetime, timezone, timedelta
 import jwt
@@ -12,7 +12,6 @@ from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 
 
-SECRET_KEY, ALGORITHM = load_signing_config()
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 DEMO_TOKEN_TTL = timedelta(hours=2)
 
@@ -31,7 +30,9 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
             minutes=ACCESS_TOKEN_EXPIRE_MINUTES
         )
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode, settings.secret_key, algorithm=settings.algorithm
+    )
     return encoded_jwt
 
 
@@ -44,7 +45,9 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token, settings.secret_key, algorithms=[settings.algorithm]
+        )
         email: str | None = payload.get("sub")
         if email is None:
             raise credentials_exception

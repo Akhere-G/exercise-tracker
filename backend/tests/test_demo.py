@@ -3,6 +3,7 @@ import re
 from datetime import date
 
 import pytest
+from app.config import settings
 from app.models import (
     Exercise,
     Notification,
@@ -235,10 +236,10 @@ def test_dry_run_rolls_back(db, fixture, freeze):
 # 8 endpoints ------------------------------------------------------------------
 
 def test_demo_endpoint(client, db, fixture, freeze, monkeypatch):
-    monkeypatch.delenv("DEMO_MODE_ENABLED", raising=False)
+    monkeypatch.setattr(settings, "demo_mode_enabled", False)
     assert client.post("/api/auth/demo").status_code == 404
 
-    monkeypatch.setenv("DEMO_MODE_ENABLED", "true")
+    monkeypatch.setattr(settings, "demo_mode_enabled", True)
     assert client.post("/api/auth/demo").status_code == 503
 
     summary = run_reset(db, fixture, freeze)
@@ -248,7 +249,7 @@ def test_demo_endpoint(client, db, fixture, freeze, monkeypatch):
 
     import jwt
 
-    claims = jwt.decode(token, user_service.SECRET_KEY, algorithms=[user_service.ALGORITHM])
+    claims = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
     from datetime import datetime, timezone
 
     remaining = claims["exp"] - datetime.now(timezone.utc).timestamp()
@@ -272,7 +273,7 @@ def test_demo_endpoint(client, db, fixture, freeze, monkeypatch):
 
 
 def test_demo_quotas(client, db, fixture, freeze, monkeypatch):
-    monkeypatch.setenv("DEMO_MODE_ENABLED", "true")
+    monkeypatch.setattr(settings, "demo_mode_enabled", True)
     run_reset(db, fixture, freeze)
     monkeypatch.setattr(demo_service, "DEMO_MAX_WORKOUTS", 14)
     monkeypatch.setattr(demo_service, "DEMO_MAX_ROUTINES", 4)

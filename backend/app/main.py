@@ -3,11 +3,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import users, exercises, routines, workouts, notifications, achievements
+from app.config import settings
 from app.database import SessionLocal
 from app.limiter import limiter, rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from app.services import achievement as achievement_service
-import os
 
 
 @asynccontextmanager
@@ -32,7 +32,7 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[
-            os.getenv("FRONTEND_ORIGIN", "http://localhost:3000"),
+            settings.frontend_origin,
         ],
         allow_credentials=True,
         allow_methods=["*"],
