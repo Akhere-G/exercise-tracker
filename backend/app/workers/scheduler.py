@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pywebpush import webpush, WebPushException
 from sqlalchemy.orm import Session
 from sqlalchemy import select
@@ -60,12 +60,12 @@ def send_push_to_user_subscriptions(
 def check_routine_reminders():
     db = SessionLocal()
     try:
-        now = datetime.now()
-        current_time = now.time()
-        one_hour_ahead = (now + timedelta(hours=1)).time()
+        now = datetime.now(timezone.utc)
+        current_time = now.timetz()
+        one_hour_ahead = (now + timedelta(hours=1)).timetz()
         current_day = now.weekday()
 
-        print(f"Server time: {datetime.now().time()}")
+        print(f"UTC time: {current_time}")
         print(f"Querying for day: {current_day}")
 
         stmt = (

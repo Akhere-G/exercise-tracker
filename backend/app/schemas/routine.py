@@ -1,6 +1,6 @@
-from datetime import time
+from datetime import time, timedelta
 from typing import List, Optional
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 from .exercise import Exercise
 from .base import BaseModel
 
@@ -32,6 +32,14 @@ class RoutineItemCreate(RoutineItemBase):
     order: int = Field(ge=0, le=1000)
 
 
+def _require_utc(value: Optional[time]) -> Optional[time]:
+    if value is not None and (
+        value.tzinfo is None or value.utcoffset() != timedelta(0)
+    ):
+        raise ValueError("start_time must be in UTC, for example 06:00:00Z.")
+    return value
+
+
 def _reject_duplicate_exercises(items):
     if items is None:
         return items
@@ -57,6 +65,8 @@ class RoutineCreate(RoutineBase):
     day: int = Field(ge=0, le=6)
     routine_items: List[RoutineItemCreate] = Field(max_length=MAX_ROUTINE_ITEMS)
 
+    _validate_start_time = field_validator("start_time")(_require_utc)
+
     @model_validator(mode="after")
     def validate_unique_exercises(self) -> "RoutineCreate":
         _reject_duplicate_exercises(self.routine_items)
@@ -76,6 +86,8 @@ class RoutineUpdate(BaseModel):
     routine_items: Optional[List[RoutineItemCreate]] = Field(
         default=None, max_length=MAX_ROUTINE_ITEMS
     )
+
+    _validate_start_time = field_validator("start_time")(_require_utc)
 
     @model_validator(mode="after")
     def validate_unique_exercises(self) -> "RoutineUpdate":
