@@ -1,6 +1,8 @@
 import posthog from "posthog-js";
 
-const KEY = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
+const KEY =
+  process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN ||
+  "phc_wVvjmwnSPM5ExJaLiBedk7KjcXM5aftu62JARhZ2Xw6W";
 const HOST = process.env.NEXT_PUBLIC_POSTHOG_HOST;
 console.log(`Host is ${HOST}`);
 console.log(`Key is present: ${Boolean(KEY)}`);
