@@ -1,5 +1,5 @@
 import logging
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta
 from typing import Optional
 
 from app.models import Exercise, ExerciseMuscle, Workout, WorkoutSet
@@ -17,8 +17,16 @@ def get_workouts(
     db: Session,
     user_id: int,
     routine_id: Optional[int] = None,
+    start: Optional[date] = None,
+    end: Optional[date] = None,
 ):
     stmt = _filter_workouts(_workout_query(), user_id, routine_id)
+    if start is not None:
+        stmt = stmt.where(Workout.completed_at >= datetime.combine(start, time.min))
+    if end is not None:
+        stmt = stmt.where(
+            Workout.completed_at < datetime.combine(end + timedelta(days=1), time.min)
+        )
     return db.execute(stmt).scalars().all()
 
 

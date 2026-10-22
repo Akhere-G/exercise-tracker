@@ -11,6 +11,7 @@ from app.services import (
     exercise as exercise_service,
 )
 from sqlalchemy.orm import Session
+from datetime import date
 from typing import Optional, List
 
 router = APIRouter(prefix="/api/workouts", tags=["Workout"])
@@ -30,8 +31,15 @@ def get_workouts(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Annotated[Session, Depends(get_db)],
     routineId: Optional[int] = None,
+    start: Optional[date] = None,
+    end: Optional[date] = None,
 ):
-    return workout_service.get_workouts(db, user.id, routineId)
+    if start and end and end < start:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="end must not be before start.",
+        )
+    return workout_service.get_workouts(db, user.id, routineId, start, end)
 
 
 @router.get("/previous/{exercise_id}", response_model=List[WorkoutSet])
