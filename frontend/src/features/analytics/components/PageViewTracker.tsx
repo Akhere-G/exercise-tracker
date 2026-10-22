@@ -1,5 +1,6 @@
 "use client";
 
+import "@/src/features/analytics/init";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { getPageEvent, track } from "@/src/features/analytics/utils";
