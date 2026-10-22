@@ -333,5 +333,7 @@ def test_migration_downgrade_and_upgrade(tmp_path):
     alembic("stamp", "51e8ae576d9d")
     alembic("downgrade", "-1")
     assert "is_demo" not in columns()
-    alembic("upgrade", "head")
+    # Not "head": later migrations (such as the index one) would try to create
+    # objects that create_all already made from the current models.
+    alembic("upgrade", "51e8ae576d9d")
     assert "is_demo" in columns()

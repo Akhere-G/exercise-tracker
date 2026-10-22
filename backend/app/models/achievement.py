@@ -42,7 +42,7 @@ class UserAchievement(Base, AuditMixin):
     __tablename__ = "user_achievements"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE")
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True
     )
     achievement_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("achievements.id", ondelete="CASCADE")
