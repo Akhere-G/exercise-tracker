@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BarChart3, Dumbbell, PlusCircle } from "lucide-react";
+import { BarChart3, Dumbbell, PlusCircle, Trophy } from "lucide-react";
 import { DemoLoginButton } from "@/src/features/auth/components/DemoLoginButton";
 
 export default function HomePage() {
@@ -91,6 +91,21 @@ export default function HomePage() {
               Keep an eye on key training metrics. Watch your estimated 1RM
               scale up, view rep zone distributions, and monitor absolute volume
               changes across timelines.
+            </p>
+          </div>
+
+          <div className="bg-card border border-border p-6 rounded-2xl shadow-sm flex flex-col gap-3 md:col-span-3">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+              <Trophy className="h-5 w-5" />
+            </div>
+            <h3 className="text-lg font-semibold">Achievements</h3>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Earn achievements as you train. Weekly streaks count how many
+              weeks in a row you have worked out at least a set number of times
+              (1x to 5x per week). Personal bests are tracked for every
+              exercise, depending on how it is measured: the heaviest weight
+              lifted, the most reps performed, the longest distance covered or
+              the longest duration held.
             </p>
           </div>
         </div>
