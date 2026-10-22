@@ -2,7 +2,7 @@ import os
 
 # Must be set before app modules import: never let tests reach a real database.
 os.environ["DATABASE_URL"] = "sqlite://"
-os.environ["SECRET_KEY"] = "test-secret"
+os.environ["SECRET_KEY"] = "test-secret-key-that-is-at-least-32-chars"
 os.environ["ALGORITHM"] = "HS256"
 
 import json
