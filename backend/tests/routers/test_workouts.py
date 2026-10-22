@@ -22,3 +22,20 @@ def test_updating_a_workout_with_an_unknown_exercise_is_a_422(client, auth_heade
     )
 
     assert response.status_code == 422
+
+
+def test_workouts_can_be_limited_to_a_date_range(client, auth_headers):
+    ids = {}
+    for day in (18, 19, 20):
+        payload = workout_payload(completedAt=f"2026-10-{day}T12:00:00")
+        ids[day] = client.post("/api/workouts", json=payload, headers=auth_headers).json()["id"]
+
+    response = client.get("/api/workouts?start=2026-10-19&end=2026-10-19", headers=auth_headers)
+
+    assert [w["id"] for w in response.json()] == [ids[19]]
+
+
+def test_a_date_range_ending_before_it_starts_is_a_422(client, auth_headers):
+    response = client.get("/api/workouts?start=2026-10-20&end=2026-10-19", headers=auth_headers)
+
+    assert response.status_code == 422
