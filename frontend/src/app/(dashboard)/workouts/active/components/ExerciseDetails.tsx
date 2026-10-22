@@ -29,9 +29,11 @@ import { track } from "@/src/features/analytics/utils";
 export default function ExerciseDetails({
   completeWorkout,
   canComplete,
+  isCompleting = false,
 }: {
   completeWorkout: (onComplete: () => void) => Promise<void>;
   canComplete: boolean;
+  isCompleting?: boolean;
 }) {
   const [isExerciseModalOpen, setIsExerciseModalOpen] = useState(false);
   const [removeModalOpen, setRemoveModalOpen] = useState(false);
@@ -207,6 +209,7 @@ export default function ExerciseDetails({
               <DialogClose>Cancel</DialogClose>
               <Button
                 variant="default"
+                disabled={isCompleting}
                 onClick={() => completeWorkout(() => setFinishModalOpen(false))}
               >
                 Finish
