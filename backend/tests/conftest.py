@@ -76,3 +76,24 @@ def freeze(monkeypatch):
         return datetime.combine(day, time(23, 59))
 
     return _freeze
+
+
+@pytest.fixture
+def client(engine, monkeypatch):
+    from app.database import get_db
+    from app.main import create_app
+    from fastapi.testclient import TestClient
+    from sqlalchemy.orm import sessionmaker
+
+    app = create_app()
+    Session = sessionmaker(bind=engine, autoflush=False)
+
+    def override():
+        session = Session()
+        try:
+            yield session
+        finally:
+            session.close()
+
+    app.dependency_overrides[get_db] = override
+    return TestClient(app)

@@ -24,31 +24,31 @@ def register_user(user_in: UserCreate, db: Session = Depends(get_db)):
     return user_service.get_access_token(user.email)
 
 
+def _authenticate_or_401(db: Session, email: str, password: str):
+    user = user_service.authenticate_user(db, email, password)
+    if user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
+
+
 @router.post("/token")
 def login(
     form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
 ):
-    user = user_service.get_user_by_email(db, email=form_data.username)
-
-    if not user or not user_service.check_password_hash(
-        form_data.password, user.password_hash
-    ):
-        raise HTTPException(status_code=400, detail="Incorrect email or password")
-
+    """OAuth2 password flow, used by the Swagger "Authorize" button."""
+    user = _authenticate_or_401(db, form_data.username, form_data.password)
     return user_service.get_access_token(user.email)
 
 
 @router.post("/login", status_code=status.HTTP_200_OK)
 def login_user(user_in: UserLogin, db: Session = Depends(get_db)):
-    existing_user = user_service.get_user_by_email(db, email=user_in.email)
-    if not existing_user or not user_service.check_password_hash(
-        user_in.password, existing_user.password_hash
-    ):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect password or email",
-        )
-    return user_service.get_access_token(existing_user.email)
+    """JSON login, used by the frontend."""
+    user = _authenticate_or_401(db, user_in.email, user_in.password)
+    return user_service.get_access_token(user.email)
 
 
 @router.get("/me")

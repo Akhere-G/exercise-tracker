@@ -234,27 +234,6 @@ def test_dry_run_rolls_back(db, fixture, freeze):
 
 # 8 endpoints ------------------------------------------------------------------
 
-@pytest.fixture
-def client(engine, monkeypatch):
-    from app.database import get_db
-    from app.main import create_app
-    from fastapi.testclient import TestClient
-    from sqlalchemy.orm import sessionmaker
-
-    app = create_app()
-    Session = sessionmaker(bind=engine, autoflush=False)
-
-    def override():
-        session = Session()
-        try:
-            yield session
-        finally:
-            session.close()
-
-    app.dependency_overrides[get_db] = override
-    return TestClient(app)
-
-
 def test_demo_endpoint(client, db, fixture, freeze, monkeypatch):
     monkeypatch.delenv("DEMO_MODE_ENABLED", raising=False)
     assert client.post("/api/auth/demo").status_code == 404
