@@ -9,17 +9,27 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./database.db")
 cert_path = os.getenv("DB_CA_CERT_PATH", "/app/certs/ca.pem")
 
-if DATABASE_URL.startswith("sqlite"):
-    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
-else:
-    engine = create_engine(
-        DATABASE_URL,
+def create_db_engine(database_url: str, ca_cert_path: str):
+    if database_url.startswith("sqlite"):
+        return create_engine(database_url, connect_args={"check_same_thread": False})
+
+    return create_engine(
+        database_url,
+        # Replace connections the server or network dropped while idle (for
+        # example after a Cloud SQL restart) instead of failing a request.
+        pool_pre_ping=True,
+        pool_recycle=int(os.getenv("DB_POOL_RECYCLE_SECS", "1800")),
+        pool_size=int(os.getenv("DB_POOL_SIZE", "5")),
+        max_overflow=int(os.getenv("DB_MAX_OVERFLOW", "10")),
         connect_args={
             "sslmode": "require",
-            "sslrootcert": cert_path,
+            "sslrootcert": ca_cert_path,
+            "connect_timeout": int(os.getenv("DB_CONNECT_TIMEOUT_SECS", "10")),
         },
     )
 
+
+engine = create_db_engine(DATABASE_URL, cert_path)
 
 
 def enable_sqlite_foreign_keys(target_engine) -> None:
