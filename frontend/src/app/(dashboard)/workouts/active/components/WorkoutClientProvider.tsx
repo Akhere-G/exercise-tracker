@@ -78,7 +78,6 @@ export default function WorkoutClientProvider({
   }, [routine, setWorkoutData]);
 
   async function completeWorkout(onComplete?: () => void) {
-    // The ref blocks a second call in the same tick; state drives the UI.
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
     setIsSubmitting(true);
@@ -121,8 +120,6 @@ export default function WorkoutClientProvider({
       track("create_workout_failed", { reason: "exception" });
       toast.error("Could not save workout.");
     } finally {
-      // After a save the page navigates away, so keep the guard on; after a
-      // failure let the user retry.
       if (!saved) {
         isSubmittingRef.current = false;
         setIsSubmitting(false);

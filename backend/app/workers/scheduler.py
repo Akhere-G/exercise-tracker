@@ -5,14 +5,11 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from app.database import SessionLocal
 from app.models import Routine, NotificationSubscription, Notification, User
-from dotenv import load_dotenv
-import os
+from app.config import settings
 from typing import Dict
 import logging
 
-load_dotenv()
-
-VAPID_PRIVATE_KEY = os.getenv("VAPID_PRIVATE_KEY")
+VAPID_PRIVATE_KEY = settings.vapid_private_key
 VAPID_CLAIMS: Dict[str, str | int] = {"sub": "mailto:101akhere5@gmail.com"}
 
 logger = logging.getLogger(__name__)

@@ -1,9 +1,20 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import users, exercises, routines, workouts, notifications, achievements
-from app.database import get_db
+from app.config import settings
+from app.database import SessionLocal
+from app.limiter import limiter, rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from app.services import achievement as achievement_service
-import os
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    with SessionLocal() as db:
+        achievement_service.seed_achievements(db)
+    yield
 
 
 def create_app() -> FastAPI:
@@ -11,12 +22,16 @@ def create_app() -> FastAPI:
         title="Exercise Tracker API",
         description="A professional backend for tracking fitness progress.",
         version="1.0.0",
+        lifespan=lifespan,
     )
+
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
 
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[
-            os.getenv("FRONTEND_ORIGIN", "http://localhost:3000"),
+            settings.frontend_origin,
         ],
         allow_credentials=True,
         allow_methods=["*"],
@@ -29,15 +44,6 @@ def create_app() -> FastAPI:
     app.include_router(routines.router)
     app.include_router(notifications.router)
     app.include_router(achievements.router)
-
-    @app.on_event("startup")
-    async def startup_event():
-        """Seed achievements on startup"""
-        db = next(get_db())
-        try:
-            achievement_service.seed_achievements(db)
-        finally:
-            db.close()
 
     @app.get("/", tags=["Health"])
     async def health_check():

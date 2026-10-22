@@ -2,20 +2,16 @@ from passlib.context import CryptContext
 from app.schemas.user import UserCreate, Token
 from app.models import User
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import func, select
 from fastapi import Depends, HTTPException, status
+from app.config import settings
 from app.database import get_db
-from dotenv import load_dotenv
-import os
 from datetime import datetime, timezone, timedelta
 import jwt
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 
 
-load_dotenv()
-SECRET_KEY = os.getenv("SECRET_KEY", "")
-ALGORITHM = os.getenv("ALGORITHM", "")
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 DEMO_TOKEN_TTL = timedelta(hours=2)
 
@@ -34,7 +30,9 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
             minutes=ACCESS_TOKEN_EXPIRE_MINUTES
         )
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(
+        to_encode, settings.secret_key, algorithm=settings.algorithm
+    )
     return encoded_jwt
 
 
@@ -47,7 +45,9 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(
+            token, settings.secret_key, algorithms=[settings.algorithm]
+        )
         email: str | None = payload.get("sub")
         if email is None:
             raise credentials_exception
@@ -74,7 +74,7 @@ def get_user(db: Session, user_id: int):
 
 
 def get_user_by_email(db: Session, email: str):
-    query = select(User).where(User.email == email)
+    query = select(User).where(func.lower(User.email) == email.strip().lower())
     return db.execute(query).scalars().first()
 
 

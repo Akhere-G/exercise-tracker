@@ -8,6 +8,7 @@ from app.services import (
     workout as workout_service,
     routine as routine_service,
     demo as demo_service,
+    exercise as exercise_service,
 )
 from sqlalchemy.orm import Session
 from typing import Optional, List
@@ -76,6 +77,8 @@ def create_workout(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Routine not found."
             )
 
+    exercise_service.ensure_exercises_exist(db, (s.exercise_id for s in workout_in.sets))
+
     workout = workout_service.create_workout(db, user.id, workout_in)
     return workout
 
@@ -87,6 +90,11 @@ def update_workout(
     workout_in: WorkoutUpdate,
     workout_id: int,
 ):
+    if workout_in.sets is not None:
+        exercise_service.ensure_exercises_exist(
+            db, (s.exercise_id for s in workout_in.sets)
+        )
+
     workout = workout_service.update_workout(db, user.id, workout_id, workout_in)
 
     if not workout:

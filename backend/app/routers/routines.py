@@ -1,5 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from ..services import demo as demo_service, routine as routine_service, user as user_service
+from ..services import (
+    demo as demo_service,
+    exercise as exercise_service,
+    routine as routine_service,
+    user as user_service,
+)
 from typing import Annotated
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -45,6 +50,10 @@ def create_routine(
             detail="Demo accounts are limited in size. Create an account to add more.",
         )
 
+    exercise_service.ensure_exercises_exist(
+        db, (item.exercise_id for item in routine.routine_items)
+    )
+
     new_routine = routine_service.create_routine(
         db,
         user.id,
@@ -61,6 +70,11 @@ def update_routine(
     routine_id: int,
     db: Session = Depends(get_db),
 ):
+    if routine.routine_items is not None:
+        exercise_service.ensure_exercises_exist(
+            db, (item.exercise_id for item in routine.routine_items)
+        )
+
     new_routine = routine_service.update_routine(
         db,
         user.id,

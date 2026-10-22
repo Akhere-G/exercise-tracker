@@ -179,12 +179,6 @@ def _award_achievements(db: Session, user_id: int, workout: Workout) -> None:
 
 
 def _award_achievements_safely(db: Session, user_id: int, workout: Workout) -> None:
-    """Award achievements for a saved workout without ever failing the save.
-
-    The workout is already committed, so an error here must not turn into a
-    failed request (the client would retry and create a duplicate). Missed
-    awards can be rebuilt with `achievement_service.backfill_user_achievements`.
-    """
     try:
         _award_achievements(db, user_id, workout)
     except Exception:

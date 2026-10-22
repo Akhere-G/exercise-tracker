@@ -1,5 +1,6 @@
 import axios, { isAxiosError } from "axios";
-import { ActionResponse } from "./apiTypes";
+import { redirect } from "next/navigation";
+import { ActionResponse, ValidationError } from "./apiTypes";
 
 const baseURL =
   process.env.NEXT_PUBLIC_BASE_URL ||
@@ -11,15 +12,35 @@ export const api = axios.create({
   baseURL,
 });
 
+const PUBLIC_AUTH_PATHS = [
+  "/auth/login",
+  "/auth/register",
+  "/auth/demo",
+  "/auth/token",
+];
+
 api.interceptors.request.use(async (config) => {
   if (typeof window === "undefined") {
     try {
-      const { cookies } = await import("next/headers");
+      const { cookies, headers } = await import("next/headers");
       const cookieStore = await cookies();
       const token = cookieStore.get("access_token")?.value;
 
-      if (token && config.headers) {
+      const isPublicAuthCall = PUBLIC_AUTH_PATHS.some((path) =>
+        config.url?.startsWith(path),
+      );
+      if (token && config.headers && !isPublicAuthCall) {
         config.headers.Authorization = `Bearer ${token}`;
+      }
+
+      const forwardedFor = (await headers()).get("x-forwarded-for");
+      const clientIp = forwardedFor
+        ?.split(",")
+        .map((hop) => hop.trim())
+        .filter(Boolean)
+        .at(-1);
+      if (clientIp && config.headers) {
+        config.headers["X-Forwarded-For"] = clientIp;
       }
     } catch {
       console.warn("Skipped server-side cookie parsing.");
@@ -28,11 +49,45 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
+const FALLBACK_ERROR = "Something went wrong. Please try again.";
+
+function describeApiError(detail: unknown): string {
+  if (typeof detail === "string" && detail) return detail;
+
+  if (Array.isArray(detail) && detail.length > 0) {
+    const first = detail[0] as Partial<ValidationError>;
+    if (typeof first?.msg === "string") {
+      const field = first.loc?.at(-1);
+      return typeof field === "string" ? `${field}: ${first.msg}` : first.msg;
+    }
+  }
+
+  return FALLBACK_ERROR;
+}
+
 export function handleApiError<T>(err: unknown): ActionResponse<T> {
+  if (
+    isAxiosError(err) &&
+    err.response?.status === 401 &&
+    err.config?.headers?.has("Authorization")
+  ) {
+    redirect("/api/session/expired");
+  }
+
   if (isAxiosError(err)) {
+    if (!err.response) {
+      return {
+        success: false,
+        error: "Could not reach the server. Check your connection.",
+      };
+    }
+
+    const detail: unknown = err.response.data?.detail;
     return {
       success: false,
-      errors: err.response?.data.detail,
+      error: describeApiError(detail),
+      errors: detail as ValidationError[] | string | undefined,
+      status: err.response.status,
     };
   }
   return {

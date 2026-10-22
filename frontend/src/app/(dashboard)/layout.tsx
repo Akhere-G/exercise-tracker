@@ -11,6 +11,8 @@ import { Calendar, Cog, House, Trophy } from "lucide-react";
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import { DemoBanner } from "@/src/features/auth/components/DemoBanner";
+import { getSessionOwnerId } from "@/src/features/auth/session";
+import { WorkoutOwnerGuard } from "@/src/features/workout/components/WorkoutOwnerGuard";
 
 export const metadata: Metadata = {
   manifest: "/manifest.json",
@@ -34,10 +36,12 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const isDemo = cookieStore.get("demo_session")?.value === "1";
+  const ownerId = getSessionOwnerId(cookieStore.get("access_token")?.value);
 
   return (
     <div>
       <Toaster position="top-right" richColors closeButton />
+      <WorkoutOwnerGuard ownerId={ownerId} />
 
       <div className="h-[90vh]  overflow-auto no-scrollbar">
         {isDemo && <DemoBanner />}

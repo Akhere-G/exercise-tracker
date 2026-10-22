@@ -1,25 +1,25 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine, event
-from dotenv import load_dotenv
 from sqlalchemy.orm import DeclarativeBase
-import os
+from app.config import settings
 
-load_dotenv()
-
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./database.db")
-cert_path = os.getenv("DB_CA_CERT_PATH", "/app/certs/ca.pem")
-
-if DATABASE_URL.startswith("sqlite"):
-    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+if settings.database_url.startswith("sqlite"):
+    engine = create_engine(
+        settings.database_url, connect_args={"check_same_thread": False}
+    )
 else:
     engine = create_engine(
-        DATABASE_URL,
+        settings.database_url,
+        pool_pre_ping=True,
+        pool_recycle=settings.db_pool_recycle_secs,
+        pool_size=settings.db_pool_size,
+        max_overflow=settings.db_max_overflow,
         connect_args={
             "sslmode": "require",
-            "sslrootcert": cert_path,
+            "sslrootcert": settings.db_ca_cert_path,
+            "connect_timeout": settings.db_connect_timeout_secs,
         },
     )
-
 
 
 def enable_sqlite_foreign_keys(target_engine) -> None:
