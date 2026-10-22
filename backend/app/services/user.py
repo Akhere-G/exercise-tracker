@@ -7,6 +7,7 @@ from fastapi import Depends, HTTPException, status
 from app.config import load_signing_config
 from app.database import get_db
 from datetime import datetime, timezone, timedelta
+from functools import cache
 import jwt
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
@@ -63,6 +64,26 @@ def get_password_hash(password: str) -> str:
 
 def check_password_hash(password: str, hash: str) -> bool:
     return pwd_context.verify(password, hash)
+
+
+@cache
+def _dummy_password_hash() -> str:
+    return pwd_context.hash("not-a-real-password")
+
+
+def authenticate_user(db: Session, email: str, password: str) -> User | None:
+    """Return the user if the credentials are valid, otherwise None.
+
+    A hash is verified even when the email is unknown so both failures take
+    about the same time.
+    """
+    user = get_user_by_email(db, email=email)
+    if user is None:
+        check_password_hash(password, _dummy_password_hash())
+        return None
+    if not check_password_hash(password, user.password_hash):
+        return None
+    return user
 
 
 def get_user(db: Session, user_id: int):
