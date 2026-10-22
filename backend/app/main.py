@@ -12,7 +12,6 @@ from app.services import achievement as achievement_service
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Seed achievement definitions that are missing (idempotent).
     with SessionLocal() as db:
         achievement_service.seed_achievements(db)
     yield

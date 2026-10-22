@@ -16,7 +16,6 @@ def normalize_email(value: str) -> str:
     return value.strip().lower()
 
 
-# Matches the String(50) columns on User.
 MAX_USERNAME_LENGTH = 50
 MAX_EMAIL_LENGTH = 50
 
