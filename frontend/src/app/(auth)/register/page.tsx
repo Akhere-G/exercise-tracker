@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { registerAction } from "../../../features/auth/actions";
+import { getFailureReason, track } from "@/src/features/analytics/utils";
 
 export default function Register() {
   const [errorMessages, setErrorMessage] = useState<Record<string, string>>({
@@ -45,10 +46,13 @@ export default function Register() {
       const response = await registerAction(formattedData);
 
       if (!response.success) {
+        track("register_failed", { reason: getFailureReason(response) });
       } else {
+        track("register");
         router.push("/routines");
       }
     } catch {
+      track("register_failed", { reason: "exception" });
       setErrorMessage((prev) => ({
         ...prev,
         general: "Sorry... Something went wrong.",

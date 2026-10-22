@@ -1,6 +1,6 @@
 import { getAllRoutines } from "@/src/features/routines/queries";
 import RoutineCard from "./components/RoutineCard";
-import Link from "next/link";
+import CreateRoutineLink from "./components/CreateRoutineLink";
 import StoredWorkout from "./components/StoredWorkout";
 import NotificationsPrompt from "@/src/features/notifications/components/NotificationsPrompt";
 import StartEmptyWorkoutButton from "../components/StartEmptyWorkoutButton";
@@ -25,9 +25,7 @@ export default async function Routines() {
       </div>
       <StartEmptyWorkoutButton />
 
-      <Link className="text-center" href="/routines/create">
-        Add New Routine
-      </Link>
+      <CreateRoutineLink />
       <StoredWorkout />
       <NotificationsPrompt />
     </div>

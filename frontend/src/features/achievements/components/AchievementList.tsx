@@ -1,6 +1,7 @@
 "use client";
 import { ActionResponse } from "@/src/lib/apiTypes";
-import React, { use, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
+import { track } from "@/src/features/analytics/utils";
 import {
   ACCENTS,
   AchievementFreqTypes,
@@ -13,6 +14,7 @@ import { Button } from "@/src/components/ui/button";
 
 interface AchievementListProps {
   achievementsPromise: Promise<ActionResponse<UserAchievement[]>>;
+  trackUnlocks?: boolean;
 }
 const filterTypes: { text: string; type: string }[] = [
   { text: "Weight", type: achievementTypes.pr_weight },
@@ -23,6 +25,7 @@ const filterTypes: { text: string; type: string }[] = [
 ];
 export default function AchievementList({
   achievementsPromise,
+  trackUnlocks = false,
 }: AchievementListProps) {
   const [selectedFilters, setSelectedFilters] = useState<
     Record<string, boolean>
@@ -34,6 +37,16 @@ export default function AchievementList({
     streak: true,
   });
   const response = use(achievementsPromise);
+  const hasTrackedUnlocks = useRef(false);
+
+  useEffect(() => {
+    if (!trackUnlocks || !response.success || hasTrackedUnlocks.current) return;
+    hasTrackedUnlocks.current = true;
+    for (const { achievement } of response.data) {
+      track("achievement_unlocked", { achievement_type: achievement.type });
+    }
+  }, [trackUnlocks, response]);
+
   if (!response.success) {
     return (
       <div className="w-full bg-destructive/10 text-destructive border-dashed border-2 border-destructive p-4 mt-4 rounded text-center">

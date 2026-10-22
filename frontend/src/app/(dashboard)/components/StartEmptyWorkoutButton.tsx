@@ -4,6 +4,7 @@ import { useWorkout, workoutStorageKey } from "@/src/features/workout/store";
 import { useRouter } from "next/navigation";
 import StartWorkoutDialog from "../routines/components/StartWorkoutDialog";
 import { useState } from "react";
+import { track } from "@/src/features/analytics/utils";
 
 export default function StartEmptyWorkoutButton() {
   const [isWorkoutDialogOpen, setIsWorkoutDialogOpen] = useState(false);
@@ -11,6 +12,7 @@ export default function StartEmptyWorkoutButton() {
   const router = useRouter();
 
   const handleClick = () => {
+    track("click_start_workout", { source: "empty" });
     if (!startedAt) {
       resetState();
       localStorage.removeItem(workoutStorageKey);

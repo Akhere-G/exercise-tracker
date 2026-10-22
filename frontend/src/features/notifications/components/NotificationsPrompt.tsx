@@ -14,6 +14,7 @@ import {
   registerAndSubscribe,
 } from "../utils";
 import { toast } from "sonner";
+import { track } from "@/src/features/analytics/utils";
 
 export default function NotificationsPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
@@ -40,6 +41,7 @@ export default function NotificationsPrompt() {
     try {
       const subscriptionData = await registerAndSubscribe();
       await subscribe(subscriptionData);
+      track("enable_notifications");
       toast.success("Successfully subscribed to notifications.");
       setShowPrompt(false);
     } catch {
@@ -54,7 +56,13 @@ export default function NotificationsPrompt() {
       </CardHeader>
       <CardContent className="flex gap-4">
         <Button onClick={handleSubscribe}>Subscribe</Button>
-        <Button variant="ghost" onClick={() => setShowPrompt(false)}>
+        <Button
+          variant="ghost"
+          onClick={() => {
+            track("dismiss_notifications_prompt");
+            setShowPrompt(false);
+          }}
+        >
           Maybe later
         </Button>
       </CardContent>

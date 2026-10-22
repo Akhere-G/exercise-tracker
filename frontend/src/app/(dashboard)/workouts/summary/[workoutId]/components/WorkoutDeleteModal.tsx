@@ -8,6 +8,7 @@ import {
   DialogFooter,
   DialogTitle,
 } from "@/src/components/ui/dialog";
+import { track } from "@/src/features/analytics/utils";
 import { deleteWorkout } from "@/src/features/workout/actions";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -31,6 +32,7 @@ export default function WorkoutDeleteModal({
   const handleDelete = async () => {
     const response = await deleteWorkout(workoutId);
     if (response.success) {
+      track("delete_workout");
       toast.success("Workout deleted successfully");
 
       // Check if previous page was /workouts/active

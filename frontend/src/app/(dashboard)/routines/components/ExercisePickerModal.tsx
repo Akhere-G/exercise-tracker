@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Exercise, RankedExercise } from "@/src/features/exercises/types";
 import { getAllExercises } from "@/src/features/exercises/actions";
+import { track } from "@/src/features/analytics/utils";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
 import {
@@ -95,6 +96,14 @@ export function ExercisePickerModal({
         });
         if (cancelled) return;
 
+        if (query && page === 1) {
+          track("search_exercises", {
+            query_length: query.length,
+            result_count: results.length,
+            has_equipment_filter: Boolean(equipment),
+            has_muscle_filter: Boolean(muscle),
+          });
+        }
         setHasMore(results.length > 0);
         setExercises((prev) => (page === 1 ? results : [...prev, ...results]));
       } catch (err) {

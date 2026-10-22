@@ -126,7 +126,10 @@ export default async function WorkoutSummary({
         <div className="mt-6">
           <h2 className="text-2xl">Achievements</h2>
           <Suspense fallback={<AchievementSkeleton />}>
-            <AchievementList achievementsPromise={achievementsPromise} />
+            <AchievementList
+              achievementsPromise={achievementsPromise}
+              trackUnlocks={Boolean(first)}
+            />
           </Suspense>
         </div>
         {first && <ConffettiEffect />}
