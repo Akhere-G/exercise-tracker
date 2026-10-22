@@ -40,7 +40,16 @@ export default function NotificationsPrompt() {
   const handleSubscribe = async () => {
     try {
       const subscriptionData = await registerAndSubscribe();
-      await subscribe(subscriptionData);
+      const response = await subscribe(subscriptionData);
+      if (!response.success) {
+        const detail = response.errors;
+        toast.error(
+          typeof detail === "string"
+            ? detail
+            : (response.error ?? "Could not subscribe."),
+        );
+        return;
+      }
       track("enable_notifications");
       toast.success("Successfully subscribed to notifications.");
       setShowPrompt(false);
