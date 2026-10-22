@@ -106,3 +106,27 @@ def client(engine, monkeypatch):
 
     app.dependency_overrides[get_db] = override
     return TestClient(app)
+
+
+@pytest.fixture
+def user(db):
+    from app.models import User
+    from app.services import user as user_service
+    from tests.helpers import PASSWORD
+
+    user = User(
+        username="Test",
+        email="test@example.com",
+        password_hash=user_service.get_password_hash(PASSWORD),
+    )
+    db.add(user)
+    db.commit()
+    return user
+
+
+@pytest.fixture
+def auth_headers(user):
+    from app.services import user as user_service
+
+    token = user_service.get_access_token(user.email).access_token
+    return {"Authorization": f"Bearer {token}"}
