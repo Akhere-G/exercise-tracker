@@ -2,7 +2,8 @@ from passlib.context import CryptContext
 from app.schemas.user import UserCreate, Token
 from app.models import User
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import func, select
+from sqlalchemy.exc import IntegrityError
 from fastapi import Depends, HTTPException, status
 from app.config import load_signing_config
 from app.database import get_db
@@ -92,8 +93,14 @@ def get_user(db: Session, user_id: int):
 
 
 def get_user_by_email(db: Session, email: str):
-    query = select(User).where(User.email == email)
+    # Case-insensitive so accounts stored before emails were lower-cased
+    # can still be found.
+    query = select(User).where(func.lower(User.email) == email.strip().lower())
     return db.execute(query).scalars().first()
+
+
+class EmailAlreadyRegisteredError(Exception):
+    """Raised when an account with this email already exists."""
 
 
 def create_user(db: Session, user_in: UserCreate):
@@ -102,7 +109,7 @@ def create_user(db: Session, user_in: UserCreate):
 
         user = User(
             username=user_in.username,
-            email=user_in.email,
+            email=user_in.email.strip().lower(),
             password_hash=hashed_password,
         )
 
@@ -110,6 +117,10 @@ def create_user(db: Session, user_in: UserCreate):
         db.commit()
         db.refresh(user)
         return user
+    except IntegrityError as error:
+        # Lost a race with a concurrent registration for the same email.
+        db.rollback()
+        raise EmailAlreadyRegisteredError from error
     except Exception:
         db.rollback()
         raise
