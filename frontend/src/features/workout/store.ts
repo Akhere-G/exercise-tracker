@@ -12,6 +12,7 @@ export interface Exercise extends BaseExercise {
 }
 
 export const workoutStorageKey = "workout-storage";
+export const workoutOwnerKey = "workout-storage-owner";
 
 export interface WorkoutState {
   routineId: number | null;
