@@ -78,6 +78,15 @@ def freeze(monkeypatch):
     return _freeze
 
 
+@pytest.fixture(autouse=True)
+def reset_rate_limits():
+    from app import rate_limit
+
+    rate_limit.reset_all_limits()
+    yield
+    rate_limit.reset_all_limits()
+
+
 @pytest.fixture
 def client(engine, monkeypatch):
     from app.database import get_db
