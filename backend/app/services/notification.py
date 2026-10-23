@@ -2,9 +2,16 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from ..models import Notification, NotificationSubscription
 
+NOTIFICATION_LIMIT = 50
+
 
 def get_notifications(db: Session, user_id: int):
-    stmt = select(Notification).where(Notification.user_id == user_id)
+    stmt = (
+        select(Notification)
+        .where(Notification.user_id == user_id)
+        .order_by(Notification.created_at.desc(), Notification.id.desc())
+        .limit(NOTIFICATION_LIMIT)
+    )
     return db.execute(stmt).scalars().all()
 
 
