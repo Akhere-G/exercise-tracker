@@ -25,7 +25,7 @@ def ensure_exercises_exist(db: Session, exercise_ids) -> None:
     missing = sorted(wanted - found)
     if missing:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=f"Unknown exercise id(s): {missing}",
         )
 
