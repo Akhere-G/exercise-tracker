@@ -1,6 +1,7 @@
 import { Exercise } from "@/src/features/exercises/types";
 import ProgressChart from "../../../components/ProgressCharts";
 import {
+  getEstimatedOneRepMax,
   getWorkoutDistance,
   getWorkoutDuration,
   getWorkoutPace,
@@ -37,18 +38,10 @@ export default function ExerciseStats({
     x: date,
   }));
 
-  // Epley Formula for Estimated 1RM: Weight * (1 + Reps / 30)
-  const e1rmData = Object.keys(groupedSets).map((date) => {
-    const max1rm = Math.max(
-      ...groupedSets[date].map(
-        (s) => (s.weight || 0) * (1 + (s.reps || 0) / 30),
-      ),
-    );
-    return {
-      y: Math.round(max1rm),
-      x: date,
-    };
-  });
+  const e1rmData = Object.keys(groupedSets).map((date) => ({
+    y: getEstimatedOneRepMax(groupedSets[date]),
+    x: date,
+  }));
 
   const durationData = Object.keys(groupedSets).map((date) => ({
     y: getWorkoutDuration(groupedSets[date]),

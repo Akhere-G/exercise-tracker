@@ -4,6 +4,7 @@ from app.limiter import limiter
 from app.models import User
 from app.services import demo as demo_service
 from app.services import user as user_service
+from sqlalchemy import select
 from tests.helpers import PASSWORD, run_reset
 
 
@@ -27,7 +28,7 @@ def _login_form(client, email="test@example.com", password=PASSWORD):
 def test_register_stores_a_lowercase_email(client, db):
     assert _register(client, "  New.User@Example.COM ").status_code == 201
 
-    assert db.query(User).one().email == "new.user@example.com"
+    assert db.execute(select(User.email)).scalar_one() == "new.user@example.com"
 
 
 def test_register_rejects_the_same_email_in_a_different_case(client, user):
@@ -119,3 +120,16 @@ def test_demo_quotas(client, db, fixture, freeze, monkeypatch):
         "routineItems": [{"exerciseId": 577, "targetSets": 3, "targetReps": 5, "order": 1}],
     }
     assert client.post("/api/routines", json=routine, headers=headers).status_code == 403
+
+
+def test_me_returns_the_profile_without_the_password_hash(client, user, auth_headers):
+    response = client.get("/api/auth/me", headers=auth_headers)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert set(body) == {"id", "username", "email", "isDemo", "createdAt"}
+    assert body["id"] == user.id
+    assert body["email"] == "test@example.com"
+    assert body["isDemo"] is False
+    assert "password" not in response.text.lower()
+

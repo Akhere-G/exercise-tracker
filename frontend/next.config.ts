@@ -9,6 +9,8 @@ const posthogAssetsHost = posthogHost.replace(
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  // Lets the E2E suite build into its own folder without touching a running dev server.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   turbopack: {},
   // Required so PostHog's trailing-slash API requests are proxied untouched.
   skipTrailingSlashRedirect: true,

@@ -33,7 +33,7 @@ export const getDefaultSets = (
   const sets: ActiveSet[] = [];
 
   if (oldExercise && sameMetrics(oldExercise, exercise)) {
-    return oldExercise.sets;
+    return oldExercise.sets.map((set) => ({ ...set, exerciseId: exercise.id }));
   }
 
   for (let i = 1; i <= DEFAULT_TOTAL_SETS; i++) {
@@ -85,6 +85,9 @@ export const isWorkoutCompleted = (exercises: Exercise[]) =>
   exercises.every((e) => isExerciseCompleted(e));
 
 export const getOrdinalSuffix = (num: number) => {
+  // 11th, 12th and 13th (and 111th...) are exceptions to the last-digit rule.
+  if (num % 100 >= 11 && num % 100 <= 13) return "th";
+
   switch (num % 10) {
     case 1:
       return "st";
@@ -283,6 +286,17 @@ export function getWorkoutDistance(sets: WorkoutSet[]) {
   }
 
   return distance;
+}
+
+// Epley formula: weight * (1 + reps / 30). Returns the best set, rounded.
+export function getEstimatedOneRepMax(
+  sets: { weight?: number | null; reps?: number | null }[],
+) {
+  const best = Math.max(
+    0,
+    ...sets.map((s) => (s.weight || 0) * (1 + (s.reps || 0) / 30)),
+  );
+  return Math.round(best);
 }
 
 export function getWorkoutPace(sets: WorkoutSet[]) {

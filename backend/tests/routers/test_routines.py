@@ -1,3 +1,4 @@
+import pytest
 from app.models import Routine
 from sqlalchemy import func, select
 from tests.helpers import item_payload, routine_payload
@@ -23,3 +24,14 @@ def test_updating_a_routine_with_an_unknown_exercise_is_a_422(client, auth_heade
     )
 
     assert response.status_code == 422
+
+
+@pytest.mark.parametrize("field", ["name", "day"])
+def test_patching_a_required_routine_field_to_null_is_a_422(client, auth_headers, field):
+    created = client.post("/api/routines", json=routine_payload(), headers=auth_headers)
+    url = f"/api/routines/{created.json()['id']}"
+
+    response = client.patch(url, json={field: None}, headers=auth_headers)
+
+    assert response.status_code == 422
+    assert client.get(url, headers=auth_headers).json() == created.json()

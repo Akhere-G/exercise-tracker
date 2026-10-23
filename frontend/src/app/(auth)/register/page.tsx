@@ -107,7 +107,7 @@ export default function Register() {
               error={formState.errors.repeatPassword?.message}
             />
             <Button disabled={isSubmitting}>
-              {isSubmitting ? "Creating account..." : "Login"}
+              {isSubmitting ? "Creating account..." : "Create account"}
             </Button>
             <Link href="/login">Have an account already?</Link>
           </form>

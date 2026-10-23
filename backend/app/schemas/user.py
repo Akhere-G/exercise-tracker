@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Annotated
 
 from pydantic import (
@@ -41,6 +42,14 @@ class UserBase(BaseModel):
 class User(BaseModel):
     id: int
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    is_demo: bool
+    created_at: datetime
 
 
 class UserCreate(UserBase):

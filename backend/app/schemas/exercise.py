@@ -24,14 +24,10 @@ class ExerciseBase(BaseModel):
     @field_validator("muscles", mode="before")
     @classmethod
     def flatten_muscles(cls, v):
-        return (
-            [
-                {"name": m.muscle.name, "contribution_type": m.contribution_type}
-                for m in v
-            ]
-            if v
-            else None
-        )
+        return [
+            {"name": m.muscle.name, "contribution_type": m.contribution_type}
+            for m in v or []
+        ]
 
 
 class Exercise(ExerciseBase):

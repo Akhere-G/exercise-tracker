@@ -2,6 +2,7 @@
 import { Routine } from "@/src/features/routines/types";
 import { Workout, WorkoutStats } from "@/src/features/workout/types";
 import {
+  getEstimatedOneRepMax,
   getWorkoutDistance,
   getWorkoutDuration,
   getWorkoutPace,
@@ -38,21 +39,10 @@ export default function RoutineStats({
     };
   });
 
-  // Epley Formula for Estimated 1RM per workout: Weight * (1 + Reps / 30)
-  const e1rmData = workouts.map((workout) => {
-    const max1rm =
-      workout.sets.length > 0
-        ? Math.max(
-            ...workout.sets.map(
-              (s) => (s.weight || 0) * (1 + (s.reps || 0) / 30),
-            ),
-          )
-        : 0;
-    return {
-      y: Math.round(max1rm),
-      x: new Date(workout.completedAt).toLocaleDateString(),
-    };
-  });
+  const e1rmData = workouts.map((workout) => ({
+    y: getEstimatedOneRepMax(workout.sets),
+    x: new Date(workout.completedAt).toLocaleDateString(),
+  }));
 
   const durationData = workouts.map((workout) => ({
     y: getWorkoutDuration(workout.sets),

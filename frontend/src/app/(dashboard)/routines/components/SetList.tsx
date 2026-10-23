@@ -145,7 +145,7 @@ function SetRow({
         <td>
           <SetInput
             value={set.weight ?? ""}
-            onChange={(value) => updateSetData("weight", value)}
+            onChange={(value) => updateSetData("weight", Number(value))}
             canBeZero
             canBeNegative
           />
@@ -155,7 +155,7 @@ function SetRow({
         <td>
           <SetInput
             value={set.reps ?? ""}
-            onChange={(value) => updateSetData("reps", value)}
+            onChange={(value) => updateSetData("reps", Number(value))}
           />
         </td>
       )}
@@ -172,7 +172,7 @@ function SetRow({
         <td>
           <SetInput
             value={set.distanceMeters ?? ""}
-            onChange={(value) => updateSetData("distanceMeters", value)}
+            onChange={(value) => updateSetData("distanceMeters", Number(value))}
           />
         </td>
       )}

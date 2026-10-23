@@ -28,3 +28,23 @@ def test_search_treats_like_wildcards_literally(db, user):
     ).scalar_one()
     found = exercise_service.get_exercises(db, user.id, search=name)
     assert REPS_WEIGHT_EXERCISE_ID in {row.Exercise.id for row in found}
+
+
+@pytest.mark.parametrize(
+    "term, escaped",
+    [
+        ("squat", "squat"),
+        ("  squat  ", "squat"),
+        ("100%", "100\\%"),
+        ("a_b", "a\\_b"),
+        ("back\\slash", "back\\\\slash"),
+        ("%_\\", "\\%\\_\\\\"),
+        ("", ""),
+    ],
+)
+def test_escape_like_neutralises_wildcards_and_trims(term, escaped):
+    assert exercise_service._escape_like(term) == escaped
+
+
+def test_like_pattern_wraps_the_escaped_term():
+    assert exercise_service._like_pattern(" 50% ") == "%50\\%%"

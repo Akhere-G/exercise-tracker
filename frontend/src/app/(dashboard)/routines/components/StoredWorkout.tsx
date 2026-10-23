@@ -6,11 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/src/components/card";
-import {
-  useWorkout,
-  WorkoutState,
-  workoutStorageKey,
-} from "@/src/features/workout/store";
+import { readStoredWorkout, useWorkout } from "@/src/features/workout/store";
 import { getTime } from "@/src/features/workout/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -26,38 +22,30 @@ export default function StoredWorkout() {
   const { setWorkoutData } = useWorkout();
   useEffect(() => {
     function getWorkoutData() {
-      try {
-        const workoutJson = localStorage.getItem(workoutStorageKey);
-        if (!workoutJson) return;
-        const workoutData: { state: WorkoutState } = JSON.parse(workoutJson);
+      const workout = readStoredWorkout();
+      if (!workout) return;
 
-        if (workoutData.state.routineName) {
-          setRoutineName(workoutData.state.routineName);
-        } else {
-          setRoutineName("Standalone workout");
-        }
+      setRoutineName(workout.routineName || "Standalone workout");
 
-        if (workoutData.state.startedAt) {
-          const startDate = new Date(workoutData.state.startedAt);
-          const duration = Math.floor(
-            (new Date().getTime() - startDate.getTime()) / 1000,
-          );
-          setDuration(duration);
+      if (workout.startedAt) {
+        const duration = Math.floor(
+          (new Date().getTime() - workout.startedAt.getTime()) / 1000,
+        );
+        setDuration(duration);
 
-          const interval = setInterval(
-            () => setDuration((prev) => (prev !== null ? prev + 1 : null)),
-            1000,
-          );
+        const interval = setInterval(
+          () => setDuration((prev) => (prev !== null ? prev + 1 : null)),
+          1000,
+        );
 
-          setTimerInterval(interval);
-        }
+        setTimerInterval(interval);
+      }
 
-        if (workoutData.state.routineId) {
-          setRoutineId(workoutData.state.routineId);
-        }
+      if (workout.routineId) {
+        setRoutineId(workout.routineId);
+      }
 
-        setWorkoutData(workoutData.state);
-      } catch {}
+      setWorkoutData(workout);
     }
 
     getWorkoutData();

@@ -104,6 +104,25 @@ def create_workout(db: Session, user_id: int, workout_in: WorkoutCreate):
     return workout
 
 
+def create_or_get_workout(
+    db: Session, user_id: int, workout_in: WorkoutCreate
+) -> tuple[Workout, bool]:
+    """Create a workout, or return the identical one already saved.
+
+    A client that never saw the response (dropped connection, double tap) will
+    resubmit the same payload; returning the original keeps the history and
+    streaks from being inflated. The boolean is True when a workout was created.
+
+    This is a check-then-insert, not a constraint, so two identical requests
+    racing each other can still both insert. Closing that needs a unique key
+    (e.g. a client-generated idempotency key) and a migration.
+    """
+    existing = _find_duplicate(db, user_id, workout_in)
+    if existing is not None:
+        return existing, False
+    return create_workout(db, user_id, workout_in), True
+
+
 def update_workout(
     db: Session, user_id: int, workout_id: int, workout_in: WorkoutUpdate
 ):
@@ -160,6 +179,37 @@ def _filter_workouts(stmt, user_id: int, routine_id: int | None):
     if routine_id is not None:
         stmt = stmt.where(Workout.routine_id == routine_id)
     return stmt
+
+
+def _find_duplicate(
+    db: Session, user_id: int, workout_in: WorkoutCreate
+) -> Workout | None:
+    stmt = _workout_query().where(
+        Workout.user_id == user_id,
+        Workout.completed_at == workout_in.completed_at,
+        Workout.duration == workout_in.duration,
+        (
+            Workout.routine_id.is_(None)
+            if workout_in.routine_id is None
+            else Workout.routine_id == workout_in.routine_id
+        ),
+    )
+    wanted = sorted(_set_key(s) for s in workout_in.sets)
+    for candidate in db.execute(stmt).scalars():
+        if sorted(_set_key(s) for s in candidate.sets) == wanted:
+            return candidate
+    return None
+
+
+def _set_key(workout_set) -> tuple:
+    return (
+        workout_set.exercise_id,
+        workout_set.set_index,
+        workout_set.reps or 0,
+        workout_set.weight or 0,
+        workout_set.duration_secs or 0,
+        workout_set.distance_meters or 0,
+    )
 
 
 def _build_set(set_data) -> WorkoutSet:

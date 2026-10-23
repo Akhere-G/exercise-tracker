@@ -47,3 +47,44 @@ def item_payload(**overrides):
         "order": 1,
         **overrides,
     }
+
+
+def add_exercise(db, name="Muscleless Move", metrics="reps+weight"):
+    """An exercise with no muscle links, which the seeded catalogue never has."""
+    from app.models import Exercise
+
+    exercise = Exercise(
+        name=name,
+        instructions="-",
+        image_url="-",
+        video_url="-",
+        equipment="none",
+        metrics=metrics,
+    )
+    db.add(exercise)
+    db.commit()
+    return exercise
+
+
+def register(client, email="b@example.com", username="B"):
+    """Sign up another user and return their auth headers."""
+    response = client.post(
+        "/api/auth/register",
+        json={"username": username, "email": email, "password": PASSWORD},
+    )
+    return {"Authorization": f"Bearer {response.json()['access_token']}"}
+
+
+def exercise_id_for(db, metrics):
+    from app.models import Exercise
+    from sqlalchemy import select
+
+    return db.execute(
+        select(Exercise.id).where(Exercise.metrics == metrics).order_by(Exercise.id)
+    ).scalars().first()
+
+
+def count(db, model):
+    from sqlalchemy import func, select
+
+    return db.execute(select(func.count()).select_from(model)).scalar_one()

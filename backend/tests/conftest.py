@@ -23,26 +23,63 @@ ROOT = Path(__file__).resolve().parents[1]
 WEDNESDAY = date(2026, 10, 21)
 
 
+@pytest.fixture(scope="session", autouse=True)
+def cheap_password_hashing():
+    """bcrypt at production cost dominates the run time and proves nothing here."""
+    from app.services import user as user_service
+
+    user_service.pwd_context.update(bcrypt_sha256__rounds=4)
+
+
+@pytest.fixture(scope="session")
+def password_hash(cheap_password_hashing):
+    from app.services import user as user_service
+    from tests.helpers import PASSWORD
+
+    return user_service.get_password_hash(PASSWORD)
+
+
 @pytest.fixture(scope="session")
 def exercise_data():
     with open(ROOT / "exercises.json", encoding="utf-8") as f:
         return json.load(f)
 
 
-@pytest.fixture
-def engine(exercise_data):
+def _new_engine():
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
     enable_sqlite_foreign_keys(engine)
+    return engine
+
+
+@pytest.fixture(scope="session")
+def seeded_template(exercise_data):
+    """The schema, exercise catalogue and achievements, built once per run."""
+    engine = _new_engine()
     Base.metadata.create_all(engine)
     with sessionmaker(bind=engine)() as session:
         muscles = seed_all_muscles(session, exercise_data)
         seed_exercises_and_junctions(session, exercise_data, muscles)
         session.commit()
         seed_achievements(session)
+    yield engine
+    engine.dispose()
+
+
+@pytest.fixture
+def engine(seeded_template):
+    """A fresh in-memory copy of the seeded template for each test."""
+    engine = _new_engine()
+    source = seeded_template.raw_connection()
+    target = engine.raw_connection()
+    try:
+        source.driver_connection.backup(target.driver_connection)
+    finally:
+        source.close()
+        target.close()
     yield engine
     engine.dispose()
 
@@ -109,15 +146,13 @@ def client(engine, monkeypatch):
 
 
 @pytest.fixture
-def user(db):
+def user(db, password_hash):
     from app.models import User
-    from app.services import user as user_service
-    from tests.helpers import PASSWORD
 
     user = User(
         username="Test",
         email="test@example.com",
-        password_hash=user_service.get_password_hash(PASSWORD),
+        password_hash=password_hash,
     )
     db.add(user)
     db.commit()

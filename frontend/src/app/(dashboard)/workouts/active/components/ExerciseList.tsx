@@ -14,7 +14,8 @@ import { useRouter } from "next/navigation";
 export default function ExerciseList() {
   const [isOpen, setIsOpen] = useState(false);
 
-  const { currentExerciseId, setWorkoutData, exercises } = useWorkout();
+  const { currentExerciseId, setWorkoutData, exercises, startedAt } =
+    useWorkout();
   const router = useRouter();
   const onClick = (exerciseId: number) => {
     if (exerciseId === currentExerciseId) {
@@ -32,6 +33,8 @@ export default function ExerciseList() {
       .map((e) => ({ ...e, sets: getDefaultSets(e) }));
 
     setWorkoutData({
+      // An ad-hoc workout has no routine to start the clock, so it starts here.
+      startedAt: startedAt ?? new Date(),
       exercises: [...exercises, ...exercisesToAdd],
       currentExerciseId:
         exercises.length === 0 ? exercisesToAdd?.[0].id : currentExerciseId,

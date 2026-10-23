@@ -2,7 +2,7 @@ from datetime import time
 from typing import List, Optional
 from pydantic import Field, model_validator
 from .exercise import Exercise
-from .base import BaseModel
+from .base import BaseModel, reject_explicit_nulls
 
 
 MAX_ROUTINE_ITEMS = 100
@@ -80,4 +80,9 @@ class RoutineUpdate(BaseModel):
     @model_validator(mode="after")
     def validate_unique_exercises(self) -> "RoutineUpdate":
         _reject_duplicate_exercises(self.routine_items)
+        return self
+
+    @model_validator(mode="after")
+    def validate_required_fields_not_null(self) -> "RoutineUpdate":
+        reject_explicit_nulls(self, "name", "day")
         return self

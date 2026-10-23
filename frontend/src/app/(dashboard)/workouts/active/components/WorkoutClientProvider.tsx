@@ -7,8 +7,8 @@ import RestTimeTracker from "./RestTimeTracker";
 import { Routine } from "@/src/features/routines/types";
 import {
   Exercise,
+  readStoredWorkout,
   useWorkout,
-  WorkoutState,
   workoutStorageKey,
 } from "@/src/features/workout/store";
 import ExerciseList from "./ExerciseList";
@@ -37,16 +37,11 @@ export default function WorkoutClientProvider({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    try {
-      const workoutJson = localStorage.getItem(workoutStorageKey);
-
-      if (workoutJson) {
-        const workoutData: { state: WorkoutState } = JSON.parse(workoutJson);
-
-        setWorkoutData(workoutData.state);
-        return;
-      }
-    } catch {}
+    const storedWorkout = readStoredWorkout();
+    if (storedWorkout) {
+      setWorkoutData(storedWorkout);
+      return;
+    }
 
     if (routine) {
       const exercises: Exercise[] = [];
@@ -84,8 +79,10 @@ export default function WorkoutClientProvider({
 
     let saved = false;
     const completedAt = new Date();
-    const durationInMs = completedAt.getTime() - new Date(startedAt!).getTime();
-    const duration = Math.floor(durationInMs / 1000);
+    const durationInMs = startedAt
+      ? completedAt.getTime() - new Date(startedAt).getTime()
+      : 0;
+    const duration = Math.max(0, Math.floor(durationInMs / 1000));
     const workout: WorkoutSchema = {
       completedAt,
       duration,

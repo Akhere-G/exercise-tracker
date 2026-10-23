@@ -71,7 +71,14 @@ export default function RoutineForm({
   const onSubmit = async (data: RoutineSchema) => {
     try {
       setErrorMessages({});
-      const response = await submitAction(data);
+      const response = await submitAction({
+        ...data,
+        // Removing items leaves gaps/duplicates in `order`; renumber to match what's on screen.
+        routineItems: data.routineItems.map((item, order) => ({
+          ...item,
+          order,
+        })),
+      });
       if (response.success) {
         if (!initalData) {
           track("create_routine", {
@@ -186,7 +193,9 @@ export default function RoutineForm({
             Add Exercise
           </Button>
 
-          <Button type="submit">{sumbitText}</Button>
+          <Button type="submit" disabled={formState.isSubmitting}>
+            {sumbitText}
+          </Button>
         </div>
       </form>
 

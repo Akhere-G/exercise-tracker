@@ -2,7 +2,7 @@ from pydantic import Field, model_validator
 from typing import Optional, List
 from datetime import datetime
 from .exercise import Exercise
-from .base import BaseModel
+from .base import BaseModel, reject_explicit_nulls
 
 
 class WorkoutSetBase(BaseModel):
@@ -68,6 +68,11 @@ class WorkoutUpdate(BaseModel):
     sets: Optional[List[WorkoutSetCreate]] = Field(
         default=None, max_length=MAX_SETS_PER_WORKOUT
     )
+
+    @model_validator(mode="after")
+    def validate_required_fields_not_null(self) -> "WorkoutUpdate":
+        reject_explicit_nulls(self, "completed_at", "duration")
+        return self
 
 
 class Workout(WorkoutBase):

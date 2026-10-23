@@ -78,12 +78,29 @@ Never commit `.env` files.
 
 ## Testing
 
-```bash
-cd backend && python -m pytest
-cd frontend && npm run lint && npm run build
-```
+| Level | Tool | Command | Covers |
+| --- | --- | --- | --- |
+| Backend unit + integration | pytest | `cd backend && python -m pytest` | Streaks, personal bests, schema validation, auth and access control, persistence and integrity, error handling |
+| Frontend unit | Vitest | `cd frontend && npm test` | Volume, estimated 1RM, formatting helpers, Yup schemas, `handleApiError`, server actions, route protection |
+| Frontend integration | Vitest + Testing Library | `cd frontend && npm test` | Active workout with the real Zustand store, localStorage persistence and recovery, failed saves, routine form |
+| End to end | Playwright (Chromium) | `cd frontend && npm run e2e` | Sign-in, creating a routine, logging and completing a workout, progress pages, recovery after reload |
 
-GitHub Actions runs the same checks, plus an advisory dependency audit, on every pull request.
+Other checks: `cd frontend && npm run lint && npm run typecheck && npm run build`.
+
+**Isolation.** Backend tests run on in-memory SQLite and set `DATABASE_URL` before the app is imported, so they never touch a real database. The E2E run starts its own backend on a throwaway SQLite file (`frontend/e2e/.tmp/e2e.db`, recreated each run) and its own frontend build in `.next-e2e`, on ports 8765 and 3100. It ignores `backend/.env` (Redis, rate limiting, demo mode) and blocks the PostHog and exercise-image hosts, so it does not disturb a running `npm run dev`.
+
+**First-time E2E setup.** Run `npx playwright install chromium` once. The backend needs its dependencies installed (`backend/.venv` is used if present, otherwise set `E2E_PYTHON`). The first run builds the frontend, so allow a few minutes.
+
+**What is mocked.** Frontend tests replace only external boundaries: the axios transport (`tests/apiStub.ts`), Next's router and cookies, toasts, and the exercise-picker drawer in the routine form test. Zustand, localStorage, validation and the components under test are real. Server Components cannot be rendered by Vitest, so they are covered by the E2E specs.
+
+**Offline behaviour.** There is no offline queue. The active workout is saved to localStorage after every change and restored on reload or after closing the browser. Corrupt saved data is ignored and the workout restarts from its routine. If saving to the API fails, the session stays on the device and the user can retry.
+
+### Known issues
+
+Found while writing the suite and deliberately left unfixed:
+
+- Backend: achievement `value` is an integer column but holds floats (matters on PostgreSQL); streak backfill uses today's date, so old history gets no streak achievements; a notification subscription endpoint can be taken over by another user; the reminder job misses the 23:00-midnight window and re-sends on repeated runs; datetimes are stored naive; workout lists are unordered; `get_exercises` combines `DISTINCT` with an `ORDER BY` that PostgreSQL may reject; sets are not checked against the exercise's metrics; `/auth/token` returns 400 where `/auth/login` returns 401; empty `sets` and `routineItems` are accepted on update paths; duplicate-workout detection is a check-then-insert, so two simultaneous identical requests can both succeed.
+- Frontend: the calendar buckets workouts by UTC date but renders local dates; `removeExercise` in the active workout always picks the first exercise (operator precedence); `StoredWorkout` never clears its timer on unmount; the demo page spins forever if demo login fails; the login page ignores `callbackUrl`; "Max pace" shows the slowest pace; the exercise-picker `addExercises` throws if nothing is selected for an empty workout.
 
 ## Reminders
 

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from app.schemas.user import User, UserCreate, UserLogin
+from app.schemas.user import User, UserCreate, UserLogin, UserResponse
 from app.config import settings
 from app.database import get_db
 from app.limiter import limiter
@@ -59,7 +59,7 @@ def login_user(request: Request, user_in: UserLogin, db: Session = Depends(get_d
     return user_service.get_access_token(existing_user.email)
 
 
-@router.get("/me")
+@router.get("/me", response_model=UserResponse)
 def check_auth(user: Annotated[User, Depends(user_service.get_current_user)]):
     return user
 
