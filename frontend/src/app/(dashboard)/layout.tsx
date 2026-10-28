@@ -52,31 +52,31 @@ export default async function RootLayout({
 
       <div className="sticky bottom-0 w-screen ">
         <NavigationMenu className="bg-secondary/95 w-screen h-[10vh] ">
-          <NavigationMenuList className="gap-8 w-screen">
+          <NavigationMenuList className="gap-2 md:gap-4 w-screen">
             <NavigationMenuItem>
               <NavigationMenuLink href="/routines">
-                <House style={{ width: "24px", height: "24px" }} />
+                <House style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
 
             <NavigationMenuItem>
               <NavigationMenuLink href="/workouts">
-                <Calendar style={{ width: "24px", height: "24px" }} />
+                <Calendar style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink href="/achievements">
-                <Trophy style={{ width: "24px", height: "24px" }} />
+                <Trophy style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink href="/stats">
-                <ChartColumn style={{ width: "24px", height: "24px" }} />
+                <ChartColumn style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink href="/settings">
-                <Cog style={{ width: "24px", height: "24px" }} />
+                <Cog style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
