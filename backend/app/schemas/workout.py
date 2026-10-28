@@ -32,9 +32,7 @@ MAX_WORKOUT_SECS = 7 * 24 * 60 * 60
 class WorkoutSetCreate(WorkoutSetBase):
     set_index: int = Field(default=1, ge=1, le=1000)
     reps: Optional[int] = Field(default=None, ge=0, le=10_000)
-    weight: Optional[float] = Field(
-        default=None, ge=0, le=10_000, allow_inf_nan=False
-    )
+    weight: Optional[float] = Field(default=None, le=10_000, allow_inf_nan=False)
     distance_meters: Optional[float] = Field(
         default=None, ge=0, le=1_000_000, allow_inf_nan=False
     )
