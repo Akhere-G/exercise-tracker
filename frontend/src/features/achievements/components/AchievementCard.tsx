@@ -28,7 +28,7 @@ function formatNumber(value: number) {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
-function formatValue(value: number, type: AchievementTypes) {
+export function formatValue(value: number, type: AchievementTypes) {
   if (type in achievementFreqTypes) {
     return `${value} ${value === 1 ? "week" : "weeks"}`;
   }

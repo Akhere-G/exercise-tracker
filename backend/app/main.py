@@ -2,11 +2,20 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import users, exercises, routines, workouts, notifications, achievements
+from slowapi.errors import RateLimitExceeded
+
 from app.config import settings
 from app.database import SessionLocal
 from app.limiter import limiter, rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
+from app.routers import (
+    achievements,
+    exercises,
+    notifications,
+    routines,
+    stats,
+    users,
+    workouts,
+)
 from app.services import achievement as achievement_service
 
 
@@ -44,6 +53,7 @@ def create_app() -> FastAPI:
     app.include_router(routines.router)
     app.include_router(notifications.router)
     app.include_router(achievements.router)
+    app.include_router(stats.router)
 
     @app.get("/", tags=["Health"])
     async def health_check():

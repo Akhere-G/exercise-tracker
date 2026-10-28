@@ -7,7 +7,7 @@ import {
 import "../globals.css";
 import { Toaster } from "@/src/components/ui/sonner";
 
-import { Calendar, Cog, House, Trophy } from "lucide-react";
+import { Calendar, ChartColumn, Cog, House, Trophy } from "lucide-react";
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
 import { DemoBanner } from "@/src/features/auth/components/DemoBanner";
@@ -67,6 +67,11 @@ export default async function RootLayout({
             <NavigationMenuItem>
               <NavigationMenuLink href="/achievements">
                 <Trophy style={{ width: "24px", height: "24px" }} />
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink href="/stats">
+                <ChartColumn style={{ width: "24px", height: "24px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>

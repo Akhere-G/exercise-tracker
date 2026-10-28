@@ -10,6 +10,7 @@ export function proxy(request: NextRequest) {
     "/workouts",
     "/exercises",
     "/achievements",
+    "/stats",
     "/settings",
   ];
 
