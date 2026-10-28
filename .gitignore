@@ -25,3 +25,6 @@ ca.pem
 .vscode*
 .idea/
 *.swp
+
+# --- frontend ---
+frontend/.next-e2e/*
