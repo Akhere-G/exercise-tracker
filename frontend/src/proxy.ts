@@ -11,6 +11,7 @@ export function proxy(request: NextRequest) {
     "/exercises",
     "/achievements",
     "/stats",
+    "/body",
     "/settings",
   ];
 

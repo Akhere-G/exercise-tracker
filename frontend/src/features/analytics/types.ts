@@ -53,6 +53,11 @@ export type AnalyticsEvents = {
   create_workout_failed: { reason: string };
   cancel_workout: { completed_sets: number };
   delete_workout: undefined;
+  routine_from_workout: undefined;
+  routine_synced: undefined;
+  repeat_workout: undefined;
+  share_workout: { method: "share" | "download" };
+  save_body_weight: undefined;
   search_exercises: {
     query_length: number;
     result_count: number;
