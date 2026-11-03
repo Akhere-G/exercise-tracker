@@ -7,7 +7,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/src/components/ui/accordion";
-import { getDayStr } from "@/src/features/routines/utils";
 import { Program } from "../types";
 import ApplyProgramDialog from "./ApplyProgramDialog";
 
@@ -37,7 +36,7 @@ export default function ProgramCard({ program }: { program: Program }) {
             <AccordionTrigger>
               {day.name}
               <span className="ml-auto mr-2 text-xs text-secondary-foreground">
-                {getDayStr(day.offset)}
+                Day {day.offset + 1}
               </span>
             </AccordionTrigger>
             <AccordionContent>
