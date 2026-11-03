@@ -13,7 +13,7 @@ from app.models import (
 )
 from app.models.achievement import AchievementType
 from app.services import workout as workout_service
-from sqlalchemy import func, select
+from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session
 
 PR_TYPES = (
@@ -24,6 +24,7 @@ PR_TYPES = (
 )
 TOP_EXERCISE_LIMIT = 5
 PERSONAL_RECORD_LIMIT = 10
+WARMUP = WorkoutSet.set_type == "warmup"
 
 
 def get_stats(
@@ -59,7 +60,7 @@ def get_muscle_breakdown(
         .join(Workout, Workout.id == WorkoutSet.workout_id)
         .join(ExerciseMuscle, ExerciseMuscle.exercise_id == WorkoutSet.exercise_id)
         .join(Muscle, Muscle.id == ExerciseMuscle.muscle_id)
-        .where(Workout.user_id == user_id)
+        .where(Workout.user_id == user_id, WorkoutSet.set_type != "warmup")
         .group_by(Muscle.name, ExerciseMuscle.contribution_type)
     )
     stmt = _filter_range(stmt, start, end)
@@ -145,9 +146,15 @@ def _get_workout_totals(
             Workout.completed_at,
             Workout.duration,
             func.count(WorkoutSet.id).label("set_count"),
-            func.coalesce(func.sum(WorkoutSet.reps * WorkoutSet.weight), 0.0).label(
-                "volume"
-            ),
+            func.coalesce(
+                func.sum(
+                    case(
+                        (WARMUP, 0.0),
+                        else_=WorkoutSet.reps * WorkoutSet.weight,
+                    )
+                ),
+                0.0,
+            ).label("volume"),
             func.coalesce(func.sum(WorkoutSet.distance_meters), 0.0).label(
                 "distance_meters"
             ),
