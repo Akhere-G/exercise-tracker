@@ -11,6 +11,7 @@ export default function CreateRoutineLink() {
       >
         Add New Routine
       </Link>
+      <Link href="/routines/build">Build with AI</Link>
       <Link href="/programs">Browse programs</Link>
     </div>
   );
