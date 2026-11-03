@@ -34,6 +34,7 @@ PERSONAS: dict[str, Persona] = {
                 "reps_up": "You can do more. Aim for {reps} reps!",
                 "deload": "Time to recharge so you come back stronger. Take an easy week!",
                 "stalled": "{exercise} has plateaued. A reset will get it moving again!",
+                "wrapped": "{workouts} workouts! Look how far you have come, keep that energy going!",
             },
         ),
         Persona(
@@ -51,6 +52,7 @@ PERSONAS: dict[str, Persona] = {
                 "reps_up": "More reps. {reps}. Go.",
                 "deload": "Stand down for a week. Light weights, clean reps.",
                 "stalled": "{exercise} has stalled. Fix it with a lighter week.",
+                "wrapped": "{workouts} sessions logged. Not bad. Now do more.",
             },
         ),
         Persona(
@@ -68,6 +70,7 @@ PERSONAS: dict[str, Persona] = {
                 "reps_up": "Add a rep or two, with control: {reps}.",
                 "deload": "Your recent training suggests a lighter week would help recovery.",
                 "stalled": "Progress on {exercise} has levelled off. A lighter week may help.",
+                "wrapped": "{workouts} sessions, steady and sustainable. Well done.",
             },
         ),
         Persona(
@@ -85,6 +88,7 @@ PERSONAS: dict[str, Persona] = {
                 "reps_up": "No load data. Progress by reps: {reps}.",
                 "deload": "Performance and effort data point to accumulated fatigue. Deload.",
                 "stalled": "{exercise}: no estimated 1RM improvement across recent sessions.",
+                "wrapped": "{workouts} sessions logged. Trendlines look good, so keep the data coming.",
             },
         ),
         Persona(
@@ -102,6 +106,7 @@ PERSONAS: dict[str, Persona] = {
                 "reps_up": "Squeeze out {reps} reps, no cheating.",
                 "deload": "Even the greats took a lighter week. Ease off and come back hungry.",
                 "stalled": "{exercise} is stuck. Back it off and build it back up.",
+                "wrapped": "{workouts} sessions in the iron. That is how you build a physique.",
             },
         ),
     )
