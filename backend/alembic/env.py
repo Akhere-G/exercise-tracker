@@ -17,6 +17,10 @@ from app.models import (
     WorkoutSet,
     Achievement,
     UserAchievement,
+    Notification,
+    NotificationSubscription,
+    UserProfile,
+    UserExerciseSetting,
 )
 
 # this is the Alembic Config object, which provides

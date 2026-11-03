@@ -37,5 +37,7 @@ class RoutineItem(Base, AuditMixin):
     target_reps: Mapped[Optional[int]] = mapped_column(Integer)
     target_duration_secs: Mapped[Optional[int]] = mapped_column(Integer)
     order: Mapped[int] = mapped_column(Integer)
+    rest_secs: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    superset_group: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     exercise: Mapped[Exercise] = relationship(Exercise)
     routine: Mapped[Routine] = relationship(Routine, back_populates="routine_items")
