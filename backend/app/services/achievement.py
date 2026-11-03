@@ -97,6 +97,8 @@ def check_and_award_prs(
     """Award or update personal-record achievements for the sets in a workout."""
     sets_by_exercise = {}
     for workout_set in workout.sets:
+        if workout_set.set_type == "warmup":
+            continue
         sets_by_exercise.setdefault(workout_set.exercise_id, []).append(workout_set)
 
     if not sets_by_exercise:
