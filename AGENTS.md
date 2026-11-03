@@ -224,6 +224,7 @@ npm start
 * `FRONTEND_ORIGIN`
 * `DB_CA_CERT_PATH` (PostgreSQL)
 * `DEMO_MODE_ENABLED` (`true` enables `POST /api/auth/demo`; default off)
+* `GEMINI_API_KEY`, `GEMINI_MODEL`, `GROQ_API_KEY`, `GROQ_MODEL` (AI features; optional)
 
 ### Frontend
 
