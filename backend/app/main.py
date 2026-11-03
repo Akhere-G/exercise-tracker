@@ -9,6 +9,7 @@ from app.database import SessionLocal
 from app.limiter import limiter, rate_limit_exceeded_handler
 from app.routers import (
     achievements,
+    body,
     exercises,
     notifications,
     profile,
@@ -56,6 +57,7 @@ def create_app() -> FastAPI:
     app.include_router(achievements.router)
     app.include_router(stats.router)
     app.include_router(profile.router)
+    app.include_router(body.router)
 
     @app.get("/", tags=["Health"])
     async def health_check():
