@@ -62,6 +62,7 @@ export type AnalyticsEvents = {
   apply_program: { slug: string };
   build_routine: { day_count: number };
   complete_onboarding: undefined;
+  share_wrapped: { theme: string; method: "share" | "download" };
   search_exercises: {
     query_length: number;
     result_count: number;
