@@ -40,6 +40,11 @@
     --chart-3: #f59e0b;
     --chart-4: #a78bfa;
     --chart-5: #f472b6;
+    --wrapped-football: #22c55e;
+    --wrapped-f1: #ef4444;
+    --wrapped-boxing: #f97316;
+    --wrapped-basketball: #f59e0b;
+    --wrapped-athletics: #38bdf8;
     
     --radius: 0.625rem;
   }
@@ -78,6 +83,11 @@
     --chart-3: #b45309;
     --chart-4: #6d28d9;
     --chart-5: #be185d;
+    --wrapped-football: #22c55e;
+    --wrapped-f1: #ef4444;
+    --wrapped-boxing: #f97316;
+    --wrapped-basketball: #f59e0b;
+    --wrapped-athletics: #38bdf8;
   }
 }
 
