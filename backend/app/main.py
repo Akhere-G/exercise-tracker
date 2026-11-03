@@ -11,6 +11,7 @@ from app.routers import (
     achievements,
     exercises,
     notifications,
+    profile,
     routines,
     stats,
     users,
@@ -54,6 +55,7 @@ def create_app() -> FastAPI:
     app.include_router(notifications.router)
     app.include_router(achievements.router)
     app.include_router(stats.router)
+    app.include_router(profile.router)
 
     @app.get("/", tags=["Health"])
     async def health_check():
