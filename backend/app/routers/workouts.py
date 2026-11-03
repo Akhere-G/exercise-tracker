@@ -1,6 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.models import User
-from app.schemas.workout import Workout, WorkoutCreate, WorkoutUpdate, WorkoutSet
+from app.schemas.workout import (
+    PreviousSet,
+    Workout,
+    WorkoutCreate,
+    WorkoutUpdate,
+    WorkoutSet,
+)
 from typing import Annotated
 from app.database import get_db
 from app.services import (
@@ -40,6 +46,27 @@ def get_workouts(
             detail="end must not be before start.",
         )
     return workout_service.get_workouts(db, user.id, routineId, start, end)
+
+
+MAX_PREVIOUS_EXERCISES = 100
+
+
+@router.get("/previous", response_model=dict[int, List[PreviousSet]])
+def get_previous_sets(
+    user: Annotated[User, Depends(user_service.get_current_user)],
+    db: Annotated[Session, Depends(get_db)],
+    exerciseIds: Annotated[str, Query(max_length=1000)] = "",
+):
+    try:
+        exercise_ids = [int(i) for i in exerciseIds.split(",") if i.strip()]
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="exerciseIds must be a comma-separated list of integers.",
+        )
+    return workout_service.get_previous_sets_for_exercises(
+        db, user.id, exercise_ids[:MAX_PREVIOUS_EXERCISES]
+    )
 
 
 @router.get("/previous/{exercise_id}", response_model=List[WorkoutSet])
