@@ -6,8 +6,10 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User
 from app.schemas.exercise import Exercise, RankedExercise
+from app.schemas.profile import ExerciseSetting, ExerciseSettingUpdate
 from app.schemas.workout import WorkoutSetWithDate
 from app.services import exercise as exercise_service
+from app.services import profile as profile_service
 from app.services import user as user_service
 
 
@@ -26,6 +28,27 @@ def get_exercises(
 ):
     return exercise_service.get_exercises(
         db, user.id, search, equipment, muscle, page, limit
+    )
+
+
+@router.get("/settings", response_model=list[ExerciseSetting])
+def get_exercise_settings(
+    user: Annotated[User, Depends(user_service.get_current_user)],
+    db: Session = Depends(get_db),
+):
+    return profile_service.get_exercise_settings(db, user.id)
+
+
+@router.put("/{exercise_id}/settings", response_model=ExerciseSetting)
+def update_exercise_setting(
+    user: Annotated[User, Depends(user_service.get_current_user)],
+    exercise_id: int,
+    setting_in: ExerciseSettingUpdate,
+    db: Session = Depends(get_db),
+):
+    exercise_service.ensure_exercises_exist(db, [exercise_id])
+    return profile_service.upsert_exercise_setting(
+        db, user.id, exercise_id, setting_in
     )
 
 
