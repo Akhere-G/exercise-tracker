@@ -21,6 +21,7 @@ from app.routers import (
     stats,
     users,
     workouts,
+    wrapped,
 )
 from app.services import achievement as achievement_service
 
@@ -66,6 +67,7 @@ def create_app() -> FastAPI:
     app.include_router(ai.router)
     app.include_router(progression.router)
     app.include_router(programs.router)
+    app.include_router(wrapped.router)
 
     @app.get("/", tags=["Health"])
     async def health_check():
