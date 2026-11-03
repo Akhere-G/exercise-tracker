@@ -9,6 +9,7 @@ export function proxy(request: NextRequest) {
     "/routines",
     "/programs",
     "/onboarding",
+    "/wrapped",
     "/workouts",
     "/exercises",
     "/achievements",
