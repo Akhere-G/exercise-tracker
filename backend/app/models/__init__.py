@@ -6,6 +6,7 @@ from .routine import Routine, RoutineItem
 from .workout import Workout, WorkoutSet
 from .notifications import Notification, NotificationSubscription
 from .achievement import Achievement, UserAchievement
+from .profile import UserProfile, UserExerciseSetting
 
 __all__ = [
     "User",
@@ -20,4 +21,6 @@ __all__ = [
     "NotificationSubscription",
     "Achievement",
     "UserAchievement",
+    "UserProfile",
+    "UserExerciseSetting",
 ]

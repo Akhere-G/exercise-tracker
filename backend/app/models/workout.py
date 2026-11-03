@@ -1,7 +1,7 @@
 from app.database import Base
 from .audit_mixin import AuditMixin
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, Float, DateTime, ForeignKey, Index
+from sqlalchemy import Integer, Float, DateTime, ForeignKey, Index, String
 from datetime import datetime
 from typing import Optional, List
 from .exercise import Exercise
@@ -41,6 +41,12 @@ class WorkoutSet(Base, AuditMixin):
     weight: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     distance_meters: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
     duration_secs: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    set_type: Mapped[str] = mapped_column(
+        String(10), default="normal", server_default="normal"
+    )
+    rpe: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    rir: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    superset_group: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
     workout: Mapped[Workout] = relationship(Workout, back_populates="sets")
     exercise: Mapped[Exercise] = relationship(Exercise)
