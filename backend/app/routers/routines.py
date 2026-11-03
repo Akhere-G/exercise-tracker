@@ -4,11 +4,17 @@ from ..services import (
     exercise as exercise_service,
     routine as routine_service,
     user as user_service,
+    workout as workout_service,
 )
 from typing import Annotated
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.schemas.routine import RoutineCreate, Routine, RoutineUpdate
+from app.schemas.routine import (
+    RoutineCreate,
+    RoutineFromWorkout,
+    Routine,
+    RoutineUpdate,
+)
 from ..models import User
 from typing import List
 
@@ -61,6 +67,57 @@ def create_routine(
     )
 
     return new_routine
+
+
+def _get_workout_or_404(db: Session, user_id: int, workout_id: int):
+    workout = workout_service.get_workout(db, user_id, workout_id)
+    if not workout:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Workout not found."
+        )
+    return workout
+
+
+@router.post(
+    "/from-workout/{workout_id}",
+    status_code=status.HTTP_201_CREATED,
+    response_model=Routine,
+)
+def create_routine_from_workout(
+    user: Annotated[User, Depends(user_service.get_current_user)],
+    workout_id: int,
+    routine_in: RoutineFromWorkout,
+    db: Session = Depends(get_db),
+):
+    if demo_service.is_quota_exceeded(db, user)["routines"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Demo accounts are limited in size. Create an account to add more.",
+        )
+
+    workout = _get_workout_or_404(db, user.id, workout_id)
+    return routine_service.create_routine_from_workout(
+        db, user.id, workout, routine_in
+    )
+
+
+@router.put(
+    "/{routine_id}/sync-from-workout/{workout_id}", response_model=Routine
+)
+def sync_routine_from_workout(
+    user: Annotated[User, Depends(user_service.get_current_user)],
+    routine_id: int,
+    workout_id: int,
+    db: Session = Depends(get_db),
+):
+    routine = routine_service.get_routine(db, user.id, routine_id)
+    if not routine:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Routine not found."
+        )
+
+    workout = _get_workout_or_404(db, user.id, workout_id)
+    return routine_service.sync_routine_from_workout(db, routine, workout)
 
 
 @router.patch("/{routine_id}", response_model=Routine)
