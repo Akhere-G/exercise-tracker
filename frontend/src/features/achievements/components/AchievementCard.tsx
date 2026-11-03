@@ -5,6 +5,7 @@ import {
   UserAchievement,
   ACCENTS,
   ICONS,
+  isMilestone,
 } from "../types";
 import {
   Card,
@@ -20,7 +21,7 @@ function getAccent(type: string) {
   if (type in ACCENTS) {
     return ACCENTS[type as keyof typeof ACCENTS];
   }
-  return ACCENTS.streak;
+  return isMilestone(type) ? ACCENTS.milestone : ACCENTS.streak;
 }
 
 export default function AchievementCard({
@@ -32,12 +33,15 @@ export default function AchievementCard({
   const { name, criteria, type, icon } = details;
 
   const isPr = PR_TYPES.includes(type);
-  const title = isPr ? `New ${name}` : "New Streak";
+  const milestone = isMilestone(type);
+  const title = isPr ? `New ${name}` : milestone ? name : "New Streak";
   const chip = isPr
     ? exercise?.name
-    : `${type.replace("freq_streak_", "")}× a week`;
+    : milestone
+      ? undefined
+      : `${type.replace("freq_streak_", "")}× a week`;
   const Icon = ICONS[icon] ?? Trophy;
-  const accent = getAccent(isPr ? type : "streak");
+  const accent = getAccent(type);
 
   return (
     <Card
@@ -55,9 +59,11 @@ export default function AchievementCard({
         </div>
       </CardHeader>
       <CardContent className="flex items-end justify-between gap-3 ">
-        <p className="text-3xl font-bold tabular-nums tracking-tight">
-          <AchievementValue value={value} type={type as AchievementTypes} />
-        </p>
+        {!milestone && (
+          <p className="text-3xl font-bold tabular-nums tracking-tight">
+            <AchievementValue value={value} type={type as AchievementTypes} />
+          </p>
+        )}
         {chip && (
           <span className="truncate rounded-full bg-muted px-2.5 py-1 text-sm font-medium text-muted-foreground">
             {chip}

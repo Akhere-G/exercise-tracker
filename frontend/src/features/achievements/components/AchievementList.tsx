@@ -7,6 +7,7 @@ import {
   AchievementFreqTypes,
   achievementFreqTypes,
   achievementTypes,
+  isMilestone,
   UserAchievement,
 } from "../types";
 import AchievementCard from "./AchievementCard";
@@ -22,6 +23,7 @@ const filterTypes: { text: string; type: string }[] = [
   { text: "Distance", type: achievementTypes.pr_distance },
   { text: "Duration", type: achievementTypes.pr_duration },
   { text: "Streak", type: "streak" },
+  { text: "Milestones", type: "milestone" },
 ];
 export default function AchievementList({
   achievementsPromise,
@@ -35,6 +37,7 @@ export default function AchievementList({
     pr_distance: true,
     pr_duration: true,
     streak: true,
+    milestone: true,
   });
   const response = use(achievementsPromise);
   const hasTrackedUnlocks = useRef(false);
@@ -63,6 +66,7 @@ export default function AchievementList({
   const filteredAchievements = response.data.filter(
     (a) =>
       selectedFilters[a.achievement.type] ||
+      (isMilestone(a.achievement.type) && selectedFilters["milestone"]) ||
       (Object.values(achievementFreqTypes).includes(
         a.achievement.type as AchievementFreqTypes,
       ) &&
