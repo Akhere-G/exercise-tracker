@@ -13,6 +13,8 @@ import { cookies } from "next/headers";
 import { DemoBanner } from "@/src/features/auth/components/DemoBanner";
 import { getSessionOwnerId } from "@/src/features/auth/session";
 import { WorkoutOwnerGuard } from "@/src/features/workout/components/WorkoutOwnerGuard";
+import { getProfile } from "@/src/features/profile/queries";
+import { ProfileProvider } from "@/src/features/profile/components/ProfileProvider";
 
 export const metadata: Metadata = {
   manifest: "/manifest.json",
@@ -37,9 +39,10 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const isDemo = cookieStore.get("demo_session")?.value === "1";
   const ownerId = getSessionOwnerId(cookieStore.get("access_token")?.value);
+  const profile = await getProfile();
 
   return (
-    <div>
+    <ProfileProvider profile={profile}>
       <Toaster position="top-right" richColors closeButton />
       <WorkoutOwnerGuard ownerId={ownerId} />
 
@@ -52,36 +55,36 @@ export default async function RootLayout({
 
       <div className="sticky bottom-0 w-screen ">
         <NavigationMenu className="bg-secondary/95 w-screen h-[10vh] ">
-          <NavigationMenuList className="gap-8 w-screen">
+          <NavigationMenuList className="gap-2 md:gap-4 w-screen">
             <NavigationMenuItem>
               <NavigationMenuLink href="/routines">
-                <House style={{ width: "24px", height: "24px" }} />
+                <House style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
 
             <NavigationMenuItem>
               <NavigationMenuLink href="/workouts">
-                <Calendar style={{ width: "24px", height: "24px" }} />
+                <Calendar style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink href="/achievements">
-                <Trophy style={{ width: "24px", height: "24px" }} />
+                <Trophy style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink href="/stats">
-                <ChartColumn style={{ width: "24px", height: "24px" }} />
+                <ChartColumn style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
               <NavigationMenuLink href="/settings">
-                <Cog style={{ width: "24px", height: "24px" }} />
+                <Cog style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
       </div>
-    </div>
+    </ProfileProvider>
   );
 }

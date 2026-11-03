@@ -1,11 +1,11 @@
 import {
-  Scale,
   Paintbrush,
   Sliders,
   UserRound,
 } from "lucide-react";
 import { LogoutButton } from "@/src/features/auth/components/LogoutButton";
 import DataPortabilityButtons from "./components/DataPortabilityButtons";
+import PreferencesCard from "./components/PreferencesCard";
 
 export default function SettingsPage() {
   return (
@@ -18,24 +18,7 @@ export default function SettingsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-card border border-border rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between min-h-[180px]">
-          <div>
-            <div className="flex items-start justify-between mb-4">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                <Scale className="h-5 w-5" />
-              </div>
-              <span className="text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2.5 py-1 rounded-full border border-amber-500/20">
-                Coming Soon
-              </span>
-            </div>
-            <h3 className="text-lg font-bold mb-2">Metrics Details</h3>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Customise your default measurement units for tracking. Toggle
-              between metric and imperial systems for weight, distance, and pace
-              calculations.
-            </p>
-          </div>
-        </div>
+        <PreferencesCard />
 
         <div className="bg-card border border-border rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between min-h-[180px]">
           <div>
