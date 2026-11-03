@@ -59,6 +59,7 @@ export type AnalyticsEvents = {
   share_workout: { method: "share" | "download" };
   save_body_weight: undefined;
   apply_progression: { action: string };
+  apply_program: { slug: string };
   search_exercises: {
     query_length: number;
     result_count: number;
