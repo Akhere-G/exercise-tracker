@@ -34,6 +34,12 @@
     --border: #3f3f46;
     --input: #3f3f46;
     --ring: #10b981;
+
+    --chart-1: #10b981;
+    --chart-2: #38bdf8;
+    --chart-3: #f59e0b;
+    --chart-4: #a78bfa;
+    --chart-5: #f472b6;
     
     --radius: 0.625rem;
   }
@@ -66,6 +72,12 @@
     --border: #e5e7eb;
     --input: #e5e7eb;
     --ring: #065f46;
+
+    --chart-1: #065f46;
+    --chart-2: #0369a1;
+    --chart-3: #b45309;
+    --chart-4: #6d28d9;
+    --chart-5: #be185d;
   }
 }
 

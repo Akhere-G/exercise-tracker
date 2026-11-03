@@ -4,6 +4,12 @@ import { getGreyShadeCSS, mapToTargetMuscle } from "../workout/utils";
 import { statsRangeSchema } from "./schema";
 import {
   DEFAULT_STATS_RANGE,
+  Granularity,
+  MuscleRecovery,
+  MuscleVolume,
+  RecoveryStatus,
+  STATS_TABS,
+  StatsTab,
   MuscleStat,
   STATS_RANGES,
   StatsRange,
@@ -67,18 +73,104 @@ const MONTHS = [
   "Dec",
 ];
 
-export function formatWeekLabel(isoDate: string) {
+export function formatWeekLabel(isoDate: string, granularity: Granularity = "week") {
   const [, month, day] = isoDate.split("-").map(Number);
-  return `${day} ${MONTHS[month - 1]}`;
+  return granularity === "month" ? MONTHS[month - 1] : `${day} ${MONTHS[month - 1]}`;
 }
+
+export const monthName = (month: number) => MONTHS[month - 1];
+
+export function parseStatsTab(value: string | string[] | undefined): StatsTab {
+  return STATS_TABS.find((t) => t.value === value)?.value ?? "overview";
+}
+
+export function parseGranularity(
+  value: string | string[] | undefined,
+): Granularity {
+  return value === "month" ? "month" : "week";
+}
+
+export function parseExerciseIds(value: string | string[] | undefined) {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return (raw ?? "")
+    .split(",")
+    .map(Number)
+    .filter((n) => Number.isInteger(n) && n > 0)
+    .slice(0, 3);
+}
+
+export const titleCase = (value: string) =>
+  value.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+
+/** Body-map slugs that make up each muscle group. */
+const GROUP_SLUGS: Record<string, Slug[]> = {
+  chest: ["chest"],
+  back: ["upper-back", "lower-back", "trapezius"],
+  shoulders: ["deltoids"],
+  biceps: ["biceps"],
+  triceps: ["triceps"],
+  forearms: ["forearm"],
+  quads: ["quadriceps"],
+  hamstrings: ["hamstring"],
+  glutes: ["gluteal"],
+  calves: ["calves"],
+  core: ["abs", "obliques"],
+};
+
+const toBodyParts = (
+  entries: { group: string; intensity: number; color: string }[],
+): ExtendedBodyPart[] =>
+  entries.flatMap(({ group, intensity, color }) =>
+    (GROUP_SLUGS[group] ?? []).map((slug) => ({ slug, intensity, color })),
+  );
+
+/** Heat map of weighted sets per group; the busiest group is the darkest. */
+export function getVolumeBodyData(volume: MuscleVolume): ExtendedBodyPart[] {
+  const max = Math.max(0, ...volume.groups.map((g) => g.thisWeekSets));
+  return toBodyParts(
+    volume.groups
+      .filter((g) => g.thisWeekSets > 0)
+      .map((g) => {
+        const intensity = Math.max(
+          1,
+          Math.ceil((g.thisWeekSets / max) * MAX_BODY_INTENSITY),
+        );
+        return {
+          group: g.group,
+          intensity,
+          color: getGreyShadeCSS(intensity),
+        };
+      }),
+  );
+}
+
+export const RECOVERY_COLORS: Record<RecoveryStatus, string> = {
+  fresh: "#10b981",
+  recovering: "#f59e0b",
+  fatigued: "#ef4444",
+};
+
+export function getRecoveryBodyData(recovery: MuscleRecovery[]): ExtendedBodyPart[] {
+  return toBodyParts(
+    recovery.map((r) => ({
+      group: r.group,
+      intensity: 1,
+      color: RECOVERY_COLORS[r.status],
+    })),
+  );
+}
+
+/** Evidence-based weekly hard set range for growth, per muscle group. */
+export const RECOMMENDED_WEEKLY_SETS = { min: 10, max: 20 };
 
 export function getTrendData(
   trends: WeeklyTrend[],
   metric: TrendMetric,
   weightUnit: WeightUnit = "kg",
+  granularity: Granularity = "week",
 ) {
   return trends.map((week) => ({
-    x: formatWeekLabel(week.weekStart),
+    x: formatWeekLabel(week.weekStart, granularity),
     y:
       metric === "workouts"
         ? week.workoutCount
