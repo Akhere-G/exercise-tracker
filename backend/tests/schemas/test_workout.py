@@ -15,7 +15,7 @@ from tests.helpers import set_payload, workout_payload
 @pytest.mark.parametrize(
     "overrides",
     [
-        {"sets": [set_payload(weight=-1)]},
+        {"sets": [set_payload(weight=-10_001)]},
         {"sets": [set_payload(weight=10_001)]},
         {"sets": [set_payload(reps=2_147_483_648)]},
         {"sets": [set_payload(setIndex=0)]},
@@ -28,6 +28,14 @@ from tests.helpers import set_payload, workout_payload
 def test_workout_create_rejects_out_of_range_values(overrides):
     with pytest.raises(ValidationError):
         WorkoutCreate.model_validate(workout_payload(**overrides))
+
+
+def test_workout_create_accepts_negative_weight_for_assisted_exercises():
+    workout = WorkoutCreate.model_validate(
+        workout_payload(sets=[set_payload(weight=-20)])
+    )
+
+    assert workout.sets[0].weight == -20
 
 
 def test_workout_update_rejects_negative_duration():
