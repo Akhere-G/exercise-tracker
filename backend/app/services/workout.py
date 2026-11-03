@@ -63,6 +63,52 @@ def get_previous_workouts(db: Session, user_id: int, exercise_id: int):
     return db.execute(stmt).scalars().all()
 
 
+def get_previous_sets_for_exercises(
+    db: Session, user_id: int, exercise_ids: list[int]
+) -> dict[int, list[WorkoutSet]]:
+    """Sets from the latest workout containing each exercise, keyed by exercise."""
+    if not exercise_ids:
+        return {}
+
+    ranked = (
+        select(
+            WorkoutSet.exercise_id,
+            Workout.id.label("workout_id"),
+            func.row_number()
+            .over(
+                partition_by=WorkoutSet.exercise_id,
+                order_by=(Workout.completed_at.desc(), Workout.id.desc()),
+            )
+            .label("rn"),
+        )
+        .join(Workout, Workout.id == WorkoutSet.workout_id)
+        .where(
+            Workout.user_id == user_id,
+            WorkoutSet.exercise_id.in_(exercise_ids),
+        )
+        .subquery()
+    )
+    latest_sq = (
+        select(ranked.c.exercise_id, ranked.c.workout_id)
+        .where(ranked.c.rn == 1)
+        .subquery()
+    )
+    stmt = (
+        select(WorkoutSet)
+        .join(
+            latest_sq,
+            (WorkoutSet.workout_id == latest_sq.c.workout_id)
+            & (WorkoutSet.exercise_id == latest_sq.c.exercise_id),
+        )
+        .order_by(WorkoutSet.exercise_id, WorkoutSet.set_index)
+    )
+
+    previous: dict[int, list[WorkoutSet]] = {}
+    for workout_set in db.execute(stmt).scalars():
+        previous.setdefault(workout_set.exercise_id, []).append(workout_set)
+    return previous
+
+
 def get_stats(db: Session, user_id: int, routine_id: int | None = None):
     count_stmt = _filter_workouts(
         select(func.count()).select_from(Workout), user_id, routine_id
@@ -178,6 +224,10 @@ def _build_set(set_data) -> WorkoutSet:
         weight=set_data.weight,
         duration_secs=set_data.duration_secs,
         distance_meters=set_data.distance_meters,
+        set_type=set_data.set_type,
+        rpe=set_data.rpe,
+        rir=set_data.rir,
+        superset_group=set_data.superset_group,
     )
 
 
