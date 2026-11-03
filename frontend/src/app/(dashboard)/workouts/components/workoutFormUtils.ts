@@ -31,6 +31,10 @@ export function buildSetsFromWorkout(workout: Workout): FormSetRow[] {
     weight: s.weight ?? undefined,
     durationSecs: s.durationSecs,
     distanceMeters: s.distanceMeters ?? undefined,
+    setType: s.setType,
+    rpe: s.rpe ?? undefined,
+    rir: s.rir ?? undefined,
+    supersetGroup: s.supersetGroup ?? undefined,
     exercise: s.exercise,
   }));
 }

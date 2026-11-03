@@ -6,6 +6,7 @@ import {
   getWorkoutPace,
   getWorkoutReps,
   getWorkoutVolume,
+  isWorkingSet,
 } from "@/src/features/workout/utils";
 import { workoutSetWithDate } from "@/src/features/workout/types";
 import {
@@ -17,6 +18,8 @@ import {
 import ExerciseStat from "../../../components/ExerciseStat";
 import { BicepsFlexed, Gauge, Route, Tally5, Timer } from "lucide-react";
 import ZoneBar from "../../../components/ZoneBar";
+import { useWeightUnit } from "@/src/features/profile/components/ProfileProvider";
+import { formatWeight, toDisplayWeight } from "@/src/lib/units";
 
 export default function ExerciseStats({
   exercise,
@@ -25,27 +28,33 @@ export default function ExerciseStats({
   exercise: Exercise;
   groupedSets: Record<string, workoutSetWithDate[]>;
 }) {
+  const unit = useWeightUnit();
   const sets = Object.values(groupedSets).flat();
+  const workingSets = sets.filter(isWorkingSet);
 
   const volumeData = Object.keys(groupedSets).map((date) => ({
-    y: getWorkoutVolume(groupedSets[date]),
+    y: Math.round(toDisplayWeight(getWorkoutVolume(groupedSets[date]), unit)),
     x: date,
   }));
 
   const weightData = Object.keys(groupedSets).map((date) => ({
-    y: Math.max(...groupedSets[date].map((s) => s.weight || 0)),
+    y: toDisplayWeight(
+      Math.max(0, ...groupedSets[date].filter(isWorkingSet).map((s) => s.weight || 0)),
+      unit,
+    ),
     x: date,
   }));
 
   // Epley Formula for Estimated 1RM: Weight * (1 + Reps / 30)
   const e1rmData = Object.keys(groupedSets).map((date) => {
     const max1rm = Math.max(
-      ...groupedSets[date].map(
-        (s) => (s.weight || 0) * (1 + (s.reps || 0) / 30),
-      ),
+      0,
+      ...groupedSets[date]
+        .filter(isWorkingSet)
+        .map((s) => (s.weight || 0) * (1 + (s.reps || 0) / 30)),
     );
     return {
-      y: Math.round(max1rm),
+      y: Math.round(toDisplayWeight(max1rm, unit)),
       x: date,
     };
   });
@@ -70,7 +79,7 @@ export default function ExerciseStats({
     x: date,
   }));
 
-  const maxWeight = Math.max(0, ...sets.map((s) => s.weight || 0));
+  const maxWeight = Math.max(0, ...workingSets.map((s) => s.weight || 0));
   const maxDuration = Math.max(0, ...durationData.map((d) => d.y));
   const maxReps = Math.max(0, ...repsData.map((d) => d.y));
   const maxDistance = Math.max(...distanceData.map((d) => d.y), 0);
@@ -93,7 +102,7 @@ export default function ExerciseStats({
         {isWeightsExercise(exercise) && (
           <ExerciseStat
             Icon={BicepsFlexed}
-            title={maxWeight + "kg"}
+            title={formatWeight(maxWeight, unit)}
             subtitle="Max Weight"
           />
         )}
@@ -126,9 +135,9 @@ export default function ExerciseStats({
       <div className="flex flex-col md:flex-row md:flex-wrap gap-6">
         {isWeightsExercise(exercise) && (
           <>
-            <ProgressChart data={e1rmData} title="Estimated 1RM (kg)" />
-            <ProgressChart data={weightData} title="Peak Load (kg)" />
-            <ProgressChart data={volumeData} title="Total Volume" />
+            <ProgressChart data={e1rmData} title={`Estimated 1RM (${unit})`} />
+            <ProgressChart data={weightData} title={`Peak Load (${unit})`} />
+            <ProgressChart data={volumeData} title={`Total Volume (${unit})`} />
           </>
         )}
 

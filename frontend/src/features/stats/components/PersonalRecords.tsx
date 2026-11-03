@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Trophy } from "lucide-react";
 import { Card, CardContent } from "@/src/components/card";
-import { formatValue } from "@/src/features/achievements/components/AchievementCard";
+import AchievementValue from "@/src/features/achievements/components/AchievementValue";
 import { AchievementTypes } from "@/src/features/achievements/types";
 import { PersonalRecord } from "../types";
 
@@ -28,7 +28,10 @@ export default function PersonalRecords({ records }: { records: PersonalRecord[]
                 </Link>
               </div>
               <p className="text-nowrap">
-                {formatValue(record.value, record.type as AchievementTypes)}
+                <AchievementValue
+                  value={record.value}
+                  type={record.type as AchievementTypes}
+                />
               </p>
             </CardContent>
           </Card>

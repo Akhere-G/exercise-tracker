@@ -1,3 +1,4 @@
+import { toDisplayWeight, WeightUnit } from "@/src/lib/units";
 import { ExtendedBodyPart, Slug } from "react-muscle-highlighter";
 import { getGreyShadeCSS, mapToTargetMuscle } from "../workout/utils";
 import { statsRangeSchema } from "./schema";
@@ -41,8 +42,6 @@ export function getRangeDates(
 export const formatNumber = (value: number) =>
   Math.round(value).toLocaleString("en-US");
 
-export const formatVolume = (kg: number) => `${formatNumber(kg)} kg`;
-
 export const formatDistance = (meters: number) =>
   `${(meters / 1000).toFixed(1)} km`;
 
@@ -73,14 +72,18 @@ export function formatWeekLabel(isoDate: string) {
   return `${day} ${MONTHS[month - 1]}`;
 }
 
-export function getTrendData(trends: WeeklyTrend[], metric: TrendMetric) {
+export function getTrendData(
+  trends: WeeklyTrend[],
+  metric: TrendMetric,
+  weightUnit: WeightUnit = "kg",
+) {
   return trends.map((week) => ({
     x: formatWeekLabel(week.weekStart),
     y:
       metric === "workouts"
         ? week.workoutCount
         : metric === "volume"
-          ? Math.round(week.totalVolume)
+          ? Math.round(toDisplayWeight(week.totalVolume, weightUnit))
           : Math.round(week.totalDurationSecs / 60),
   }));
 }
