@@ -6,7 +6,7 @@ import {
 } from "@/src/components/card";
 import { ExerciseImage } from "../workouts/components/ExerciseImage";
 import { Dot } from "lucide-react";
-import { getVolume } from "@/src/features/workout/utils";
+import { ExerciseVolume } from "@/src/features/profile/components/Weight";
 import { Exercise } from "@/src/features/workout/store";
 
 export default function ExerciseCard({ exercise }: { exercise: Exercise }) {
@@ -20,7 +20,9 @@ export default function ExerciseCard({ exercise }: { exercise: Exercise }) {
             <p className="flex items-center">
               {exercise.sets.length} sets
               <Dot />
-              <span>{getVolume(exercise)}</span>
+              <span>
+                <ExerciseVolume exercise={exercise} />
+              </span>
             </p>
           </CardDescription>
         </div>

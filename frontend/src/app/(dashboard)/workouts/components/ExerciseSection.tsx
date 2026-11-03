@@ -23,6 +23,9 @@ import SetInput from "./SetInput";
 import TimeInput from "@/src/components/ui/timeInput";
 import { useState } from "react";
 import { ExerciseGroup, FormSetRow } from "./types";
+import { useWeightUnit } from "@/src/features/profile/components/ProfileProvider";
+import { toDisplayWeight, toKg } from "@/src/lib/units";
+import { nextSetType } from "@/src/features/workout/utils";
 
 export default function ExerciseSection({
   group,
@@ -56,6 +59,7 @@ export default function ExerciseSection({
   const hasDistance = isCardioExercise(exercise);
 
   const [replaceOpen, setReplaceOpen] = useState(false);
+  const weightUnit = useWeightUnit();
 
   return (
     <div className="flex flex-col gap-3">
@@ -98,7 +102,7 @@ export default function ExerciseSection({
           <thead>
             <tr className="text-muted-foreground font-medium uppercase tracking-wider text-xs text-left">
               <th className="pb-3 pt-3 px-3">Set</th>
-              {hasWeight && <th className="pb-3 pt-3 px-2">kg</th>}
+              {hasWeight && <th className="pb-3 pt-3 px-2">{weightUnit}</th>}
               {hasReps && <th className="pb-3 pt-3 px-2">Reps</th>}
               {hasDuration && <th className="pb-3 pt-3 px-2">Mins</th>}
               {hasDistance && <th className="pb-3 pt-3 px-2">Meters</th>}
@@ -109,14 +113,38 @@ export default function ExerciseSection({
             {sets.map((set) => (
               <tr key={`${set.exerciseId}_${set.setIndex}`}>
                 <td className="py-2 px-3 font-semibold text-muted-foreground">
-                  {set.setIndex}
+                  <button
+                    type="button"
+                    title="Tap to change set type"
+                    aria-label={`Set ${set.setIndex}, ${set.setType ?? "normal"}. Tap to change set type.`}
+                    className={`w-6 text-left ${set.setType === "warmup" ? "text-warning" : set.setType === "drop" ? "text-info" : set.setType === "failure" ? "text-destructive" : ""}`}
+                    onClick={() =>
+                      onUpdateSet(
+                        set.fieldIndex,
+                        "setType",
+                        nextSetType(set.setType),
+                      )
+                    }
+                  >
+                    {set.setType && set.setType !== "normal"
+                      ? { warmup: "W", drop: "D", failure: "F" }[set.setType]
+                      : set.setIndex}
+                  </button>
                 </td>
                 {hasWeight && (
                   <td>
                     <SetInput
-                      value={set.weight ?? ""}
+                      value={
+                        set.weight == null
+                          ? ""
+                          : toDisplayWeight(Number(set.weight), weightUnit)
+                      }
                       onChange={(v) =>
-                        onUpdateSet(set.fieldIndex, "weight", Number(v))
+                        onUpdateSet(
+                          set.fieldIndex,
+                          "weight",
+                          toKg(Number(v), weightUnit),
+                        )
                       }
                       canBeZero
                       canBeNegative

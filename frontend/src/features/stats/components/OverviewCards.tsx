@@ -7,7 +7,8 @@ import {
   Weight,
 } from "lucide-react";
 import ExerciseStat from "@/src/app/(dashboard)/components/ExerciseStat";
-import { formatDuration, formatNumber, formatVolume } from "../utils";
+import { formatDuration, formatNumber } from "../utils";
+import { WeightText } from "@/src/features/profile/components/Weight";
 import { StatsOverview } from "../types";
 
 export default function OverviewCards({ overview }: { overview: StatsOverview }) {
@@ -20,7 +21,7 @@ export default function OverviewCards({ overview }: { overview: StatsOverview })
       />
       <ExerciseStat
         Icon={Weight}
-        title={formatVolume(overview.totalVolume)}
+        title={<WeightText kg={Math.round(overview.totalVolume)} />}
         subtitle="Volume"
       />
       <ExerciseStat
