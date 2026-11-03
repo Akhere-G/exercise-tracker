@@ -7,6 +7,8 @@ export interface RoutineItem {
   targetReps: number | null;
   targetDurationSecs: number | null;
   order: number;
+  restSecs: number | null;
+  supersetGroup: number | null;
   exercise: Exercise;
 }
 

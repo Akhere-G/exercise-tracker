@@ -9,6 +9,8 @@ export interface ActiveSet extends WorkoutSetSchema {
 
 export interface Exercise extends BaseExercise {
   sets: ActiveSet[];
+  restSecs?: number | null;
+  supersetGroup?: number | null;
 }
 
 export const workoutStorageKey = "workout-storage";
