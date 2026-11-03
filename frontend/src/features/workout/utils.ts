@@ -458,3 +458,38 @@ export const formatPreviousSet = (
   }
   return `${set.reps ?? 0}`;
 };
+
+/** Exercises for a new workout that repeats a past one, with nothing completed. */
+export const getExercisesFromWorkout = (workout: Workout): Exercise[] => {
+  const byExercise = new Map<number, Exercise>();
+
+  [...workout.sets]
+    .sort((a, b) => a.id - b.id)
+    .forEach((set) => {
+      const exercise = byExercise.get(set.exerciseId) ?? {
+        ...set.exercise,
+        sets: [],
+        restSecs: null,
+        supersetGroup: set.supersetGroup ?? null,
+      };
+      exercise.sets.push({
+        exerciseId: set.exerciseId,
+        setIndex: exercise.sets.length + 1,
+        reps: set.reps,
+        weight: set.weight,
+        durationSecs: set.durationSecs,
+        distanceMeters: set.distanceMeters,
+        setType: set.setType,
+        isCompleted: false,
+      });
+      byExercise.set(set.exerciseId, exercise);
+    });
+
+  const exercises = [...byExercise.values()];
+  // A superset needs at least two members.
+  return exercises.map((e) =>
+    getActiveSupersetGroup(exercises, e) === null
+      ? { ...e, supersetGroup: null }
+      : e,
+  );
+};
