@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from ..services import (
     demo as demo_service,
     exercise as exercise_service,
@@ -67,6 +67,32 @@ def create_routine(
     )
 
     return new_routine
+
+
+MAX_BATCH_ROUTINES = 7
+
+
+@router.post(
+    "/batch", status_code=status.HTTP_201_CREATED, response_model=List[Routine]
+)
+def create_routines(
+    user: Annotated[User, Depends(user_service.get_current_user)],
+    routines: Annotated[
+        List[RoutineCreate], Body(min_length=1, max_length=MAX_BATCH_ROUTINES)
+    ],
+    db: Session = Depends(get_db),
+):
+    if user.is_demo:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Demo accounts are limited in size. Create an account to add more.",
+        )
+
+    exercise_service.ensure_exercises_exist(
+        db,
+        (item.exercise_id for routine in routines for item in routine.routine_items),
+    )
+    return routine_service.create_routines(db, user.id, routines)
 
 
 def _get_workout_or_404(db: Session, user_id: int, workout_id: int):
