@@ -9,7 +9,9 @@ import {
 import { RoutineItem } from "../routines/types";
 import { WorkoutSetSchema } from "./schema";
 import { ActiveSet, Exercise } from "./store";
-import { Workout, WorkoutSet } from "./types";
+import { PreviousSet, Workout, WorkoutSet } from "./types";
+import { formatWeight, toDisplayWeight, WeightUnit } from "@/src/lib/units";
+import { SetType } from "./schema";
 
 const DEFAULT_TOTAL_SETS = 3;
 const DEFAULT_REPS = 10;
@@ -26,57 +28,109 @@ export const sameMetrics = (
     (isDurationExercise(exercise) && isDurationExercise(otherExercise))
   );
 };
+interface SetValues {
+  reps?: number | null;
+  weight?: number | null;
+  distanceMeters?: number | null;
+  durationSecs?: number | null;
+}
+
+interface SetSources {
+  /** The routine's targets for this exercise. */
+  routineItem?: RoutineItem;
+  /** What the user did the last time they trained this exercise. */
+  previousSets?: PreviousSet[];
+}
+
+/**
+ * Builds one set with only the fields the exercise type tracks. Routine targets
+ * decide reps and duration, and the last session decides weight and distance.
+ */
+const buildSet = (
+  exercise: BaseExercise,
+  setIndex: number,
+  { routineItem, values }: { routineItem?: RoutineItem; values?: SetValues },
+): ActiveSet => ({
+  exerciseId: exercise.id,
+  setIndex,
+  durationSecs: isDurationExercise(exercise)
+    ? (routineItem?.targetDurationSecs ??
+      values?.durationSecs ??
+      DEFAULT_DURATION)
+    : undefined,
+  reps: isRepsExercise(exercise)
+    ? (routineItem?.targetReps ?? values?.reps ?? DEFAULT_REPS)
+    : undefined,
+  weight: isWeightsExercise(exercise)
+    ? (values?.weight ?? DEFAULT_WEIGHT)
+    : undefined,
+  distanceMeters: isCardioExercise(exercise)
+    ? (values?.distanceMeters ?? DEFAULT_DISTANCE)
+    : undefined,
+  isCompleted: false,
+});
+
 export const getDefaultSets = (
   exercise: BaseExercise,
   oldExercise?: Exercise,
+  { routineItem, previousSets = [] }: SetSources = {},
 ) => {
-  const sets: ActiveSet[] = [];
-
   if (oldExercise && sameMetrics(oldExercise, exercise)) {
     return oldExercise.sets;
   }
 
-  for (let i = 1; i <= DEFAULT_TOTAL_SETS; i++) {
-    const set: ActiveSet = {
-      exerciseId: exercise.id,
-      setIndex: i,
-      durationSecs: isDurationExercise(exercise) ? DEFAULT_DURATION : undefined,
-      reps: isRepsExercise(exercise) ? DEFAULT_REPS : undefined,
-      weight: isWeightsExercise(exercise) ? DEFAULT_WEIGHT : undefined,
-      distanceMeters: isCardioExercise(exercise) ? DEFAULT_DISTANCE : undefined,
-      isCompleted: false,
-    };
-    sets.push(set);
-  }
+  const lastWorkingSets = previousSets.filter(isWorkingSet);
+  const count =
+    routineItem?.targetSets ?? (lastWorkingSets.length || DEFAULT_TOTAL_SETS);
 
-  return sets;
+  return Array.from({ length: count }, (_, i) =>
+    buildSet(exercise, i + 1, {
+      routineItem,
+      values: lastWorkingSets[i] ?? lastWorkingSets[lastWorkingSets.length - 1],
+    }),
+  );
 };
 
+/** A set added mid-workout repeats the previous working set's values. */
 export const getNewSet = (
   exercise: Exercise,
   routineItem?: RoutineItem,
-): WorkoutSetSchema => {
-  if (routineItem) {
-    return {
-      exerciseId: exercise.id,
-      setIndex: exercise.sets.length + 1,
-      durationSecs: isDurationExercise(exercise)
-        ? routineItem.targetDurationSecs!
-        : undefined,
-      reps: isRepsExercise(exercise) ? routineItem.targetReps : undefined,
-      weight: isWeightsExercise(exercise) ? DEFAULT_WEIGHT : undefined,
-      distanceMeters: isCardioExercise(exercise) ? DEFAULT_DISTANCE : undefined,
-    };
+  previousSets: PreviousSet[] = [],
+): ActiveSet => {
+  const workingSets = exercise.sets.filter(isWorkingSet);
+  const last = workingSets[workingSets.length - 1];
+
+  if (last) {
+    return buildSet(exercise, exercise.sets.length + 1, { values: last });
   }
-  return {
-    exerciseId: exercise.id,
-    setIndex: exercise.sets.length + 1,
-    durationSecs: isDurationExercise(exercise) ? DEFAULT_DURATION : undefined,
-    reps: isRepsExercise(exercise) ? DEFAULT_REPS : undefined,
-    weight: isWeightsExercise(exercise) ? DEFAULT_WEIGHT : undefined,
-    distanceMeters: isCardioExercise(exercise) ? DEFAULT_DISTANCE : undefined,
-  };
+
+  const lastWorkingSets = previousSets.filter(isWorkingSet);
+  return buildSet(exercise, exercise.sets.length + 1, {
+    routineItem,
+    values: lastWorkingSets[lastWorkingSets.length - 1],
+  });
 };
+
+/**
+ * The set from the last session that lines up with this one, matching warm-ups
+ * with warm-ups so a warm-up never shifts the working sets out of step.
+ */
+export const getPreviousForSet = (
+  previousSets: PreviousSet[],
+  sets: ActiveSet[],
+  set: ActiveSet,
+) => {
+  const isWarmup = set.setType === "warmup";
+  const sameKind = <T extends { setType?: string }>(list: T[]) =>
+    list.filter((s) => (s.setType === "warmup") === isWarmup);
+
+  const position = sameKind(sets).findIndex((s) => s.setIndex === set.setIndex);
+  return sameKind(previousSets)[position];
+};
+
+/** Warm-up sets are excluded from volume, records and strength estimates. */
+export const isWorkingSet = (set: { setType?: string }) =>
+  set.setType !== "warmup";
 
 export const isExerciseCompleted = (exercise: Exercise) =>
   exercise.sets.every((s) => s.isCompleted);
@@ -160,7 +214,11 @@ export function getGreyShadeCSS(intensity: number): string {
   return `hsl(0, 100%, ${Math.round(lightness)}%)`;
 }
 
-export const getSetVolume = (exercise: BaseExercise, set: WorkoutSetSchema) => {
+export const getSetVolume = (
+  exercise: BaseExercise,
+  set: WorkoutSetSchema,
+  unit: WeightUnit = "kg",
+) => {
   if (isCardioExercise(exercise)) {
     return `${set.distanceMeters}m in ${getTime(set.durationSecs!)} mins`;
   }
@@ -170,13 +228,13 @@ export const getSetVolume = (exercise: BaseExercise, set: WorkoutSetSchema) => {
   }
 
   if (isWeightsExercise(exercise)) {
-    return `${set.reps!} x ${set.weight} kg`;
+    return `${set.reps!} x ${formatWeight(set.weight ?? 0, unit)}`;
   }
 
   return set.reps! + " reps";
 };
 
-export const getVolume = (exercise: Exercise) => {
+export const getVolume = (exercise: Exercise, unit: WeightUnit = "kg") => {
   if (isDurationExercise(exercise)) {
     const totalSecs = exercise.sets.reduce(
       (prev, curr) => prev + curr.durationSecs!,
@@ -187,10 +245,11 @@ export const getVolume = (exercise: Exercise) => {
 
   if (isWeightsExercise(exercise)) {
     const totalWeight = exercise.sets.reduce(
-      (prev, curr) => prev + curr.weight! * curr.reps!,
+      (prev, curr) =>
+        curr.setType === "warmup" ? prev : prev + curr.weight! * curr.reps!,
       0,
     );
-    return totalWeight + " kg";
+    return formatWeight(totalWeight, unit);
   }
 
   const totalReps = exercise.sets.reduce((prev, curr) => prev + curr.reps!, 0);
@@ -204,7 +263,8 @@ export const getTotalVolume = (exercises: Exercise[]) => {
       (!isWeightsExercise(curr)
         ? 0
         : curr.sets.reduce(
-            (prev, curr) => prev + curr.reps! * curr.weight!,
+            (prev, curr) =>
+              curr.setType === "warmup" ? prev : prev + curr.reps! * curr.weight!,
             0,
           )),
     0,
@@ -241,7 +301,7 @@ export function getWorkoutVolume(sets: WorkoutSet[]) {
   let volume = 0;
 
   for (const set of sets) {
-    if (isWeightsExercise(set.exercise)) {
+    if (isWeightsExercise(set.exercise) && set.setType !== "warmup") {
       volume += set.weight! * set.reps!;
     }
   }
@@ -309,3 +369,92 @@ export function getWorkoutPace(sets: WorkoutSet[]) {
 
   return minutesPerKm;
 }
+
+const SET_TYPE_ORDER: SetType[] = ["normal", "warmup", "drop", "failure"];
+
+export const nextSetType = (current: SetType = "normal"): SetType =>
+  SET_TYPE_ORDER[(SET_TYPE_ORDER.indexOf(current) + 1) % SET_TYPE_ORDER.length];
+
+/** W / D / F for special sets, otherwise the position among normal sets. */
+export const getSetLabel = (sets: ActiveSet[], set: ActiveSet) => {
+  switch (set.setType) {
+    case "warmup":
+      return "W";
+    case "drop":
+      return "D";
+    case "failure":
+      return "F";
+    default:
+      return String(
+        sets.filter(
+          (s) => s.setIndex <= set.setIndex && (s.setType ?? "normal") === "normal",
+        ).length,
+      );
+  }
+};
+
+export const getSupersetMembers = (
+  exercises: Exercise[],
+  group: number | null | undefined,
+) =>
+  group == null ? [] : exercises.filter((e) => e.supersetGroup === group);
+
+/** Groups with fewer than two exercises are not really supersets. */
+export const getActiveSupersetGroup = (
+  exercises: Exercise[],
+  exercise: Exercise,
+) =>
+  getSupersetMembers(exercises, exercise.supersetGroup).length > 1
+    ? exercise.supersetGroup!
+    : null;
+
+export const linkWithNext = (
+  exercises: Exercise[],
+  exerciseId: number,
+): Exercise[] => {
+  const index = exercises.findIndex((e) => e.id === exerciseId);
+  const current = exercises[index];
+  const next = exercises[index + 1];
+  if (!current || !next) return exercises;
+
+  const group =
+    current.supersetGroup ??
+    next.supersetGroup ??
+    Math.max(0, ...exercises.map((e) => e.supersetGroup ?? 0)) + 1;
+
+  return exercises.map((e) =>
+    e.id === current.id || e.id === next.id ? { ...e, supersetGroup: group } : e,
+  );
+};
+
+export const unlinkSuperset = (
+  exercises: Exercise[],
+  exerciseId: number,
+): Exercise[] =>
+  exercises.map((e) =>
+    e.id === exerciseId ? { ...e, supersetGroup: null } : e,
+  );
+
+export const DEFAULT_REST_SECS = 180;
+
+export const formatPreviousSet = (
+  exercise: BaseExercise,
+  set: {
+    reps?: number;
+    weight?: number;
+    distanceMeters?: number;
+    durationSecs?: number;
+  },
+  unit: WeightUnit,
+) => {
+  if (isCardioExercise(exercise)) {
+    return `${set.distanceMeters ?? 0}m`;
+  }
+  if (isDurationExercise(exercise)) {
+    return getTime(set.durationSecs ?? 0);
+  }
+  if (isWeightsExercise(exercise)) {
+    return `${toDisplayWeight(set.weight ?? 0, unit)}×${set.reps ?? 0}`;
+  }
+  return `${set.reps ?? 0}`;
+};

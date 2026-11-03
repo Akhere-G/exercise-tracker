@@ -1,5 +1,8 @@
 import * as Yup from "yup";
 
+export const SET_TYPES = ["normal", "warmup", "drop", "failure"] as const;
+export type SetType = (typeof SET_TYPES)[number];
+
 export const workoutSetSchema = Yup.object()
   .shape({
     exerciseId: Yup.number().required(),
@@ -8,6 +11,10 @@ export const workoutSetSchema = Yup.object()
     weight: Yup.number().nullable(),
     distanceMeters: Yup.number().nullable(),
     durationSecs: Yup.number().nullable(),
+    setType: Yup.mixed<SetType>().oneOf(SET_TYPES).optional(),
+    rpe: Yup.number().nullable().min(1).max(10),
+    rir: Yup.number().nullable().min(0).max(10),
+    supersetGroup: Yup.number().nullable(),
   })
   .test(
     "validate-set-data",
