@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { LogoutButton } from "@/src/features/auth/components/LogoutButton";
 import DataPortabilityButtons from "./components/DataPortabilityButtons";
+import GoalsForm from "./components/GoalsForm";
 import PreferencesCard from "./components/PreferencesCard";
 import { getPersonas } from "@/src/features/ai/queries";
 
@@ -25,6 +26,7 @@ export default async function SettingsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <PreferencesCard personas={personas} />
+        <GoalsForm />
 
         <div className="bg-card border border-border rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between min-h-[180px]">
           <div>
