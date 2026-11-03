@@ -32,12 +32,13 @@ def get_stats(
     user_id: int,
     start: Optional[date] = None,
     end: Optional[date] = None,
+    granularity: str = "week",
 ) -> dict:
     workouts = _get_workout_totals(db, user_id, start, end)
 
     return {
         "overview": _build_overview(db, user_id, workouts),
-        "trends": _build_trends(workouts, start, end),
+        "trends": _build_trends(workouts, start, end, granularity),
         "muscles": get_muscle_breakdown(db, user_id, start, end),
         "top_exercises": get_top_exercises(db, user_id, start, end),
         "personal_records": get_personal_records(db, user_id),
@@ -189,42 +190,61 @@ def _build_overview(db: Session, user_id: int, workouts) -> dict:
     }
 
 
-def _build_trends(
-    workouts, start: Optional[date], end: Optional[date]
-) -> list[dict]:
-    """Workouts, volume and time per week, with empty weeks filled in."""
-    weeks: dict[date, dict] = {}
+def _period_start(day: date, granularity: str) -> date:
+    if granularity == "month":
+        return day.replace(day=1)
+    return workout_service._week_start(day)
 
-    first_week = (
-        workout_service._week_start(start)
+
+def _next_period(period: date, granularity: str) -> date:
+    if granularity == "month":
+        return (period.replace(day=28) + timedelta(days=4)).replace(day=1)
+    return period + workout_service.ONE_WEEK
+
+
+def _build_trends(
+    workouts,
+    start: Optional[date],
+    end: Optional[date],
+    granularity: str = "week",
+) -> list[dict]:
+    """Workouts, volume and time per week or month, with empty periods filled in.
+
+    `week_start` holds the first day of the period, which is the first of the
+    month when the granularity is "month".
+    """
+    periods: dict[date, dict] = {}
+
+    first = (
+        _period_start(start, granularity)
         if start is not None
-        else workout_service._week_start(workouts[0].completed_at.date())
+        else _period_start(workouts[0].completed_at.date(), granularity)
         if workouts
         else None
     )
-    if first_week is None:
+    if first is None:
         return []
 
-    last_week = workout_service._week_start(end if end is not None else date.today())
-    week = first_week
-    while week <= last_week:
-        weeks[week] = {
-            "week_start": week,
+    last = _period_start(end if end is not None else date.today(), granularity)
+    period = first
+    while period <= last:
+        periods[period] = {
+            "week_start": period,
             "workout_count": 0,
             "total_volume": 0.0,
             "total_duration_secs": 0,
         }
-        week += workout_service.ONE_WEEK
+        period = _next_period(period, granularity)
 
     for workout in workouts:
-        bucket = weeks.get(workout_service._week_start(workout.completed_at.date()))
+        bucket = periods.get(_period_start(workout.completed_at.date(), granularity))
         if bucket is None:
             continue
         bucket["workout_count"] += 1
         bucket["total_volume"] += workout.volume
         bucket["total_duration_secs"] += workout.duration
 
-    return list(weeks.values())
+    return list(periods.values())
 
 
 def _filter_range(stmt, start: Optional[date], end: Optional[date]):

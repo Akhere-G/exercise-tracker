@@ -50,3 +50,82 @@ class Stats(BaseModel):
     muscles: list[MuscleStat]
     top_exercises: list[TopExercise]
     personal_records: list[PersonalRecord]
+
+
+class MuscleGroupVolume(BaseModel):
+    group: str
+    sets: list[float]
+    volume: list[float]
+    this_week_sets: float
+
+
+class MuscleVolume(BaseModel):
+    weeks: list[date]
+    groups: list[MuscleGroupVolume]
+
+
+class MuscleRecovery(BaseModel):
+    group: str
+    fatigue: float
+    status: str
+    hours_since_trained: float | None = None
+
+
+class StrengthStandard(BaseModel):
+    key: str
+    name: str
+    exercise_id: int | None = None
+    estimated_one_rep_max: float | None = None
+    ratio: float | None = None
+    level: str | None = None
+    next_level: str | None = None
+    progress: float | None = None
+    kg_to_next: float | None = None
+
+
+class StrengthStandards(BaseModel):
+    body_weight_kg: float | None = None
+    lifts: list[StrengthStandard]
+
+
+class HeatmapDay(BaseModel):
+    day: date
+    count: int
+
+
+class Consistency(BaseModel):
+    year: int
+    total_workouts: int
+    active_days: int
+    average_per_week: float
+    best_week_count: int
+    longest_weekly_streak: int
+    current_weekly_streak: int
+    best_month: int | None = None
+    best_month_count: int
+    weekday_counts: list[int]
+    heatmap: list[HeatmapDay]
+
+
+class DeltaValue(BaseModel):
+    change: float
+    percent: float | None = None
+
+
+class PeriodComparison(BaseModel):
+    current: StatsOverview
+    previous: StatsOverview
+    deltas: dict[str, DeltaValue]
+
+
+class ExerciseSession(BaseModel):
+    day: date
+    estimated_one_rep_max: float | None = None
+    top_weight: float | None = None
+    volume: float
+
+
+class ExerciseSeries(BaseModel):
+    exercise_id: int
+    name: str
+    sessions: list[ExerciseSession]
