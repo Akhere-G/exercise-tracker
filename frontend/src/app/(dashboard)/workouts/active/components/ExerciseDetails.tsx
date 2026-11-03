@@ -12,9 +12,14 @@ import { ExercisePickerModal } from "../../../routines/components/ExercisePicker
 import { useState } from "react";
 import { Exercise } from "@/src/features/exercises/types";
 import {
+  getActiveSupersetGroup,
   getDefaultSets,
   isExerciseCompleted,
+  linkWithNext,
+  unlinkSuperset,
 } from "@/src/features/workout/utils";
+import RestTimeDialog from "./RestTimeDialog";
+import { useEnsurePreviousSets } from "@/src/features/workout/components/WorkoutContext";
 import {
   Dialog,
   DialogClose,
@@ -39,29 +44,45 @@ export default function ExerciseDetails({
   const [removeModalOpen, setRemoveModalOpen] = useState(false);
   const [finishModalOpen, setFinishModalOpen] = useState(false);
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [restModalOpen, setRestModalOpen] = useState(false);
 
   const router = useRouter();
+  const ensurePreviousSets = useEnsurePreviousSets();
 
   const { currentExerciseId, exercises, setWorkoutData, resetState } =
     useWorkout();
 
   const currentExercise = exercises.find((e) => e.id === currentExerciseId);
+  const currentIndex = exercises.findIndex((e) => e.id === currentExerciseId);
+  const isInSuperset =
+    !!currentExercise && getActiveSupersetGroup(exercises, currentExercise) !== null;
+  const canLinkWithNext = currentIndex >= 0 && currentIndex < exercises.length - 1;
 
-  function replaceExercise(newExercises: Exercise[]) {
+  async function replaceExercise(newExercises: Exercise[]) {
     const exisiting: Record<number, boolean> = {};
     exercises.forEach((e) => {
       exisiting[e.id] = true;
     });
     const newExercise = newExercises.filter((e) => !exisiting[e.id])[0];
     if (!newExercise) return;
-    const updatedExercises = exercises.map((e) =>
-      e.id === currentExerciseId
-        ? {
-            ...newExercise,
-            sets: getDefaultSets(newExercise, e),
-          }
-        : e,
-    );
+
+    const replacedId = currentExerciseId;
+    const previous = await ensurePreviousSets([newExercise.id]);
+
+    // Read the store again: it may have changed while the sets were loading.
+    const updatedExercises = useWorkout
+      .getState()
+      .exercises.map((e) =>
+        e.id === replacedId
+          ? {
+              ...newExercise,
+              sets: getDefaultSets(newExercise, e, {
+                previousSets: previous[newExercise.id],
+              }),
+              supersetGroup: e.supersetGroup,
+            }
+          : e,
+      );
 
     setWorkoutData({
       exercises: updatedExercises,
@@ -152,6 +173,31 @@ export default function ExerciseDetails({
                 <DropdownMenuItem onClick={removeLastSet}>
                   Remove Last set
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setRestModalOpen(true)}>
+                  Rest time…
+                </DropdownMenuItem>
+                {canLinkWithNext && (
+                  <DropdownMenuItem
+                    onClick={() =>
+                      setWorkoutData({
+                        exercises: linkWithNext(exercises, currentExerciseId),
+                      })
+                    }
+                  >
+                    Superset with next exercise
+                  </DropdownMenuItem>
+                )}
+                {isInSuperset && (
+                  <DropdownMenuItem
+                    onClick={() =>
+                      setWorkoutData({
+                        exercises: unlinkSuperset(exercises, currentExerciseId),
+                      })
+                    }
+                  >
+                    Remove from superset
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={() => setIsExerciseModalOpen(true)}>
                   Replace Exercise
                 </DropdownMenuItem>
@@ -233,6 +279,16 @@ export default function ExerciseDetails({
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {currentExercise && (
+          <RestTimeDialog
+            key={currentExercise.id}
+            exerciseId={currentExercise.id}
+            exerciseName={currentExercise.name}
+            open={restModalOpen}
+            onOpenChange={setRestModalOpen}
+          />
+        )}
 
         {currentExercise && (
           <ExercisePickerModal
