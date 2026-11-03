@@ -52,6 +52,8 @@ def create_routine(db: Session, user_id: int, routine: RoutineCreate):
                 target_reps=item.target_reps,
                 target_duration_secs=item.target_duration_secs,
                 order=item.order,
+                rest_secs=item.rest_secs,
+                superset_group=item.superset_group,
             )
             db.add(routine_item)
 
@@ -91,6 +93,8 @@ def update_routine(
                     target_reps=item.target_reps,
                     target_duration_secs=item.target_duration_secs,
                     order=item.order,
+                    rest_secs=item.rest_secs,
+                    superset_group=item.superset_group,
                 )
                 old_routine.routine_items.append(new_item)
 

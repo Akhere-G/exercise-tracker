@@ -14,6 +14,8 @@ class RoutineItemBase(BaseModel):
     target_reps: Optional[int] = None
     target_duration_secs: Optional[int] = None
     order: int
+    rest_secs: Optional[int] = None
+    superset_group: Optional[int] = None
 
     @model_validator(mode="after")
     def validate_reps_duration(self) -> "RoutineItemBase":
@@ -30,6 +32,8 @@ class RoutineItemCreate(RoutineItemBase):
     target_reps: Optional[int] = Field(default=None, ge=0, le=10_000)
     target_duration_secs: Optional[int] = Field(default=None, ge=0, le=24 * 60 * 60)
     order: int = Field(ge=0, le=1000)
+    rest_secs: Optional[int] = Field(default=None, ge=0, le=60 * 60)
+    superset_group: Optional[int] = Field(default=None, ge=0, le=1000)
 
 
 def _require_utc(value: Optional[time]) -> Optional[time]:
