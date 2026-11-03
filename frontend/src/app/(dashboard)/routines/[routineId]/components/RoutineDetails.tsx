@@ -7,6 +7,7 @@ import {
 } from "@/src/features/workout/utils";
 import { BicepsFlexed, Flame, Timer, Weight } from "lucide-react";
 import React from "react";
+import { WeightText } from "@/src/features/profile/components/Weight";
 import ExerciseStat from "../../../components/ExerciseStat";
 import RoutineItemCard from "../../../components/RoutineItemCard";
 import BodyChart from "../../../workouts/summary/[workoutId]/components/BodyChart";
@@ -35,7 +36,7 @@ export default function RoutineDetails({
         />
         <ExerciseStat
           Icon={Weight}
-          title={getTotalWorkoutsVolume(workouts) + " kg"}
+          title={<WeightText kg={getTotalWorkoutsVolume(workouts)} />}
           subtitle="Volume"
         />
         <ExerciseStat

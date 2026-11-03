@@ -7,7 +7,7 @@ import {
 } from "@/src/components/ui/accordion";
 import { Exercise } from "@/src/features/exercises/types";
 import { workoutSetWithDate } from "@/src/features/workout/types";
-import { getSetVolume } from "@/src/features/workout/utils";
+import { SetSummary } from "@/src/features/profile/components/Weight";
 
 export default function ExerciseHistory({
   exercise,
@@ -79,7 +79,9 @@ function SetCard({
       <span className="text-muted-foreground text-[9px] tracking-wider uppercase">
         Set {set.setIndex}
       </span>
-      <span>{getSetVolume(exercise, set)}</span>
+      <span>
+        <SetSummary exercise={exercise} set={set} />
+      </span>
     </div>
   );
 }

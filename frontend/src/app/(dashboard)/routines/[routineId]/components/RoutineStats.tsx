@@ -7,11 +7,14 @@ import {
   getWorkoutPace,
   getWorkoutReps,
   getWorkoutVolume,
+  isWorkingSet,
 } from "@/src/features/workout/utils";
 import ExerciseStat from "../../../components/ExerciseStat";
 import { BicepsFlexed, Gauge, Route, Tally5, Timer } from "lucide-react";
 import ProgressChart from "../../../components/ProgressCharts";
 import ZoneBar from "../../../components/ZoneBar";
+import { useWeightUnit } from "@/src/features/profile/components/ProfileProvider";
+import { toDisplayWeight } from "@/src/lib/units";
 
 export default function RoutineStats({
   workouts,
@@ -20,36 +23,35 @@ export default function RoutineStats({
   workouts: Workout[];
   stats: WorkoutStats;
 }) {
+  const unit = useWeightUnit();
   const allSets = workouts.flatMap((workout) => workout.sets);
 
   const volumeData = workouts.map((workout) => ({
-    y: getWorkoutVolume(workout.sets),
+    y: Math.round(toDisplayWeight(getWorkoutVolume(workout.sets), unit)),
     x: new Date(workout.completedAt).toLocaleDateString(),
   }));
 
   const weightData = workouts.map((workout) => {
-    const maxWeight =
-      workout.sets.length > 0
-        ? Math.max(...workout.sets.map((s) => s.weight || 0))
-        : 0;
+    const maxWeight = Math.max(
+      0,
+      ...workout.sets.filter(isWorkingSet).map((s) => s.weight || 0),
+    );
     return {
-      y: maxWeight,
+      y: toDisplayWeight(maxWeight, unit),
       x: new Date(workout.completedAt).toLocaleDateString(),
     };
   });
 
   // Epley Formula for Estimated 1RM per workout: Weight * (1 + Reps / 30)
   const e1rmData = workouts.map((workout) => {
-    const max1rm =
-      workout.sets.length > 0
-        ? Math.max(
-            ...workout.sets.map(
-              (s) => (s.weight || 0) * (1 + (s.reps || 0) / 30),
-            ),
-          )
-        : 0;
+    const max1rm = Math.max(
+      0,
+      ...workout.sets
+        .filter(isWorkingSet)
+        .map((s) => (s.weight || 0) * (1 + (s.reps || 0) / 30)),
+    );
     return {
-      y: Math.round(max1rm),
+      y: Math.round(toDisplayWeight(max1rm, unit)),
       x: new Date(workout.completedAt).toLocaleDateString(),
     };
   });
@@ -105,7 +107,7 @@ export default function RoutineStats({
         {maxWeight > 0 && (
           <ExerciseStat
             Icon={BicepsFlexed}
-            title={maxWeight + "kg"}
+            title={`${maxWeight} ${unit}`}
             subtitle="Max Weight"
           />
         )}
@@ -138,8 +140,8 @@ export default function RoutineStats({
       <div className="flex flex-col gap-6">
         {maxWeight > 0 && (
           <>
-            <ProgressChart data={e1rmData} title="Estimated 1RM (kg)" />
-            <ProgressChart data={weightData} title="Peak Load (kg)" />
+            <ProgressChart data={e1rmData} title={`Estimated 1RM (${unit})`} />
+            <ProgressChart data={weightData} title={`Peak Load (${unit})`} />
           </>
         )}
         <ProgressChart data={volumeData} title="Volume" />
