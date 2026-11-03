@@ -21,6 +21,7 @@ from app.models import (
     NotificationSubscription,
     UserProfile,
     UserExerciseSetting,
+    BodyWeight,
 )
 
 # this is the Alembic Config object, which provides
