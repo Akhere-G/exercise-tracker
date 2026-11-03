@@ -28,9 +28,14 @@ export default async function StatsPage({
       <div className="container">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <h2 className="text-2xl">Stats</h2>
-          <Link href="/body" className="text-sm underline">
-            Body weight
-          </Link>
+          <div className="flex gap-4 text-sm">
+            <Link href="/wrapped" className="underline">
+              Wrapped
+            </Link>
+            <Link href="/body" className="underline">
+              Body weight
+            </Link>
+          </div>
         </div>
         <StatsTabs active={tab} range={range} />
         {usesRange && (
