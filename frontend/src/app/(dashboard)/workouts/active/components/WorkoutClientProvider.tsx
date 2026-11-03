@@ -29,6 +29,14 @@ import { ExerciseSetting } from "@/src/features/profile/types";
 import { WorkoutContextProvider } from "@/src/features/workout/components/WorkoutContext";
 
 import { useRouter } from "next/navigation";
+import PostWorkoutReuseDialog, {
+  ReuseTarget,
+} from "@/src/features/routines/components/PostWorkoutReuseDialog";
+import {
+  diffRoutine,
+  hasRoutineDiff,
+  PerformedExercise,
+} from "@/src/features/routines/utils";
 import { getFailureReason, track } from "@/src/features/analytics/utils";
 
 export default function WorkoutClientProvider({
@@ -45,6 +53,7 @@ export default function WorkoutClientProvider({
   const hasTrackedStart = useRef(false);
   const isSubmittingRef = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reuseTarget, setReuseTarget] = useState<ReuseTarget | null>(null);
   const [previousSets, setPreviousSets] = useState<
     Record<number, PreviousSet[]>
   >(initialPreviousSets ?? {});
@@ -147,6 +156,9 @@ export default function WorkoutClientProvider({
     }
   }, [routine, setWorkoutData]);
 
+  const goToSummary = (workoutId: number) =>
+    setTimeout(() => router.push(`/workouts/summary/${workoutId}?first=true`));
+
   async function completeWorkout(onComplete?: () => void) {
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
@@ -181,12 +193,39 @@ export default function WorkoutClientProvider({
           has_routine: routine !== null,
         });
         saved = true;
+
+        const performed: PerformedExercise[] = exercises.flatMap((e) => {
+          const done = e.sets.filter((s) => s.isCompleted);
+          const working = done.filter((s) => s.setType !== "warmup");
+          return done.length > 0
+            ? [
+                {
+                  exerciseId: e.id,
+                  name: e.name,
+                  sets: (working.length ? working : done).length,
+                },
+              ]
+            : [];
+        });
+        const diff = routine
+          ? diffRoutine(routine.routineItems, performed)
+          : null;
+        const offerReuse = !routine || (diff !== null && hasRoutineDiff(diff));
+
         resetState();
         localStorage.removeItem(workoutStorageKey);
         onComplete?.();
-        setTimeout(() =>
-          router.push(`/workouts/summary/${newWorkout.id}?first=true`),
-        );
+
+        if (offerReuse) {
+          setReuseTarget({
+            workoutId: newWorkout.id,
+            routine: routine ? { id: routine.id, name: routine.name } : null,
+            diff,
+            suggestedName: routine?.name ?? "My workout",
+          });
+        } else {
+          goToSummary(newWorkout.id);
+        }
       } else {
         track("create_workout_failed", { reason: getFailureReason(response) });
         toast.error(response.error);
@@ -231,6 +270,12 @@ export default function WorkoutClientProvider({
         </Button>
       </div>
     </div>
+    {reuseTarget && (
+      <PostWorkoutReuseDialog
+        target={reuseTarget}
+        onDone={() => goToSummary(reuseTarget.workoutId)}
+      />
+    )}
     </WorkoutContextProvider>
   );
 }
