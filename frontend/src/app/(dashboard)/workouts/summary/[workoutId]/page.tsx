@@ -1,5 +1,13 @@
 import { getWorkout, getWorkoutStats } from "@/src/features/workout/queries";
 import {
+  formatWeight,
+} from "@/src/lib/units";
+import { getWeightUnit } from "@/src/features/profile/queries";
+import RepeatWorkoutButton from "@/src/features/workout/components/RepeatWorkoutButton";
+import ShareWorkoutButton from "@/src/features/share/components/ShareWorkoutButton";
+import { WorkoutShareData } from "@/src/features/share/components/WorkoutShareCard";
+import {
+  getSetVolume,
   getGreyShadeCSS,
   getOrdinalSuffix,
   getTime,
@@ -66,6 +74,23 @@ export default async function WorkoutSummary({
   );
 
   const exercisesList = Object.values(exercises);
+  const weightUnit = await getWeightUnit();
+
+  const shareData: WorkoutShareData = {
+    date: workout ? new Date(workout.completedAt).toDateString() : "",
+    duration: getTime(workout?.duration ?? 0),
+    volume: formatWeight(getTotalVolume(exercisesList), weightUnit),
+    sets: workout?.sets.length ?? 0,
+    topLifts: exercisesList.slice(0, 5).flatMap((exercise) => {
+      const working = exercise.sets.filter((s) => s.setType !== "warmup");
+      const best = [...(working.length ? working : exercise.sets)].sort(
+        (a, b) => (b.weight ?? 0) - (a.weight ?? 0) || (b.reps ?? 0) - (a.reps ?? 0),
+      )[0];
+      return best
+        ? [{ name: exercise.name, best: getSetVolume(exercise, best, weightUnit) }]
+        : [];
+    }),
+  };
 
   const completedDate = workout
     ? new Date(workout.completedAt).toDateString()
@@ -77,15 +102,21 @@ export default async function WorkoutSummary({
           <h2 className="text-2xl">
             {first ? "Workout Complete" : completedDate}
           </h2>
-          {!first && (
+          {workout && (
             <div className="flex gap-2">
-              <Link href={`/workouts/edit/${workoutId}`}>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Pencil size={14} />
-                  Edit
-                </Button>
-              </Link>
-              <WorkoutDeleteModal workoutId={Number(workoutId)} />
+              <ShareWorkoutButton data={shareData} />
+              <RepeatWorkoutButton workout={workout} />
+              {!first && (
+                <>
+                  <Link href={`/workouts/edit/${workoutId}`}>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Pencil size={14} />
+                      Edit
+                    </Button>
+                  </Link>
+                  <WorkoutDeleteModal workoutId={Number(workoutId)} />
+                </>
+              )}
             </div>
           )}
         </div>
