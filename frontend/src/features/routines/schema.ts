@@ -24,6 +24,14 @@ export const routineItemSchema = yup.object({
       );
     }),
   order: yup.number().required(),
+  restSecs: yup
+    .number()
+    .transform((value, original) => (original === "" ? null : value))
+    .nullable()
+    .notRequired()
+    .min(0)
+    .max(3600),
+  supersetGroup: yup.number().nullable().notRequired(),
 });
 
 export const routineSchema = yup.object({
