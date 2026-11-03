@@ -7,6 +7,7 @@ from .workout import Workout, WorkoutSet
 from .notifications import Notification, NotificationSubscription
 from .achievement import Achievement, UserAchievement
 from .profile import UserProfile, UserExerciseSetting
+from .body import BodyWeight
 
 __all__ = [
     "User",
@@ -23,4 +24,5 @@ __all__ = [
     "UserAchievement",
     "UserProfile",
     "UserExerciseSetting",
+    "BodyWeight",
 ]
