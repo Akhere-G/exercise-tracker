@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription } from "@/src/components/card";
 import { LucideProps } from "lucide-react";
-import { ForwardRefExoticComponent, RefAttributes } from "react";
+import { ForwardRefExoticComponent, ReactNode, RefAttributes } from "react";
 
 export default function ExerciseStat({
   Icon,
@@ -10,7 +10,7 @@ export default function ExerciseStat({
   Icon: ForwardRefExoticComponent<
     Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
   >;
-  title: string | number;
+  title: ReactNode;
   subtitle: string | number;
 }) {
   return (

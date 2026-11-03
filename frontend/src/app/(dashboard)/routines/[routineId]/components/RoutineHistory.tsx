@@ -16,7 +16,8 @@ import { getImageUrl } from "@/src/features/exercises/utils";
 import { Routine } from "@/src/features/routines/types";
 import { Exercise } from "@/src/features/workout/store";
 import { Workout, WorkoutStats } from "@/src/features/workout/types";
-import { getSetVolume, getTime } from "@/src/features/workout/utils";
+import { getTime } from "@/src/features/workout/utils";
+import { SetSummary } from "@/src/features/profile/components/Weight";
 import { Dot, Info } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -125,7 +126,9 @@ function ExerciseCard({ exercise }: { exercise: Exercise }) {
               <span className="text-muted-foreground text-[9px] tracking-wider uppercase">
                 Set {set.setIndex}
               </span>
-              <span>{getSetVolume(exercise, set)}</span>
+              <span>
+                <SetSummary exercise={exercise} set={set} />
+              </span>
             </div>
           ))}
         </CardContent>

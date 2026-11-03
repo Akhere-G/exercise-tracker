@@ -1,8 +1,6 @@
 import React from "react";
 import { Trophy } from "lucide-react";
 import {
-  achievementFreqTypes,
-  achievementTypes,
   AchievementTypes,
   UserAchievement,
   ACCENTS,
@@ -16,35 +14,13 @@ import {
   CardTitle,
 } from "@/src/components/card";
 import { PR_TYPES } from "../../exercises/types";
+import AchievementValue from "./AchievementValue";
 
 function getAccent(type: string) {
   if (type in ACCENTS) {
     return ACCENTS[type as keyof typeof ACCENTS];
   }
   return ACCENTS.streak;
-}
-
-function formatNumber(value: number) {
-  return Number.isInteger(value) ? String(value) : value.toFixed(1);
-}
-
-export function formatValue(value: number, type: AchievementTypes) {
-  if (type in achievementFreqTypes) {
-    return `${value} ${value === 1 ? "week" : "weeks"}`;
-  }
-
-  switch (type) {
-    case achievementTypes.pr_weight:
-      return `${formatNumber(value)} kg`;
-    case achievementTypes.pr_reps:
-      return `${value} ${value === 1 ? "rep" : "reps"}`;
-    case achievementTypes.pr_distance:
-      return `${formatNumber(value / 1000)} km`;
-    case achievementTypes.pr_duration:
-      return `${formatNumber(value / 60)} mins`;
-    default:
-      return String(value);
-  }
 }
 
 export default function AchievementCard({
@@ -80,7 +56,7 @@ export default function AchievementCard({
       </CardHeader>
       <CardContent className="flex items-end justify-between gap-3 ">
         <p className="text-3xl font-bold tabular-nums tracking-tight">
-          {formatValue(value, type as AchievementTypes)}
+          <AchievementValue value={value} type={type as AchievementTypes} />
         </p>
         {chip && (
           <span className="truncate rounded-full bg-muted px-2.5 py-1 text-sm font-medium text-muted-foreground">

@@ -14,6 +14,7 @@ import ConffettiEffect from "./components/ConffettiEffect";
 import WorkoutDeleteModal from "./components/WorkoutDeleteModal";
 import ExerciseStat from "../../../components/ExerciseStat";
 import ExerciseCard from "../../../components/ExerciseCard";
+import { WeightText } from "@/src/features/profile/components/Weight";
 import Link from "next/link";
 import { Button } from "@/src/components/ui/button";
 import { getUserAchievementsForWorkout } from "@/src/features/achievements/actions";
@@ -97,7 +98,7 @@ export default async function WorkoutSummary({
         <div className="flex gap-4 flex-wrap">
           <ExerciseStat
             Icon={Weight}
-            title={getTotalVolume(exercisesList) + " kg"}
+            title={<WeightText kg={getTotalVolume(exercisesList)} />}
             subtitle="Volume"
           />
           <ExerciseStat

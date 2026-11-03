@@ -6,17 +6,20 @@ import { Card, CardContent } from "@/src/components/card";
 import { Button } from "@/src/components/ui/button";
 import { TrendMetric, WeeklyTrend } from "../types";
 import { getTrendData } from "../utils";
+import { useWeightUnit } from "@/src/features/profile/components/ProfileProvider";
 
 const METRICS: { value: TrendMetric; label: string; unit: string }[] = [
   { value: "workouts", label: "Workouts", unit: "workouts" },
-  { value: "volume", label: "Volume", unit: "kg" },
+  { value: "volume", label: "Volume", unit: "" },
   { value: "minutes", label: "Time", unit: "min" },
 ];
 
 export default function TrendsChart({ trends }: { trends: WeeklyTrend[] }) {
   const [metric, setMetric] = useState<TrendMetric>("workouts");
-  const { unit } = METRICS.find((m) => m.value === metric)!;
-  const data = getTrendData(trends, metric);
+  const weightUnit = useWeightUnit();
+  const { unit: metricUnit } = METRICS.find((m) => m.value === metric)!;
+  const unit = metric === "volume" ? weightUnit : metricUnit;
+  const data = getTrendData(trends, metric, weightUnit);
 
   return (
     <section>
