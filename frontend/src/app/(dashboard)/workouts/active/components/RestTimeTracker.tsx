@@ -44,7 +44,7 @@ export default function RestTimeTracker() {
           <Icon />
         </Button>
         <Button onClick={() => setTime(currentTime + 15)}>+ 15</Button>
-        <Button onClick={start}>
+        <Button onClick={() => start()}>
           <RefreshCcw />
         </Button>
       </div>
