@@ -5,17 +5,22 @@ import { ExercisePickerModal } from "../../../routines/components/ExercisePicker
 import { Exercise as BaseExercise } from "@/src/features/exercises/types";
 import { Check, Plus } from "lucide-react";
 import {
+  getActiveSupersetGroup,
   getDefaultSets,
   isExerciseCompleted,
 } from "@/src/features/workout/utils";
 import { ExerciseImage } from "../../components/ExerciseImage";
 import { useRouter } from "next/navigation";
+import { useEnsurePreviousSets } from "@/src/features/workout/components/WorkoutContext";
+
+const SUPERSET_COLOURS = ["bg-primary", "bg-warning", "bg-info"];
 
 export default function ExerciseList() {
   const [isOpen, setIsOpen] = useState(false);
 
   const { currentExerciseId, setWorkoutData, exercises } = useWorkout();
   const router = useRouter();
+  const ensurePreviousSets = useEnsurePreviousSets();
   const onClick = (exerciseId: number) => {
     if (exerciseId === currentExerciseId) {
       router.push(`/exercises/${exerciseId}`);
@@ -24,18 +29,28 @@ export default function ExerciseList() {
     }
   };
 
-  function addExercises(newExercises: BaseExercise[]) {
-    const exisitingExerciseLookup = new Set(exercises.map((e) => e.id));
+  async function addExercises(newExercises: BaseExercise[]) {
+    const previous = await ensurePreviousSets(newExercises.map((e) => e.id));
+
+    // Read the store again: it may have changed while the sets were loading.
+    const { exercises: latest, currentExerciseId: latestCurrentId } =
+      useWorkout.getState();
+    const exisitingExerciseLookup = new Set(latest.map((e) => e.id));
 
     const exercisesToAdd: Exercise[] = newExercises
       .filter((e) => !exisitingExerciseLookup.has(e.id))
-      .map((e) => ({ ...e, sets: getDefaultSets(e) }));
+      .map((e) => ({
+        ...e,
+        sets: getDefaultSets(e, undefined, { previousSets: previous[e.id] }),
+      }));
 
-    setWorkoutData({
-      exercises: [...exercises, ...exercisesToAdd],
-      currentExerciseId:
-        exercises.length === 0 ? exercisesToAdd?.[0].id : currentExerciseId,
-    });
+    if (exercisesToAdd.length > 0) {
+      setWorkoutData({
+        exercises: [...latest, ...exercisesToAdd],
+        currentExerciseId:
+          latest.length === 0 ? exercisesToAdd[0].id : latestCurrentId,
+      });
+    }
 
     setIsOpen(false);
   }
@@ -57,18 +72,27 @@ export default function ExerciseList() {
       <div className="px-2 py-4 bg-secondary overflow-x-scroll">
         <div className="flex gap-2 w-max">
           {!!exercises.length &&
-            exercises.map((item) => (
-              <div
-                key={item.id}
-                className={`relative transition-opacity duration-300 ${currentExerciseId === item.id ? "cursor-pointer" : "opacity-50"}`}
-                onClick={() => onClick(item.id)}
-              >
-                <ExerciseImage exercise={item} />
-                {isExerciseCompleted(item) && (
-                  <Check className="absolute right-1 bottom-1 bg-white w-5 h-5 rounded-full text-success " />
-                )}
-              </div>
-            ))}
+            exercises.map((item) => {
+              const group = getActiveSupersetGroup(exercises, item);
+              return (
+                <div
+                  key={item.id}
+                  className={`relative transition-opacity duration-300 ${currentExerciseId === item.id ? "cursor-pointer" : "opacity-50"}`}
+                  onClick={() => onClick(item.id)}
+                >
+                  <ExerciseImage exercise={item} />
+                  {isExerciseCompleted(item) && (
+                    <Check className="absolute right-1 bottom-1 bg-white w-5 h-5 rounded-full text-success " />
+                  )}
+                  {group !== null && (
+                    <span
+                      title={`Superset ${group}`}
+                      className={`absolute -bottom-2 left-0 right-0 h-1 rounded-full ${SUPERSET_COLOURS[(group - 1) % SUPERSET_COLOURS.length]}`}
+                    />
+                  )}
+                </div>
+              );
+            })}
           <Button
             className={`h-12 ${noExercises ? "" : "w-17"}`}
             onClick={() => setIsOpen(true)}

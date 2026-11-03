@@ -12,6 +12,7 @@ import { ExercisePickerModal } from "./ExercisePickerModal";
 import { useRouter } from "next/navigation";
 import { Routine } from "@/src/features/routines/types";
 import {
+  toggleSupersetLink,
   toLocalSchedule,
   toUtcSchedule,
 } from "@/src/features/routines/utils";
@@ -110,6 +111,16 @@ export default function RoutineForm({
 
   const values = watch();
 
+  const handleToggleSuperset = (index: number) => {
+    const groups = toggleSupersetLink(
+      (values.routineItems ?? []).map((item) => item.supersetGroup),
+      index,
+    );
+    groups.forEach((group, i) =>
+      setValue(`routineItems.${i}.supersetGroup`, group, { shouldDirty: true }),
+    );
+  };
+
   const handleAddExerciseToForm = (exercises: Exercise[]) => {
     for (const exercise of exercises) {
       if (fields.some((e) => e.exerciseId === exercise.id)) {
@@ -184,6 +195,8 @@ export default function RoutineForm({
             remove={remove}
             errors={formState.errors}
             control={control}
+            items={values.routineItems ?? []}
+            onToggleSuperset={handleToggleSuperset}
           />
           <Button
             type="button"
