@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Suspense } from "react";
 import StatsRangeSelector from "@/src/features/stats/components/StatsRangeSelector";
 import StatsSkeleton from "@/src/features/stats/components/StatsSkeleton";
@@ -18,7 +19,12 @@ export default async function StatsPage({
       <div className="container">
         <div className="flex items-center justify-between gap-4 flex-wrap">
           <h2 className="text-2xl">Stats</h2>
-          <StatsRangeSelector active={range} />
+          <div className="flex items-center gap-3 flex-wrap">
+            <Link href="/body" className="text-sm underline">
+              Body weight
+            </Link>
+            <StatsRangeSelector active={range} />
+          </div>
         </div>
         <Suspense key={range} fallback={<StatsSkeleton />}>
           <StatsView statsPromise={statsPromise} />

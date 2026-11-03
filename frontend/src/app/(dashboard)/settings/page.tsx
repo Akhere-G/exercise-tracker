@@ -1,5 +1,7 @@
+import Link from "next/link";
 import {
   Paintbrush,
+  Scale,
   Sliders,
   UserRound,
 } from "lucide-react";
@@ -51,14 +53,29 @@ export default function SettingsPage() {
             </div>
             <h3 className="text-lg font-bold mb-2">Data Portability</h3>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl mb-6">
-              Your fitness data belongs entirely to you. You will soon be able
-              to securely back up your entire routine history, or import legacy
+              Your fitness data belongs entirely to you. Export your history as CSV now, and soon
+              import legacy
               training logs via structured formats.
             </p>
           </div>
 
           <DataPortabilityButtons />
         </div>
+
+        <Link
+          href="/body"
+          className="bg-card border border-border rounded-2xl p-6 md:col-span-2 flex items-center gap-3 hover:bg-accent"
+        >
+          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+            <Scale className="h-5 w-5" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold">Body weight</h3>
+            <p className="text-sm text-muted-foreground">
+              Log and chart your weigh-ins.
+            </p>
+          </div>
+        </Link>
 
         <div className="bg-card border border-border rounded-2xl p-6 md:col-span-2 flex flex-col gap-4">
           <div className="flex items-center gap-3">
