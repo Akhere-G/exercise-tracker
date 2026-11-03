@@ -77,6 +77,14 @@ class RoutineCreate(RoutineBase):
         return self
 
 
+class RoutineFromWorkout(BaseModel):
+    name: str = Field(min_length=1, max_length=255)
+    day: int = Field(ge=0, le=6)
+    start_time: Optional[time] = None
+
+    _validate_start_time = field_validator("start_time")(_require_utc)
+
+
 class Routine(RoutineBase):
     id: int
     user_id: int
