@@ -7,7 +7,8 @@ export interface TimerState {
   restTime: number;
   isRunning: boolean;
   timerInterval: NodeJS.Timeout | null;
-  start: () => void;
+  /** Starts a countdown, optionally changing the rest duration first. */
+  start: (restSecs?: number) => void;
   pause: () => void;
   play: () => void;
   clear: () => void;
@@ -32,11 +33,13 @@ export const useTimer = create<TimerState>((set, get) => {
     isRunning: false,
     timerInterval: null,
 
-    start: () => {
+    start: (restSecs) => {
       const interval = startInterval();
+      const restTime = typeof restSecs === "number" ? restSecs : get().restTime;
       set({
         isRunning: true,
-        currentTime: get().restTime,
+        restTime,
+        currentTime: restTime,
         timerInterval: interval,
       });
     },

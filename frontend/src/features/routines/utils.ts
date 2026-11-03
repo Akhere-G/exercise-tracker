@@ -44,3 +44,46 @@ export const toUtcSchedule = (day: number, time: string) => {
 
 export const toLocalSchedule = (day: number, startTime: string) =>
   shiftWeekTime(day, startTime, -new Date().getTimezoneOffset());
+
+type SupersetGroups = (number | null | undefined)[];
+
+/**
+ * Links the exercise at `index` with the next one, or unlinks them when they
+ * are already linked. Exercises that end up alone in a group are cleared.
+ */
+export function toggleSupersetLink(
+  groups: SupersetGroups,
+  index: number,
+): (number | null)[] {
+  const result = groups.map((g) => g ?? null);
+  if (index < 0 || index + 1 >= groups.length) return result;
+
+  const current = groups[index] ?? null;
+  const next = groups[index + 1] ?? null;
+  const newGroupId = Math.max(0, ...groups.map((g) => g ?? 0)) + 1;
+
+  if (current !== null && current === next) {
+    const tail: number[] = [];
+    for (let i = index + 1; i < groups.length && groups[i] === current; i++) {
+      tail.push(i);
+    }
+    tail.forEach((i) => {
+      result[i] = tail.length > 1 ? newGroupId : null;
+    });
+
+    const headCount = groups.filter((g, i) => g === current && i <= index)
+      .length;
+    if (headCount === 1) result[index] = null;
+    return result;
+  }
+
+  const group = current ?? next ?? newGroupId;
+  if (next !== null) {
+    groups.forEach((g, i) => {
+      if (g === next) result[i] = group;
+    });
+  }
+  result[index] = group;
+  result[index + 1] = group;
+  return result;
+}
