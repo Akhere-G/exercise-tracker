@@ -4,7 +4,8 @@ import { useState } from "react";
 import { Bar, BarChart, Tooltip, XAxis, YAxis } from "recharts";
 import { Card, CardContent } from "@/src/components/card";
 import { Button } from "@/src/components/ui/button";
-import { TrendMetric, WeeklyTrend } from "../types";
+import Link from "next/link";
+import { Granularity, StatsRange, TrendMetric, WeeklyTrend } from "../types";
 import { getTrendData } from "../utils";
 import { useWeightUnit } from "@/src/features/profile/components/ProfileProvider";
 
@@ -14,17 +15,35 @@ const METRICS: { value: TrendMetric; label: string; unit: string }[] = [
   { value: "minutes", label: "Time", unit: "min" },
 ];
 
-export default function TrendsChart({ trends }: { trends: WeeklyTrend[] }) {
+export default function TrendsChart({
+  trends,
+  granularity = "week",
+  range,
+}: {
+  trends: WeeklyTrend[];
+  granularity?: Granularity;
+  range: StatsRange;
+}) {
   const [metric, setMetric] = useState<TrendMetric>("workouts");
   const weightUnit = useWeightUnit();
   const { unit: metricUnit } = METRICS.find((m) => m.value === metric)!;
   const unit = metric === "volume" ? weightUnit : metricUnit;
-  const data = getTrendData(trends, metric, weightUnit);
+  const data = getTrendData(trends, metric, weightUnit, granularity);
 
   return (
     <section>
       <div className="flex items-center justify-between gap-2 flex-wrap mb-4">
-        <h3 className="text-xl">Weekly trends</h3>
+        <div className="flex items-center gap-3">
+          <h3 className="text-xl">
+            {granularity === "month" ? "Monthly" : "Weekly"} trends
+          </h3>
+          <Link
+            className="text-sm underline"
+            href={`/stats?tab=overview&range=${range}&granularity=${granularity === "month" ? "week" : "month"}`}
+          >
+            Show {granularity === "month" ? "weekly" : "monthly"}
+          </Link>
+        </div>
         <div className="flex gap-2">
           {METRICS.map(({ value, label }) => (
             <Button
