@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import ExerciseDetails from "./ExerciseDetails";
 import SetList from "../../../routines/components/SetList";
@@ -13,28 +13,94 @@ import {
 } from "@/src/features/workout/store";
 import ExerciseList from "./ExerciseList";
 import {
+  getActiveSupersetGroup,
   getDefaultSets,
   isWorkoutCompleted,
 } from "@/src/features/workout/utils";
 import { toast } from "sonner";
 import { Button } from "@/src/components/ui/button";
 import { WorkoutSchema } from "@/src/features/workout/schema";
-import { createWorkout } from "@/src/features/workout/actions";
+import {
+  createWorkout,
+  getPreviousSetsForExercises,
+} from "@/src/features/workout/actions";
+import { PreviousSet } from "@/src/features/workout/types";
+import { ExerciseSetting } from "@/src/features/profile/types";
+import { WorkoutContextProvider } from "@/src/features/workout/components/WorkoutContext";
 
 import { useRouter } from "next/navigation";
-import PreviousSets from "./PreviousSets";
 import { getFailureReason, track } from "@/src/features/analytics/utils";
 
 export default function WorkoutClientProvider({
   routine,
+  exerciseSettings = [],
+  initialPreviousSets = null,
 }: {
   routine: Routine | null;
+  exerciseSettings?: ExerciseSetting[];
+  initialPreviousSets?: Record<number, PreviousSet[]> | null;
 }) {
   const { setWorkoutData, exercises, startedAt, resetState } = useWorkout();
   const router = useRouter();
   const hasTrackedStart = useRef(false);
   const isSubmittingRef = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previousSets, setPreviousSets] = useState<
+    Record<number, PreviousSet[]>
+  >(initialPreviousSets ?? {});
+  const previousRef = useRef<Record<number, PreviousSet[]>>(
+    initialPreviousSets ?? {},
+  );
+  const loadedPreviousIds = useRef(
+    new Set<number>(
+      initialPreviousSets
+        ? (routine?.routineItems.map((item) => item.exerciseId) ?? [])
+        : [],
+    ),
+  );
+  const [restSettings, setRestSettings] = useState<
+    Record<number, number | null>
+  >(() =>
+    Object.fromEntries(exerciseSettings.map((s) => [s.exerciseId, s.restSecs])),
+  );
+
+  const setRestSetting = useCallback(
+    (exerciseId: number, restSecs: number | null) =>
+      setRestSettings((current) => ({ ...current, [exerciseId]: restSecs })),
+    [],
+  );
+
+  const ensurePreviousSets = useCallback(async (exerciseIds: number[]) => {
+    const missing = exerciseIds.filter(
+      (id) => !loadedPreviousIds.current.has(id),
+    );
+
+    if (missing.length > 0) {
+      const response = await getPreviousSetsForExercises(missing);
+      if (response.success) {
+        missing.forEach((id) => loadedPreviousIds.current.add(id));
+        previousRef.current = { ...previousRef.current, ...response.data };
+        setPreviousSets(previousRef.current);
+      }
+    }
+
+    return previousRef.current;
+  }, []);
+
+  const exerciseIdsKey = exercises.map((e) => e.id).join(",");
+  useEffect(() => {
+    ensurePreviousSets(exerciseIdsKey.split(",").filter(Boolean).map(Number));
+  }, [exerciseIdsKey, ensurePreviousSets]);
+
+  const contextValue = useMemo(
+    () => ({
+      previousSets,
+      ensurePreviousSets,
+      restSettings,
+      setRestSetting,
+    }),
+    [previousSets, ensurePreviousSets, restSettings, setRestSetting],
+  );
 
   useEffect(() => {
     try {
@@ -53,10 +119,14 @@ export default function WorkoutClientProvider({
 
       for (const item of routine.routineItems) {
         const { exercise } = item;
-        // TODO: set routineItem data to get new set using targetRep and time data
         const exerciseItem: Exercise = {
           ...exercise,
-          sets: getDefaultSets(exercise),
+          sets: getDefaultSets(exercise, undefined, {
+            routineItem: item,
+            previousSets: initialPreviousSets?.[exercise.id],
+          }),
+          restSecs: item.restSecs ?? null,
+          supersetGroup: item.supersetGroup ?? null,
         };
 
         exercises.push(exerciseItem);
@@ -90,7 +160,12 @@ export default function WorkoutClientProvider({
       completedAt,
       duration,
       routineId: routine?.id,
-      sets: exercises.flatMap((e) => e.sets).filter((s) => s.isCompleted),
+      sets: exercises.flatMap((e) => {
+        const group = getActiveSupersetGroup(exercises, e);
+        return e.sets
+          .filter((s) => s.isCompleted)
+          .map((s) => ({ ...s, supersetGroup: group }));
+      }),
     };
     try {
       const response = await createWorkout(workout);
@@ -129,6 +204,7 @@ export default function WorkoutClientProvider({
 
   const canComplete = isWorkoutCompleted(exercises) && exercises.length > 0;
   return (
+    <WorkoutContextProvider value={contextValue}>
     <div className="relative  h-[90vh] flex flex-1 flex-col justify-between">
       <div>
         <ExerciseList />
@@ -140,7 +216,6 @@ export default function WorkoutClientProvider({
             .some((s) => s.isCompleted)}
         />
         <SetList routine={routine} />
-        <PreviousSets />
       </div>
       <RestTimeTracker />
 
@@ -156,5 +231,6 @@ export default function WorkoutClientProvider({
         </Button>
       </div>
     </div>
+    </WorkoutContextProvider>
   );
 }
