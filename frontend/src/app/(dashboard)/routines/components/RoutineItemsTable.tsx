@@ -8,7 +8,7 @@ import {
 } from "@/src/features/routines/schema";
 import { Input } from "@/src/components/ui/input";
 import TimeInput from "@/src/components/ui/timeInput";
-import { Trash2 } from "lucide-react";
+import { Link2, Link2Off, Trash2 } from "lucide-react";
 import {
   isDurationExercise,
   isRepsExercise,
@@ -22,6 +22,9 @@ interface RoutineItemsTableProps {
   remove: (index: number) => void;
   errors: FieldErrors<RoutineSchema>;
   control: Control<RoutineSchema>;
+  /** Current form values, so superset links reflect edits straight away. */
+  items: RoutineItemSchema[];
+  onToggleSuperset: (index: number) => void;
 }
 
 export function RoutineItemsTable({
@@ -30,6 +33,8 @@ export function RoutineItemsTable({
   remove,
   errors,
   control,
+  items,
+  onToggleSuperset,
 }: RoutineItemsTableProps) {
   return (
     <div>
@@ -49,6 +54,11 @@ export function RoutineItemsTable({
               ? isDurationExercise(exercise as Exercise)
               : false;
 
+            const group = items[index]?.supersetGroup ?? null;
+            const nextGroup = items[index + 1]?.supersetGroup ?? null;
+            const isLinkedToNext = group !== null && group === nextGroup;
+            const hasNext = index < fields.length - 1;
+
             return (
               <div
                 key={field.exerciseId}
@@ -62,6 +72,11 @@ export function RoutineItemsTable({
                     <span className="font-semibold text-sm truncate">
                       {exercise?.name || "Unknown"}
                     </span>
+                    {group !== null && (
+                      <span className="text-[10px] uppercase tracking-wide text-primary bg-primary/10 px-1.5 py-0.5 rounded mt-0.5">
+                        Superset {group}
+                      </span>
+                    )}
                   </div>
                   <Button
                     type="button"
@@ -106,6 +121,20 @@ export function RoutineItemsTable({
                     </div>
                   )}
 
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] uppercase text-muted-foreground">
+                      Rest (s)
+                    </label>
+                    <Input
+                      type="number"
+                      min={0}
+                      max={3600}
+                      placeholder="Default"
+                      className="text-center"
+                      {...register(`routineItems.${index}.restSecs`)}
+                    />
+                  </div>
+
                   {hasDuration && (
                     <div className="flex flex-col gap-1">
                       <label className="text-[10px] uppercase text-muted-foreground">
@@ -124,6 +153,26 @@ export function RoutineItemsTable({
                     </div>
                   )}
                 </div>
+
+                {hasNext && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="self-start"
+                    onClick={() => onToggleSuperset(index)}
+                  >
+                    {isLinkedToNext ? (
+                      <>
+                        <Link2Off size={14} /> Unlink from next
+                      </>
+                    ) : (
+                      <>
+                        <Link2 size={14} /> Superset with next
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
             );
           })}
