@@ -87,3 +87,41 @@ export function toggleSupersetLink(
   result[index + 1] = group;
   return result;
 }
+
+export interface PerformedExercise {
+  exerciseId: number;
+  name: string;
+  /** Completed sets, not counting warm-ups. */
+  sets: number;
+}
+
+export interface RoutineDiff {
+  added: PerformedExercise[];
+  removed: { exerciseId: number; name: string }[];
+  changed: { exerciseId: number; name: string; from: number; to: number }[];
+}
+
+/** What a finished workout did differently from the routine it was based on. */
+export function diffRoutine(
+  routineItems: { exerciseId: number; targetSets: number; exercise: { name: string } }[],
+  performed: PerformedExercise[],
+): RoutineDiff {
+  const targets = new Map(routineItems.map((item) => [item.exerciseId, item]));
+  const done = new Map(performed.map((p) => [p.exerciseId, p]));
+
+  return {
+    added: performed.filter((p) => !targets.has(p.exerciseId)),
+    removed: routineItems
+      .filter((item) => !done.has(item.exerciseId))
+      .map((item) => ({ exerciseId: item.exerciseId, name: item.exercise.name })),
+    changed: performed.flatMap((p) => {
+      const item = targets.get(p.exerciseId);
+      return item && item.targetSets !== p.sets
+        ? [{ exerciseId: p.exerciseId, name: p.name, from: item.targetSets, to: p.sets }]
+        : [];
+    }),
+  };
+}
+
+export const hasRoutineDiff = (diff: RoutineDiff) =>
+  diff.added.length + diff.removed.length + diff.changed.length > 0;
