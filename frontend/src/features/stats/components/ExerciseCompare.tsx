@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
+import { Legend, Line, LineChart, Tooltip, XAxis, YAxis } from "recharts";
 import { X } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
@@ -20,9 +20,9 @@ const METRICS = [
 
 type Metric = (typeof METRICS)[number]["value"];
 const COLORS = [
-  "var(--color-chart-1)",
-  "var(--color-chart-2)",
-  "var(--color-chart-3)",
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
 ];
 const MAX_EXERCISES = 3;
 
@@ -64,7 +64,7 @@ export default function ExerciseCompare({
     ...Object.fromEntries(
       series.map((s) => {
         const session = s.sessions.find((x) => x.day === day);
-        return [s.name, session ? read(session) : null];
+        return [`s${s.exerciseId}`, session ? read(session) : null];
       }),
     ),
   }));
@@ -145,8 +145,10 @@ export default function ExerciseCompare({
           <XAxis dataKey="x" stroke="var(--color-secondary-foreground)" />
           <YAxis width="auto" stroke="var(--color-secondary-foreground)" />
           <Tooltip
-            formatter={(value) => [`${value} ${metric === "volume" ? "" : unit}`, ""]}
-            separator=""
+            formatter={(value, name) => [
+              `${value}${metric === "volume" ? "" : ` ${unit}`}`,
+              name,
+            ]}
             contentStyle={{
               backgroundColor: "var(--color-card, #fff)",
               borderColor: "var(--color-border, #e2e8f0)",
@@ -155,14 +157,17 @@ export default function ExerciseCompare({
             itemStyle={{ color: "var(--color-foreground)" }}
             labelStyle={{ color: "var(--color-muted-foreground)" }}
           />
+          <Legend wrapperStyle={{ color: "var(--color-foreground)" }} />
           {series.map((s, i) => (
             <Line
               key={s.exerciseId}
-              dataKey={s.name}
+              dataKey={`s${s.exerciseId}`}
+              name={s.name}
               stroke={COLORS[i]}
               strokeWidth={2}
               connectNulls
-              dot={{ r: 3 }}
+              dot={{ r: 4, fill: COLORS[i], stroke: COLORS[i] }}
+              activeDot={{ r: 6, fill: COLORS[i], stroke: COLORS[i] }}
             />
           ))}
         </LineChart>
