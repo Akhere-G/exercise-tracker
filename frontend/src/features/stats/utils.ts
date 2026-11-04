@@ -58,6 +58,18 @@ export function formatDuration(totalSecs: number) {
   return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 }
 
+export function formatSignedDuration(secs: number) {
+  const sign = secs > 0 ? "+" : secs < 0 ? "-" : "";
+  const mins = Math.round(Math.abs(secs) / 60);
+  if (mins < 60) return `${sign}${mins}m`;
+  const hours = Math.round((mins / 60) * 10) / 10;
+  return `${sign}${hours}h`;
+}
+
+export function formatSignedCount(value: number) {
+  return `${value > 0 ? "+" : ""}${value}`;
+}
+
 const MONTHS = [
   "Jan",
   "Feb",
