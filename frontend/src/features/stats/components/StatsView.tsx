@@ -2,17 +2,25 @@
 
 import { use } from "react";
 import { ActionResponse } from "@/src/lib/apiTypes";
-import { Stats } from "../types";
+import { Suspense } from "react";
+import { Granularity, PeriodComparison, Stats, StatsRange } from "../types";
 import MuscleBreakdown from "./MuscleBreakdown";
 import OverviewCards from "./OverviewCards";
+import PeriodDeltas from "./PeriodDeltas";
 import PersonalRecords from "./PersonalRecords";
 import TopExercises from "./TopExercises";
 import TrendsChart from "./TrendsChart";
 
 export default function StatsView({
   statsPromise,
+  comparisonPromise,
+  range,
+  granularity,
 }: {
   statsPromise: Promise<ActionResponse<Stats>>;
+  comparisonPromise: Promise<ActionResponse<PeriodComparison> | null>;
+  range: StatsRange;
+  granularity: Granularity;
 }) {
   const response = use(statsPromise);
 
@@ -41,7 +49,10 @@ export default function StatsView({
   return (
     <div className="mt-4 flex flex-col gap-8 pb-8">
       <OverviewCards overview={overview} />
-      <TrendsChart trends={trends} />
+      <Suspense fallback={null}>
+        <PeriodDeltas comparisonPromise={comparisonPromise} />
+      </Suspense>
+      <TrendsChart trends={trends} granularity={granularity} range={range} />
       <MuscleBreakdown muscles={muscles} />
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         <TopExercises exercises={topExercises} />
