@@ -57,12 +57,6 @@ export default async function RootLayout({
         <NavigationMenu className="bg-secondary/95 w-screen h-[10vh] ">
           <NavigationMenuList className="gap-2 md:gap-4 w-screen">
             <NavigationMenuItem>
-              <NavigationMenuLink href="/routines">
-                <House style={{ width: "20px", height: "20px" }} />
-              </NavigationMenuLink>
-            </NavigationMenuItem>
-
-            <NavigationMenuItem>
               <NavigationMenuLink href="/workouts">
                 <Calendar style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
@@ -70,6 +64,11 @@ export default async function RootLayout({
             <NavigationMenuItem>
               <NavigationMenuLink href="/achievements">
                 <Trophy style={{ width: "20px", height: "20px" }} />
+              </NavigationMenuLink>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <NavigationMenuLink href="/routines">
+                <House style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
