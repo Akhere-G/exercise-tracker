@@ -39,3 +39,25 @@ def test_a_date_range_ending_before_it_starts_is_a_422(client, auth_headers):
     response = client.get("/api/workouts?start=2026-10-20&end=2026-10-19", headers=auth_headers)
 
     assert response.status_code == 422
+
+
+def test_creating_a_workout_longer_than_the_cap_clamps_the_duration(
+    client, auth_headers
+):
+    payload = workout_payload(duration=30 * 24 * 60 * 60)
+
+    response = client.post("/api/workouts", json=payload, headers=auth_headers)
+
+    assert response.status_code == 201
+    assert response.json()["duration"] == 3 * 60 * 60
+    assert response.json()["durationCapped"] is True
+
+
+def test_creating_a_workout_within_the_cap_is_not_flagged(client, auth_headers):
+    response = client.post(
+        "/api/workouts", json=workout_payload(duration=3 * 60 * 60), headers=auth_headers
+    )
+
+    assert response.status_code == 201
+    assert response.json()["duration"] == 3 * 60 * 60
+    assert response.json()["durationCapped"] is False

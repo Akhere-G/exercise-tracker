@@ -193,6 +193,11 @@ export default function WorkoutClientProvider({
           has_routine: routine !== null,
         });
         saved = true;
+        if (newWorkout.durationCapped) {
+          toast.warning(
+            "Workout time was shortened to 3 hours because it was too long.",
+          );
+        }
 
         const performed: PerformedExercise[] = exercises.flatMap((e) => {
           const done = e.sets.filter((s) => s.isCompleted);

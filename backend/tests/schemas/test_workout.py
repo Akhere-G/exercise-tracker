@@ -21,7 +21,7 @@ from tests.helpers import set_payload, workout_payload
         {"sets": [set_payload(setIndex=0)]},
         {"sets": [set_payload(durationSecs=100_000)]},
         {"duration": -1},
-        {"duration": 8 * 24 * 60 * 60},
+        {"duration": 2_147_483_648},
         {"sets": [set_payload(setIndex=i + 1) for i in range(MAX_SETS_PER_WORKOUT + 1)]},
     ],
 )

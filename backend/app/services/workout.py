@@ -3,7 +3,7 @@ from datetime import date, datetime, time, timedelta
 from typing import Optional
 
 from app.models import Exercise, ExerciseMuscle, Workout, WorkoutSet
-from app.schemas.workout import WorkoutCreate, WorkoutUpdate
+from app.schemas.workout import MAX_NEW_WORKOUT_SECS, WorkoutCreate, WorkoutUpdate
 from app.services import achievement as achievement_service
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
@@ -139,12 +139,14 @@ def calculate_current_frequency_streaks(
 
 
 def create_workout(db: Session, user_id: int, workout_in: WorkoutCreate):
+    duration_capped = workout_in.duration > MAX_NEW_WORKOUT_SECS
+    duration = min(workout_in.duration, MAX_NEW_WORKOUT_SECS)
     try:
         workout = Workout(
             user_id=user_id,
             routine_id=workout_in.routine_id,
             completed_at=workout_in.completed_at,
-            duration=workout_in.duration,
+            duration=duration,
             sets=[_build_set(set_data) for set_data in workout_in.sets],
         )
         db.add(workout)
@@ -155,6 +157,8 @@ def create_workout(db: Session, user_id: int, workout_in: WorkoutCreate):
         raise
 
     _award_achievements_safely(db, user_id, workout)
+    # Transient response flag; not a column.
+    workout.duration_capped = duration_capped
     return workout
 
 

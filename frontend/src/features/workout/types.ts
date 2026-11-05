@@ -35,6 +35,7 @@ export interface Workout {
   routineId: number;
   completedAt: Date;
   duration: number;
+  durationCapped?: boolean;
   sets: WorkoutSet[];
 }
 
