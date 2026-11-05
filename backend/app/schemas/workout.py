@@ -33,6 +33,8 @@ class WorkoutSetBase(BaseModel):
 
 MAX_SETS_PER_WORKOUT = 500
 MAX_WORKOUT_SECS = 7 * 24 * 60 * 60
+MAX_NEW_WORKOUT_SECS = 3 * 60 * 60
+MAX_INT32 = 2_147_483_647
 
 
 class WorkoutSetCreate(WorkoutSetBase):
@@ -79,7 +81,8 @@ class WorkoutBase(BaseModel):
 
 
 class WorkoutCreate(WorkoutBase):
-    duration: int = Field(ge=0, le=MAX_WORKOUT_SECS)
+    # Over-long durations are clamped to MAX_NEW_WORKOUT_SECS by the service, not rejected.
+    duration: int = Field(ge=0, le=MAX_INT32)
     sets: List[WorkoutSetCreate] = Field(max_length=MAX_SETS_PER_WORKOUT)
 
 
@@ -94,4 +97,5 @@ class WorkoutUpdate(BaseModel):
 class Workout(WorkoutBase):
     id: int
     user_id: int
+    duration_capped: bool = False
     sets: List[WorkoutSet] = []
