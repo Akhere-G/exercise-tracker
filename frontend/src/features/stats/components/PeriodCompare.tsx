@@ -1,7 +1,7 @@
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { WeightText } from "@/src/features/profile/components/Weight";
-import { PeriodComparison } from "../types";
-import { formatDuration, formatNumber } from "../utils";
+import { DeltaValue, PeriodComparison } from "../types";
+import { formatDuration, formatNumber, formatSignedCount, formatSignedDuration } from "../utils";
 
 const ROWS = [
   { key: "workoutCount", label: "Workouts", format: (v: number) => formatNumber(v) },
@@ -17,6 +17,13 @@ type OverviewKey = Row["key"];
 
 const show = (row: Row, value: number) =>
   "kg" in row ? <WeightText kg={Math.round(value)} /> : row.format(value);
+
+const change = (key: OverviewKey, delta: DeltaValue | undefined) => {
+  if (!delta) return "–";
+  if (key === "workoutCount" || key === "totalSets") return formatSignedCount(delta.change);
+  if (key === "totalDurationSecs") return formatSignedDuration(delta.change);
+  return delta.percent === null ? "–" : `${delta.percent > 0 ? "+" : ""}${delta.percent}%`;
+};
 
 export default function PeriodCompare({
   comparison,
@@ -56,9 +63,7 @@ export default function PeriodCompare({
                   <td className="py-2">
                     <span className="inline-flex items-center gap-1">
                       <Icon size={12} className={delta?.change > 0 ? "text-primary" : ""} />
-                      {delta?.percent !== null && delta?.percent !== undefined
-                        ? `${delta.percent > 0 ? "+" : ""}${delta.percent}%`
-                        : "–"}
+                      {change(key, delta)}
                     </span>
                   </td>
                 </tr>
