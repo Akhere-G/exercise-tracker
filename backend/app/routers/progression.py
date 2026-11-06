@@ -17,12 +17,12 @@ router = APIRouter(prefix="/api/progression", tags=["Progression"])
 def get_progression(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Annotated[Session, Depends(get_db)],
-    exerciseIds: Annotated[str, Query(max_length=1000)] = "",
+    exerciseIds: Annotated[str, Query(max_length=1000)] = "",  # noqa: N803
 ):
     try:
         exercise_ids = [int(i) for i in exerciseIds.split(",") if i.strip()]
     except ValueError:
-        raise HTTPException(
+        raise HTTPException(  # noqa: B904
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="exerciseIds must be a comma-separated list of integers.",
         )

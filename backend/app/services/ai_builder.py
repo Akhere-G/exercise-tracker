@@ -73,9 +73,7 @@ def build_prompt(request: BuildRoutineRequest, candidates: Sequence[Exercise]) -
     return "\n".join(lines)
 
 
-def _to_preview(
-    plan: RoutinePlan, catalogue: dict[int, Exercise]
-) -> RoutinePreview:
+def _to_preview(plan: RoutinePlan, catalogue: dict[int, Exercise]) -> RoutinePreview:
     routines = []
     for routine in plan.routines:
         items = [
@@ -115,6 +113,8 @@ def build_routines(
         get_persona(profile.coach_persona).system_prompt,
         providers,
     )
+    print("AI text= ", end="")
+    print(raw)
     try:
         plan = RoutinePlan.model_validate(ai_service.extract_json(raw))
     except (ValueError, ValidationError) as exc:
