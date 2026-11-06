@@ -10,6 +10,7 @@ class AchievementBase(BaseModel):
     type: str
     icon: str
     criteria: str | None = None
+    priority: int = 0
 
 
 class AchievementCreate(AchievementBase):

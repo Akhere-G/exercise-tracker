@@ -2,6 +2,7 @@ from datetime import date, datetime, timedelta, timezone
 
 from app.constants.milestones import MILESTONES
 from app.models import Achievement, Exercise, UserAchievement, Workout
+from app.models.achievement import AchievementPriority
 from app.schemas.achievement import UserAchievementResponse
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session, selectinload
@@ -51,6 +52,13 @@ PR_DEFINITIONS = [
     ),
 ]
 
+# Milestones, then streaks, then PRs; newest first within each.
+_DISPLAY_ORDER = (
+    Achievement.priority,
+    UserAchievement.unlocked_at.desc(),
+    UserAchievement.id.desc(),
+)
+
 FREQUENCY_ICONS = {1: "flame", 2: "calendar", 3: "award", 4: "medal", 5: "crown"}
 
 
@@ -66,6 +74,7 @@ def seed_achievements(db: Session) -> None:
                 type=type_,
                 icon=icon,
                 criteria=criteria,
+                priority=AchievementPriority.PR,
             )
         )
 
@@ -81,6 +90,7 @@ def seed_achievements(db: Session) -> None:
                 type=_streak_type(frequency),
                 icon=FREQUENCY_ICONS[frequency],
                 criteria=description,
+                priority=AchievementPriority.STREAK,
             )
         )
 
@@ -92,13 +102,27 @@ def seed_achievements(db: Session) -> None:
                 type=milestone.type,
                 icon=milestone.icon,
                 criteria=milestone.description,
+                priority=AchievementPriority.MILESTONE,
             )
         )
 
-    existing_types = set(db.execute(select(Achievement.type)).scalars().all())
+    existing = {
+        achievement.type: achievement
+        for achievement in db.execute(select(Achievement)).scalars()
+    }
+    milestone_types = {milestone.type for milestone in MILESTONES}
     for definition in definitions:
-        if definition.type not in existing_types:
+        current = existing.get(definition.type)
+        if current is None:
             db.add(definition)
+            continue
+        current.priority = definition.priority
+        if definition.type in milestone_types:
+            # Milestones are code-defined, so renames and icon changes must propagate.
+            current.name = definition.name
+            current.description = definition.description
+            current.icon = definition.icon
+            current.criteria = definition.criteria
 
     db.commit()
 
@@ -349,7 +373,9 @@ def get_user_achievements(db: Session, user_id: int) -> list[UserAchievementResp
             ranked_achievements,
             UserAchievement.id == ranked_achievements.c.user_achievement_id,
         )
+        .join(Achievement, UserAchievement.achievement_id == Achievement.id)
         .where(ranked_achievements.c.rn == 1)
+        .order_by(*_DISPLAY_ORDER)
     )
     return _serialize(db.execute(stmt).scalars().all())
 
@@ -387,7 +413,9 @@ def get_achievements_for_exercise(
             ranked_exercise_achievements,
             UserAchievement.id == ranked_exercise_achievements.c.user_achievement_id,
         )
+        .join(Achievement, UserAchievement.achievement_id == Achievement.id)
         .where(ranked_exercise_achievements.c.rn == 1)
+        .order_by(*_DISPLAY_ORDER)
     )
     return _serialize(db.execute(stmt).scalars().all())
 
@@ -428,7 +456,9 @@ def get_achievements_for_workout(
             ranked_workout_achievements,
             UserAchievement.id == ranked_workout_achievements.c.user_achievement_id,
         )
+        .join(Achievement, UserAchievement.achievement_id == Achievement.id)
         .where(ranked_workout_achievements.c.rn == 1)
+        .order_by(*_DISPLAY_ORDER)
     )
     return _serialize(db.execute(stmt).scalars().all())
 
