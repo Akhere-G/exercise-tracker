@@ -21,6 +21,7 @@ class StalledExercise(BaseModel):
     exercise_id: int
     name: str
     reason: str
+    change_percent: float
 
 
 class DeloadSuggestion(BaseModel):

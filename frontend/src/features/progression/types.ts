@@ -12,6 +12,7 @@ export interface StalledExercise {
   exerciseId: number;
   name: string;
   reason: "stalled" | "declined";
+  changePercent: number;
 }
 
 export interface DeloadAssessment {

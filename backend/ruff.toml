@@ -1,0 +1,26 @@
+target-version = "py311"
+line-length = 88
+extend-exclude = ["alembic/versions", ".venv"]
+
+[lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "I",        # isort
+    "N",        # pep8-naming
+    "UP",       # pyupgrade
+    "B",        # bugbear
+    "C4",       # comprehensions
+    "SIM",      # simplify
+    "RET",      # return consistency
+    "PL",       # pylint
+    "PERF",     # perflint
+    "RUF",      # ruff-specific
+]
+ignore = ["PLR0913"]  # service functions take explicit arguments
+
+[lint.isort]
+known-first-party = ["app", "tests", "seed"]
+
+[lint.per-file-ignores]
+"tests/**" = ["PLR2004"]  # magic numbers are fine in assertions
