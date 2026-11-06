@@ -66,6 +66,17 @@ frontend/
 * Return appropriate HTTP status codes.
 * Keep routers thin; delegate logic to services.
 
+### Code Quality
+
+* Python must pass `ruff check` and `ruff format` using `backend/ruff.toml` (rules: https://docs.astral.sh/ruff/rules/). Run both on every file you change.
+* Write ordinary loops with descriptive names (`working_set`, `stalled_lifts`), not clever comprehension chains, walrus operators or one-letter names. Use a comprehension only when it is a single simple transform or filter (ruff `PERF` may require it).
+* Keep functions small and single-purpose. Give each independent signal or rule its own function and result type (a `dataclass`) instead of mixing them in one function.
+* Name thresholds as module constants with a comment on what they mean; never inline magic numbers.
+* Use modern typing: `X | None`, `collections.abc.Sequence`. Avoid `Optional`/`typing.Sequence` in new code.
+* Prefer `datetime.now(UTC)` over `datetime.utcnow()`.
+* Anything that produces a recommendation or alert must (1) return nothing when there is too little data to judge, (2) be rate-limited with a cooldown so users are not nagged, and (3) explain why it triggered, with the numbers behind it.
+* Every new rule or branch needs a test, including the "not enough data" and cooldown cases.
+
 ### Migrations
 
 After model changes:
@@ -161,6 +172,8 @@ Do not create new architectural patterns without a good reason.
 * Modify `node_modules`.
 * Commit build artifacts.
 * Ignore existing TypeScript or lint errors.
+* Leave ruff errors in files you touch.
+* Add clever one-liners that need a comment to decode.
 * Introduce unnecessary architectural changes.
 
 ## Development Workflow

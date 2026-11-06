@@ -36,6 +36,9 @@ class UserProfile(Base, AuditMixin):
     wrapped_theme: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     timezone: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     onboarded_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    last_deload_recommended_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True
+    )
 
 
 class UserExerciseSetting(Base, AuditMixin):
