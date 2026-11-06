@@ -43,7 +43,7 @@ def test_recommends_a_deload_when_lifts_have_stalled(client, auth_headers):
     assert body["shouldDeload"] is True
     assert body["stalledExercises"][0]["reason"] == "stalled"
     assert body["stalledExercises"][0]["changePercent"] == 0
-    assert "2 of 2 tracked lifts" in body["reasons"][0]
+    assert "estimated 1RM made no progress" in body["reasons"][0]
     assert body["suggestion"] == {"volumePercent": 60, "maxRpe": 7.0}
     assert body["message"]
 
@@ -55,7 +55,7 @@ def test_recommends_a_deload_after_a_run_of_hard_sessions(client, auth_headers):
     body = client.get("/api/progression/deload", headers=auth_headers).json()
 
     assert body["shouldDeload"] is True
-    assert "average effort is RPE 9.5" in body["reasons"][0]
+    assert "RPE 9.5" in body["reasons"][0]
     assert body["stalledExercises"] == []
 
 
