@@ -1,23 +1,41 @@
 import { ExerciseNoMuscles } from "../exercises/types";
 import {
   Award,
+  Cake,
   Calendar,
+  CalendarCheck,
+  CalendarDays,
+  Compass,
   Crown,
+  Dumbbell,
   Flag,
   Flame,
+  Focus,
+  Gauge,
   Hourglass,
   Medal,
+  Moon,
+  MoonStar,
+  Mountain,
   PartyPopper,
   Repeat,
+  Repeat2,
   Route,
   Shapes,
+  Shield,
+  Sparkles,
+  Sprout,
+  Sun,
   Sunrise,
   Swords,
   Tally5,
+  Target,
   Timer,
+  TrendingUp,
   Trophy,
-  Moon,
+  Users,
   Weight,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 export interface Achievement {
@@ -27,6 +45,7 @@ export interface Achievement {
   type: string;
   icon: string;
   criteria: string;
+  priority: number;
 }
 
 export interface UserAchievement {
@@ -64,14 +83,31 @@ export type AchievementPrTypes =
 
 const MILESTONE_PREFIXES = [
   "first_workout",
-  "back_to_back",
-  "early_bird",
-  "night_owl",
-  "weekend_warrior",
+  "workouts_",
   "century",
+  "back_to_back",
+  "three_peat",
+  "five_day_fire",
+  "weekly_warrior",
+  "monthly_regular",
+  "four_week_focus",
+  "two_month_club",
+  "weekend_warrior",
+  "early_riser",
+  "early_bird",
+  "lunch_break_lifter",
+  "night_owl",
+  "midnight_oil",
+  "speed_demon",
   "marathon_session",
+  "heavy_hitter",
   "ton_up",
+  "volume_monster",
+  "triple_threat",
+  "record_breaker",
   "variety_",
+  "new_year_new_gains",
+  "first_anniversary",
 ];
 
 export const isMilestone = (type: string) =>
@@ -112,6 +148,24 @@ export const ICONS: Record<string, LucideIcon> = {
   hourglass: Hourglass,
   weight: Weight,
   shapes: Shapes,
+  sprout: Sprout,
+  dumbbell: Dumbbell,
+  target: Target,
+  gauge: Gauge,
+  shield: Shield,
+  "repeat-2": Repeat2,
+  "calendar-check": CalendarCheck,
+  "calendar-days": CalendarDays,
+  focus: Focus,
+  users: Users,
+  sun: Sun,
+  "moon-star": MoonStar,
+  zap: Zap,
+  mountain: Mountain,
+  "trending-up": TrendingUp,
+  compass: Compass,
+  sparkles: Sparkles,
+  cake: Cake,
 };
 
 export const ACCENTS = {

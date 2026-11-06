@@ -24,6 +24,14 @@ class AchievementType:
     FREQ_STREAK_5 = "freq_streak_5"
 
 
+class AchievementPriority:
+    """Display rank of an achievement category; lower sorts first."""
+
+    MILESTONE = 0
+    STREAK = 1
+    PR = 2
+
+
 class Achievement(Base, AuditMixin):
     __tablename__ = "achievements"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -32,6 +40,9 @@ class Achievement(Base, AuditMixin):
     type: Mapped[str] = mapped_column(String(50), index=True)
     icon: Mapped[str] = mapped_column(String(50))
     criteria: Mapped[str] = mapped_column(String(255))
+    priority: Mapped[int] = mapped_column(
+        Integer, server_default=str(AchievementPriority.MILESTONE)
+    )
     user_achievements: Mapped[list["UserAchievement"]] = relationship(
         "UserAchievement", back_populates="achievement"
     )
