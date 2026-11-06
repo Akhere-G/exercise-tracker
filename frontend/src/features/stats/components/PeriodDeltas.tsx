@@ -2,7 +2,8 @@
 import { use } from "react";
 import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { ActionResponse } from "@/src/lib/apiTypes";
-import { PeriodComparison } from "../types";
+import { DeltaValue, PeriodComparison } from "../types";
+import { formatSignedCount, formatSignedDuration } from "../utils";
 
 const FIELDS = [
   { key: "workoutCount", label: "Workouts" },
@@ -10,6 +11,13 @@ const FIELDS = [
   { key: "totalVolume", label: "Volume" },
   { key: "totalDurationSecs", label: "Time" },
 ] as const;
+
+const formatChange = (key: (typeof FIELDS)[number]["key"], delta: DeltaValue) => {
+  if (key === "totalDurationSecs") return formatSignedDuration(delta.change);
+  if (key === "totalVolume")
+    return delta.percent === null ? "–" : `${delta.percent > 0 ? "+" : ""}${delta.percent}%`;
+  return formatSignedCount(delta.change);
+};
 
 export default function PeriodDeltas({
   comparisonPromise,
@@ -33,7 +41,7 @@ export default function PeriodDeltas({
           >
             <Icon size={12} className={delta.change > 0 ? "text-primary" : ""} />
             {label}
-            {delta.percent !== null && ` ${delta.percent > 0 ? "+" : ""}${delta.percent}%`}
+            {` ${formatChange(key, delta)}`}
           </span>
         );
       })}
