@@ -8,8 +8,12 @@ import {
 import { LogoutButton } from "@/src/features/auth/components/LogoutButton";
 import DataPortabilityButtons from "./components/DataPortabilityButtons";
 import PreferencesCard from "./components/PreferencesCard";
+import { getPersonas } from "@/src/features/ai/queries";
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const personasResponse = await getPersonas();
+  const personas = personasResponse.success ? personasResponse.data : [];
+
   return (
     <div className="container ">
       <div className="flex flex-col gap-1 mb-8">
@@ -20,7 +24,7 @@ export default function SettingsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <PreferencesCard />
+        <PreferencesCard personas={personas} />
 
         <div className="bg-card border border-border rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between min-h-[180px]">
           <div>

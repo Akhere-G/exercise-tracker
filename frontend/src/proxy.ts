@@ -7,6 +7,7 @@ export function proxy(request: NextRequest) {
   const authPaths = ["/login", "/register"];
   const protectedPaths = [
     "/routines",
+    "/programs",
     "/workouts",
     "/exercises",
     "/achievements",

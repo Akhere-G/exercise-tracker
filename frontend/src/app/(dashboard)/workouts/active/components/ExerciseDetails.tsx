@@ -30,6 +30,7 @@ import {
 } from "@/src/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { track } from "@/src/features/analytics/utils";
+import ProgressionChip from "@/src/features/progression/components/ProgressionChip";
 
 export default function ExerciseDetails({
   completeWorkout,
@@ -159,6 +160,7 @@ export default function ExerciseDetails({
                   {currentExercise.muscles.map((m) => m.name).join(", ")}
                 </p>
               </div>
+              <ProgressionChip exercise={currentExercise} />
             </div>
             <DropdownMenu>
               <DropdownMenuTrigger>

@@ -12,7 +12,9 @@ class RoutineItemBase(BaseModel):
     exercise_id: int
     target_sets: int
     target_reps: Optional[int] = None
+    target_weight: Optional[float] = None
     target_duration_secs: Optional[int] = None
+    target_distance_meters: Optional[float] = None
     order: int
     rest_secs: Optional[int] = None
     superset_group: Optional[int] = None
@@ -30,7 +32,13 @@ class RoutineItemBase(BaseModel):
 class RoutineItemCreate(RoutineItemBase):
     target_sets: int = Field(ge=1, le=100)
     target_reps: Optional[int] = Field(default=None, ge=0, le=10_000)
+    target_weight: Optional[float] = Field(
+        default=None, ge=0, le=10_000, allow_inf_nan=False
+    )
     target_duration_secs: Optional[int] = Field(default=None, ge=0, le=24 * 60 * 60)
+    target_distance_meters: Optional[float] = Field(
+        default=None, ge=0, le=1_000_000, allow_inf_nan=False
+    )
     order: int = Field(ge=0, le=1000)
     rest_secs: Optional[int] = Field(default=None, ge=0, le=60 * 60)
     superset_group: Optional[int] = Field(default=None, ge=0, le=1000)

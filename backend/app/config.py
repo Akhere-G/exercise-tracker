@@ -28,5 +28,10 @@ class Settings(BaseSettings):
 
     vapid_private_key: str | None = None
 
+    gemini_api_key: str | None = None
+    gemini_model: str = "gemini-3.5-flash"
+    groq_api_key: str | None = None
+    groq_model: str = "openai/gpt-oss-20b"
+
 
 settings = Settings()

@@ -1,6 +1,6 @@
 from app.database import Base
 from .audit_mixin import AuditMixin
-from sqlalchemy import Integer, String, Time, ForeignKey
+from sqlalchemy import Float, Integer, String, Time, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 from datetime import time
 from typing import Optional, List
@@ -35,7 +35,9 @@ class RoutineItem(Base, AuditMixin):
     )
     target_sets: Mapped[int] = mapped_column(Integer)
     target_reps: Mapped[Optional[int]] = mapped_column(Integer)
+    target_weight: Mapped[Optional[float]] = mapped_column(Float)
     target_duration_secs: Mapped[Optional[int]] = mapped_column(Integer)
+    target_distance_meters: Mapped[Optional[float]] = mapped_column(Float)
     order: Mapped[int] = mapped_column(Integer)
     rest_secs: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     superset_group: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
