@@ -37,19 +37,19 @@ def get_routine(db: Session, user_id: int, routine_id: int):
     return db.execute(stmt).scalars().one_or_none()
 
 
-def create_routine(db: Session, user_id: int, routine: RoutineCreate):
-    try:
-        new_routine = Routine(
-            name=routine.name,
-            user_id=user_id,
-            day=routine.day,
-            start_time=routine.start_time,
-        )
-        db.add(new_routine)
-        db.flush()
+def _add_routine(db: Session, user_id: int, routine: RoutineCreate) -> Routine:
+    new_routine = Routine(
+        name=routine.name,
+        user_id=user_id,
+        day=routine.day,
+        start_time=routine.start_time,
+    )
+    db.add(new_routine)
+    db.flush()
 
-        for item in routine.routine_items:
-            routine_item = RoutineItem(
+    for item in routine.routine_items:
+        db.add(
+            RoutineItem(
                 routine_id=new_routine.id,
                 exercise_id=item.exercise_id,
                 target_sets=item.target_sets,
@@ -59,15 +59,27 @@ def create_routine(db: Session, user_id: int, routine: RoutineCreate):
                 rest_secs=item.rest_secs,
                 superset_group=item.superset_group,
             )
-            db.add(routine_item)
+        )
+    return new_routine
 
+
+def create_routines(
+    db: Session, user_id: int, routines: list[RoutineCreate]
+) -> list[Routine]:
+    """Creates all the routines or none of them."""
+    try:
+        created = [_add_routine(db, user_id, routine) for routine in routines]
         db.commit()
-        db.refresh(new_routine)
-        return new_routine
-
+        for routine in created:
+            db.refresh(routine)
+        return created
     except Exception:
         db.rollback()
         raise
+
+
+def create_routine(db: Session, user_id: int, routine: RoutineCreate):
+    return create_routines(db, user_id, [routine])[0]
 
 
 def update_routine(

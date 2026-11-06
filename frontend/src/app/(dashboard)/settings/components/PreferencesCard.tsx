@@ -4,7 +4,12 @@ import { Scale } from "lucide-react";
 import { toast } from "sonner";
 import { updateProfile } from "@/src/features/profile/actions";
 import { useProfile } from "@/src/features/profile/components/ProfileProvider";
-import { EffortMetric, ProfileUpdate } from "@/src/features/profile/types";
+import { Persona } from "@/src/features/ai/types";
+import {
+  CoachPersona,
+  EffortMetric,
+  ProfileUpdate,
+} from "@/src/features/profile/types";
 import { WeightUnit } from "@/src/lib/units";
 
 const UNITS: { value: WeightUnit; label: string }[] = [
@@ -18,7 +23,11 @@ const EFFORT_METRICS: { value: EffortMetric; label: string }[] = [
   { value: "rir", label: "RIR (reps in reserve)" },
 ];
 
-export default function PreferencesCard() {
+export default function PreferencesCard({
+  personas = [],
+}: {
+  personas?: Persona[];
+}) {
   const profile = useProfile();
   const [isSaving, setIsSaving] = useState(false);
 
@@ -76,6 +85,25 @@ export default function PreferencesCard() {
           ))}
         </select>
       </label>
+
+      {personas.length > 0 && (
+        <label className="flex flex-col gap-1 text-sm font-medium">
+          Coach
+          <select
+            value={profile.coachPersona}
+            disabled={isSaving}
+            onChange={(e) =>
+              save({ coachPersona: e.target.value as CoachPersona })
+            }
+          >
+            {personas.map((p) => (
+              <option key={p.slug} value={p.slug}>
+                {p.name} – {p.tagline}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
     </div>
   );
 }

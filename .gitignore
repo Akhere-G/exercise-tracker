@@ -28,3 +28,4 @@ ca.pem
 
 # --- frontend ---
 frontend/.next-e2e/*
+docs
