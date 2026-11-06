@@ -5,6 +5,7 @@ from typing import Optional
 from app.models import Exercise, ExerciseMuscle, Workout, WorkoutSet
 from app.schemas.workout import MAX_NEW_WORKOUT_SECS, WorkoutCreate, WorkoutUpdate
 from app.services import achievement as achievement_service
+from app.services import milestones as milestones_service
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
@@ -238,6 +239,7 @@ def _build_set(set_data) -> WorkoutSet:
 def _award_achievements(db: Session, user_id: int, workout: Workout) -> None:
     achievement_service.check_and_award_prs(db, user_id, workout.id, workout)
     achievement_service.check_and_award_frequency_streaks(db, user_id, workout.id)
+    milestones_service.check_and_award_milestones(db, user_id, workout)
 
 
 def _award_achievements_safely(db: Session, user_id: int, workout: Workout) -> None:

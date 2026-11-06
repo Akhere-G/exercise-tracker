@@ -61,6 +61,7 @@ export type AnalyticsEvents = {
   apply_progression: { action: string };
   apply_program: { slug: string };
   build_routine: { day_count: number };
+  complete_onboarding: undefined;
   search_exercises: {
     query_length: number;
     result_count: number;

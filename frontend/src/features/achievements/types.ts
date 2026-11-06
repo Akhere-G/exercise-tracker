@@ -3,12 +3,21 @@ import {
   Award,
   Calendar,
   Crown,
+  Flag,
   Flame,
+  Hourglass,
   Medal,
+  PartyPopper,
+  Repeat,
   Route,
+  Shapes,
+  Sunrise,
+  Swords,
   Tally5,
   Timer,
   Trophy,
+  Moon,
+  Weight,
   type LucideIcon,
 } from "lucide-react";
 export interface Achievement {
@@ -53,6 +62,21 @@ export const achievementPrTypes = {
 export type AchievementPrTypes =
   (typeof achievementPrTypes)[keyof typeof achievementPrTypes];
 
+const MILESTONE_PREFIXES = [
+  "first_workout",
+  "back_to_back",
+  "early_bird",
+  "night_owl",
+  "weekend_warrior",
+  "century",
+  "marathon_session",
+  "ton_up",
+  "variety_",
+];
+
+export const isMilestone = (type: string) =>
+  MILESTONE_PREFIXES.some((prefix) => type.startsWith(prefix));
+
 export const achievementTypes = {
   ...achievementFreqTypes,
   ...achievementPrTypes,
@@ -79,6 +103,15 @@ export const ICONS: Record<string, LucideIcon> = {
   award: Award,
   medal: Medal,
   crown: Crown,
+  flag: Flag,
+  repeat: Repeat,
+  sunrise: Sunrise,
+  moon: Moon,
+  swords: Swords,
+  "party-popper": PartyPopper,
+  hourglass: Hourglass,
+  weight: Weight,
+  shapes: Shapes,
 };
 
 export const ACCENTS = {
@@ -100,6 +133,10 @@ export const ACCENTS = {
     border: "border-l-emerald-500",
     badge:
       "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400",
+  },
+  milestone: {
+    border: "border-l-pink-500",
+    badge: "bg-pink-100 text-pink-600 dark:bg-pink-500/15 dark:text-pink-400",
   },
   streak: {
     border: "border-l-orange-500",

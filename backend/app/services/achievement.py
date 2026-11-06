@@ -1,5 +1,6 @@
 from datetime import date, datetime, timedelta, timezone
 
+from app.constants.milestones import MILESTONES
 from app.models import Achievement, Exercise, UserAchievement, Workout
 from app.schemas.achievement import UserAchievementResponse
 from sqlalchemy import delete, func, select
@@ -80,6 +81,17 @@ def seed_achievements(db: Session) -> None:
                 type=_streak_type(frequency),
                 icon=FREQUENCY_ICONS[frequency],
                 criteria=description,
+            )
+        )
+
+    for milestone in MILESTONES:
+        definitions.append(
+            Achievement(
+                name=milestone.name,
+                description=milestone.description,
+                type=milestone.type,
+                icon=milestone.icon,
+                criteria=milestone.description,
             )
         )
 
@@ -263,6 +275,7 @@ def backfill_user_achievements(
     user_id: int,
 ) -> list[UserAchievementResponse]:
     """Rebuild a user's achievement records from their workout history."""
+    from app.services.milestones import check_and_award_milestones
 
     # Remove existing records so the backfill can rebuild them cleanly.
     db.execute(delete(UserAchievement).where(UserAchievement.user_id == user_id))
@@ -302,6 +315,7 @@ def backfill_user_achievements(
                 commit=False,
             )
         )
+        created.extend(check_and_award_milestones(db, user_id, workout, commit=False))
         db.flush()
 
     return created
