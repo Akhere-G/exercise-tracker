@@ -10,10 +10,12 @@ import { Toaster } from "@/src/components/ui/sonner";
 import { Calendar, ChartColumn, Cog, House, Trophy } from "lucide-react";
 import type { Metadata, Viewport } from "next";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { DemoBanner } from "@/src/features/auth/components/DemoBanner";
 import { getSessionOwnerId } from "@/src/features/auth/session";
 import { WorkoutOwnerGuard } from "@/src/features/workout/components/WorkoutOwnerGuard";
-import { getProfile } from "@/src/features/profile/queries";
+import { getProfileResponse } from "@/src/features/profile/queries";
+import { DEFAULT_PROFILE } from "@/src/features/profile/types";
 import { ProfileProvider } from "@/src/features/profile/components/ProfileProvider";
 
 export const metadata: Metadata = {
@@ -39,7 +41,13 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const isDemo = cookieStore.get("demo_session")?.value === "1";
   const ownerId = getSessionOwnerId(cookieStore.get("access_token")?.value);
-  const profile = await getProfile();
+  const profileResponse = await getProfileResponse();
+  if (!isDemo && profileResponse.success && !profileResponse.data.onboardedAt) {
+    redirect("/onboarding");
+  }
+  const profile = profileResponse.success
+    ? profileResponse.data
+    : DEFAULT_PROFILE;
 
   return (
     <ProfileProvider profile={profile}>

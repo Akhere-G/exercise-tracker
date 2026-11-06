@@ -8,6 +8,7 @@ export function proxy(request: NextRequest) {
   const protectedPaths = [
     "/routines",
     "/programs",
+    "/onboarding",
     "/workouts",
     "/exercises",
     "/achievements",
