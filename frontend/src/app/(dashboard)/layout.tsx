@@ -65,27 +65,30 @@ export default async function RootLayout({
         <NavigationMenu className="bg-secondary/95 w-screen h-[10vh] ">
           <NavigationMenuList className="gap-2 md:gap-4 w-screen">
             <NavigationMenuItem>
-              <NavigationMenuLink href="/workouts">
+              <NavigationMenuLink href="/workouts" aria-label="Workout history">
                 <Calendar style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink href="/achievements">
+              <NavigationMenuLink
+                href="/achievements"
+                aria-label="Achievements"
+              >
                 <Trophy style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink href="/routines">
+              <NavigationMenuLink href="/routines" aria-label="Routines">
                 <House style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink href="/stats">
+              <NavigationMenuLink href="/stats" aria-label="Stats">
                 <ChartColumn style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <NavigationMenuLink href="/settings">
+              <NavigationMenuLink href="/settings" aria-label="Settings">
                 <Cog style={{ width: "20px", height: "20px" }} />
               </NavigationMenuLink>
             </NavigationMenuItem>

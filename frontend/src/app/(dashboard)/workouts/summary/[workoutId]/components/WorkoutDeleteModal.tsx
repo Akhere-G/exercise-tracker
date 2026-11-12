@@ -12,7 +12,7 @@ import { track } from "@/src/features/analytics/utils";
 import { deleteWorkout } from "@/src/features/workout/actions";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export default function WorkoutDeleteModal({
@@ -22,26 +22,14 @@ export default function WorkoutDeleteModal({
 }) {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const router = useRouter();
-  const previousPageRef = useRef<string | null>(null);
-
-  useEffect(() => {
-    // Store the previous page URL when component mounts
-    previousPageRef.current = document.referrer;
-  }, []);
-
   const handleDelete = async () => {
     const response = await deleteWorkout(workoutId);
     if (response.success) {
       track("delete_workout");
       toast.success("Workout deleted successfully");
-
-      // Check if previous page was /workouts/active
-      const previousPage = previousPageRef.current;
-      if (previousPage?.includes("/workouts/active")) {
-        router.push("/workouts");
-      } else {
-        router.back();
-      }
+      // The summary no longer exists. Going "back" could restart the finished
+      // workout or leave the app, so always land on the history.
+      router.replace("/workouts");
     } else {
       toast.error(response.error || "Failed to delete workout");
     }

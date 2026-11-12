@@ -58,7 +58,11 @@ export default function Login() {
         </CardHeader>
         <CardContent>
           <form className="form" onSubmit={handleSubmit(onSubmit)}>
-            {errorMessage && <p className="text-error">{errorMessage}</p>}
+            {errorMessage && (
+              <p role="alert" className="text-error">
+                {errorMessage}
+              </p>
+            )}
             <FormInput
               id="email"
               label="Email"

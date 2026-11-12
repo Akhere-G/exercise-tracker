@@ -62,6 +62,8 @@ export function RoutineItemsTable({
             return (
               <div
                 key={field.exerciseId}
+                role="group"
+                aria-label={exercise?.name || "Unknown"}
                 className="card-custom p-4 bg-muted/20 rounded-lg flex flex-col gap-3"
               >
                 <div className="flex justify-between items-start gap-2">
@@ -82,6 +84,7 @@ export function RoutineItemsTable({
                     type="button"
                     variant="ghost"
                     size="sm"
+                    aria-label={`Remove ${exercise?.name || "exercise"}`}
                     onClick={() => remove(index)}
                   >
                     <Trash2 size={16} className="text-destructive" />
@@ -90,10 +93,14 @@ export function RoutineItemsTable({
 
                 <div className="grid grid-cols-2 gap-2 text-center items-center pt-2 border-t border-border/50">
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] uppercase text-muted-foreground">
+                    <label
+                      htmlFor={`routine-item-${index}-sets`}
+                      className="text-[10px] uppercase text-muted-foreground"
+                    >
                       Sets
                     </label>
                     <Input
+                      id={`routine-item-${index}-sets`}
                       type="number"
                       className={`text-center ${
                         errors.routineItems?.[index]?.targetSets?.message
@@ -106,10 +113,14 @@ export function RoutineItemsTable({
 
                   {hasReps && (
                     <div className="flex flex-col gap-1">
-                      <label className="text-[10px] uppercase text-muted-foreground">
+                      <label
+                        htmlFor={`routine-item-${index}-reps`}
+                        className="text-[10px] uppercase text-muted-foreground"
+                      >
                         Reps
                       </label>
                       <Input
+                        id={`routine-item-${index}-reps`}
                         type="number"
                         className={`text-center ${
                           errors.routineItems?.[index]?.targetReps?.message
@@ -122,10 +133,14 @@ export function RoutineItemsTable({
                   )}
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] uppercase text-muted-foreground">
+                    <label
+                      htmlFor={`routine-item-${index}-rest`}
+                      className="text-[10px] uppercase text-muted-foreground"
+                    >
                       Rest (s)
                     </label>
                     <Input
+                      id={`routine-item-${index}-rest`}
                       type="number"
                       min={0}
                       max={3600}
@@ -145,6 +160,7 @@ export function RoutineItemsTable({
                         control={control}
                         render={({ field }) => (
                           <TimeInput
+                            aria-label="Mins"
                             value={field.value ?? ""}
                             onChange={field.onChange}
                           />

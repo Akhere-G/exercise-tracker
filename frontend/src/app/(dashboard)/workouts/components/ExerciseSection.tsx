@@ -62,7 +62,11 @@ export default function ExerciseSection({
   const weightUnit = useWeightUnit();
 
   return (
-    <div className="flex flex-col gap-3">
+    <div
+      className="flex flex-col gap-3"
+      role="group"
+      aria-label={exercise.name}
+    >
       <div className="flex items-start justify-between">
         <div>
           <h3 className="font-semibold">{exercise.name}</h3>
@@ -79,7 +83,12 @@ export default function ExerciseSection({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              aria-label={`${exercise.name} options`}
+            >
               <MoreVertical size={16} />
             </Button>
           </DropdownMenuTrigger>
@@ -139,6 +148,7 @@ export default function ExerciseSection({
                           ? ""
                           : toDisplayWeight(Number(set.weight), weightUnit)
                       }
+                      aria-label={`Set ${set.setIndex} weight`}
                       onChange={(v) =>
                         onUpdateSet(
                           set.fieldIndex,
@@ -155,6 +165,7 @@ export default function ExerciseSection({
                   <td>
                     <SetInput
                       value={set.reps ?? ""}
+                      aria-label={`Set ${set.setIndex} reps`}
                       onChange={(v) =>
                         onUpdateSet(set.fieldIndex, "reps", Number(v))
                       }
@@ -166,6 +177,7 @@ export default function ExerciseSection({
                     <TimeInput
                       className="bg-transparent! border-none max-w-fit"
                       value={set.durationSecs ?? ""}
+                      aria-label={`Set ${set.setIndex} duration`}
                       onChange={(v) =>
                         onUpdateSet(set.fieldIndex, "durationSecs", Number(v))
                       }
@@ -176,6 +188,7 @@ export default function ExerciseSection({
                   <td>
                     <SetInput
                       value={set.distanceMeters ?? ""}
+                      aria-label={`Set ${set.setIndex} distance`}
                       onChange={(v) =>
                         onUpdateSet(set.fieldIndex, "distanceMeters", Number(v))
                       }

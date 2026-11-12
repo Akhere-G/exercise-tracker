@@ -21,7 +21,11 @@ export default function StartWorkoutDialog({
   setIsOpen: (open: boolean) => void;
 }) {
   const router = useRouter();
-  const { resetState } = useWorkout();
+  // Resuming goes back to the workout in progress; starting new uses `routineId`
+  // (none for an empty workout).
+  const { resetState, routineId: activeRoutineId } = useWorkout();
+  const activeWorkoutUrl = (id: number | null | undefined) =>
+    id ? `/workouts/active?routineId=${id}` : "/workouts/active";
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => setIsOpen(open)}>
@@ -35,7 +39,7 @@ export default function StartWorkoutDialog({
           <Button
             className="flex-1"
             onClick={() => {
-              router.push(`/workouts/active?routineId=${routineId}`);
+              router.push(activeWorkoutUrl(activeRoutineId));
             }}
           >
             Resume current workout
@@ -46,7 +50,7 @@ export default function StartWorkoutDialog({
             onClick={() => {
               resetState();
               localStorage.removeItem(workoutStorageKey);
-              router.push(`/workouts/active?routineId=${routineId}`);
+              router.push(activeWorkoutUrl(routineId));
             }}
           >
             Start new workout

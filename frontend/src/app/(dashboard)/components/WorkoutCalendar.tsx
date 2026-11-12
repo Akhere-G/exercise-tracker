@@ -58,7 +58,9 @@ export default function WorkoutsCalendar() {
   const workoutsByDate = workouts.reduce<Record<string, Workout[]>>(
     (acc, workout) => {
       if (!workout.completedAt) return acc;
-      const dateKey = new Date(workout.completedAt).toISOString().split("T")[0];
+      // Local calendar day, matching how the cells are keyed below.
+      const completed = new Date(workout.completedAt);
+      const dateKey = `${completed.getFullYear()}-${String(completed.getMonth() + 1).padStart(2, "0")}-${String(completed.getDate()).padStart(2, "0")}`;
       if (!acc[dateKey]) acc[dateKey] = [];
       acc[dateKey].push(workout);
       return acc;
@@ -98,12 +100,14 @@ export default function WorkoutsCalendar() {
         <div className="flex items-center gap-2 border border-border rounded-xl p-1 bg-card">
           <button
             onClick={handlePrevMonth}
+            aria-label="Previous month"
             className="p-2 hover:bg-muted rounded-lg transition-colors"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
           <button
             onClick={handleNextMonth}
+            aria-label="Next month"
             className="p-2 hover:bg-muted rounded-lg transition-colors"
           >
             <ChevronRight className="h-4 w-4" />
@@ -158,6 +162,7 @@ export default function WorkoutsCalendar() {
                     <Link
                       key={workout.id || index}
                       href={`/workouts/summary/${workout.id}`}
+                      aria-label={`Workout on ${dateString}`}
                     >
                       <div className="w-full flex-1 h-2 bg-primary rounded-full mt-2" />
                     </Link>

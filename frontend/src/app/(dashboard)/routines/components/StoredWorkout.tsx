@@ -19,12 +19,11 @@ export default function StoredWorkout() {
   const [routineName, setRoutineName] = useState<string | null>(null);
   const [routineId, setRoutineId] = useState<number | null>(null);
   const [duration, setDuration] = useState<number | null>(null);
-  const [timerInterval, setTimerInterval] = useState<NodeJS.Timeout | null>(
-    null,
-  );
   const router = useRouter();
   const { setWorkoutData } = useWorkout();
   useEffect(() => {
+    let timerInterval: ReturnType<typeof setInterval> | null = null;
+
     function getWorkoutData() {
       try {
         const workoutJson = localStorage.getItem(workoutStorageKey);
@@ -44,12 +43,10 @@ export default function StoredWorkout() {
           );
           setDuration(duration);
 
-          const interval = setInterval(
+          timerInterval = setInterval(
             () => setDuration((prev) => (prev !== null ? prev + 1 : null)),
             1000,
           );
-
-          setTimerInterval(interval);
         }
 
         if (workoutData.state.routineId) {
@@ -70,19 +67,27 @@ export default function StoredWorkout() {
   return (
     routineName && (
       <div className="sticky bottom-12">
-        <div
-          className=" "
-          onClick={() => router.push(`/workouts/active?routineId=${routineId}`)}
+        <button
+          type="button"
+          aria-label={`Resume workout: ${routineName}`}
+          className="block w-full text-left"
+          onClick={() =>
+            router.push(
+              routineId
+                ? `/workouts/active?routineId=${routineId}`
+                : "/workouts/active",
+            )
+          }
         >
           <Card>
             <CardHeader>
               <CardTitle>{routineName}</CardTitle>
-              {duration && (
+              {duration !== null && (
                 <CardDescription>{getTime(duration)}</CardDescription>
               )}
             </CardHeader>
           </Card>
-        </div>
+        </button>
       </div>
     )
   );

@@ -20,27 +20,33 @@ export default function BodyWeightList({ weights }: { weights: BodyWeight[] }) {
     <ul className="divide-y divide-border">
       {[...weights]
         .sort((a, b) => b.measuredOn.localeCompare(a.measuredOn))
-        .map((w) => (
-          <li key={w.id} className="flex items-center justify-between py-2">
-            <span>
-              {new Date(`${w.measuredOn}T00:00:00`).toLocaleDateString(
-                "en-GB",
-                { weekday: "short", day: "numeric", month: "short", year: "numeric" },
-              )}
-            </span>
-            <span className="flex items-center gap-2">
-              <WeightText kg={w.weightKg} />
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Delete weigh-in"
-                onClick={() => remove(w.id)}
-              >
-                <Trash2 size={14} />
-              </Button>
-            </span>
-          </li>
-        ))}
+        .map((w) => {
+          const date = new Date(`${w.measuredOn}T00:00:00`).toLocaleDateString(
+            "en-GB",
+            {
+              weekday: "short",
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            },
+          );
+          return (
+            <li key={w.id} className="flex items-center justify-between py-2">
+              <span>{date}</span>
+              <span className="flex items-center gap-2">
+                <WeightText kg={w.weightKg} />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label={`Delete weigh-in on ${date}`}
+                  onClick={() => remove(w.id)}
+                >
+                  <Trash2 size={14} />
+                </Button>
+              </span>
+            </li>
+          );
+        })}
     </ul>
   );
 }

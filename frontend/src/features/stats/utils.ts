@@ -205,7 +205,10 @@ export function getMuscleChartData(muscles: MuscleStat[]) {
 
   const maxSets = Math.max(0, ...Object.values(setsBySlug));
 
-  const data: ExtendedBodyPart[] = Object.entries(setsBySlug).map(
+  // Muscles with no sets are left off the map (and would divide by zero).
+  const trainedSlugs = Object.entries(setsBySlug).filter(([, sets]) => sets > 0);
+
+  const data: ExtendedBodyPart[] = trainedSlugs.map(
     ([slug, sets]) => {
       const intensity = Math.max(
         1,

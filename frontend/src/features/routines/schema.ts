@@ -20,7 +20,7 @@ export const routineItemSchema = yup.object({
     .test("reps-or-duration", "Must have reps or duration", function (value) {
       return (
         (value && value > 0) ||
-        (this.parent.targetSets && this.parent.targetSets > 0)
+        (this.parent.targetReps && this.parent.targetReps > 0)
       );
     }),
   order: yup.number().required(),

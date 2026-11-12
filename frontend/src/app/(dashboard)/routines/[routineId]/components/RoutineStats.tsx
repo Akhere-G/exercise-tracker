@@ -9,6 +9,7 @@ import {
   getWorkoutVolume,
   isWorkingSet,
 } from "@/src/features/workout/utils";
+import { getEstimatedOneRepMax } from "@/src/features/exercises/utils";
 import ExerciseStat from "../../../components/ExerciseStat";
 import { BicepsFlexed, Gauge, Route, Tally5, Timer } from "lucide-react";
 import ProgressChart from "../../../components/ProgressCharts";
@@ -42,14 +43,8 @@ export default function RoutineStats({
     };
   });
 
-  // Epley Formula for Estimated 1RM per workout: Weight * (1 + Reps / 30)
   const e1rmData = workouts.map((workout) => {
-    const max1rm = Math.max(
-      0,
-      ...workout.sets
-        .filter(isWorkingSet)
-        .map((s) => (s.weight || 0) * (1 + (s.reps || 0) / 30)),
-    );
+    const max1rm = getEstimatedOneRepMax(workout.sets);
     return {
       y: Math.round(toDisplayWeight(max1rm, unit)),
       x: new Date(workout.completedAt).toLocaleDateString(),

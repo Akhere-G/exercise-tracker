@@ -16,11 +16,33 @@ import {
 import { toast } from "sonner";
 import { track } from "@/src/features/analytics/utils";
 
+/** How long "Maybe later" hides the prompt, so it does not nag on every visit. */
+const DISMISS_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
+export const NOTIFICATIONS_DISMISSED_KEY = "notifications-prompt-dismissed-at";
+
+const recentlyDismissed = () => {
+  try {
+    const dismissedAt = Number(
+      localStorage.getItem(NOTIFICATIONS_DISMISSED_KEY),
+    );
+    return dismissedAt > 0 && Date.now() - dismissedAt < DISMISS_COOLDOWN_MS;
+  } catch {
+    return false;
+  }
+};
+
+const rememberDismissal = () => {
+  try {
+    localStorage.setItem(NOTIFICATIONS_DISMISSED_KEY, String(Date.now()));
+  } catch {}
+};
+
 export default function NotificationsPrompt() {
   const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
     const initialiseNotifications = async () => {
+      if (recentlyDismissed()) return;
       try {
         await ensureServiceWorker();
         const isSubscribed = await checkSubscriptionStatus();
@@ -64,6 +86,7 @@ export default function NotificationsPrompt() {
           variant="ghost"
           onClick={() => {
             track("dismiss_notifications_prompt");
+            rememberDismissal();
             setShowPrompt(false);
           }}
         >

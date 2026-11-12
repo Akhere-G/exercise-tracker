@@ -1,7 +1,7 @@
 "use client";
 
 import { Input } from "@/src/components/ui/input";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 interface TimeInputProps {
   value: number | string;
@@ -11,7 +11,7 @@ interface TimeInputProps {
   "aria-label"?: string;
 }
 
-const formatTime = (value: number | string): string => {
+export const formatTime = (value: number | string): string => {
   if (value === "" || value === null || value === undefined) return "";
   const total = Math.round(Number(value));
   if (!Number.isFinite(total) || total < 0) return "";
@@ -23,7 +23,7 @@ const formatTime = (value: number | string): string => {
   return `${mins}:${secs}`;
 };
 
-const parseDigits = (digits: string): number | null => {
+export const parseDigits = (digits: string): number | null => {
   if (digits === "") return null;
   const mins = Number(digits.slice(0, -2) || 0);
   const secs = Number(digits.slice(-2));
@@ -39,9 +39,13 @@ export default function TimeInput({
 }: TimeInputProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState("");
+  // Escape blurs the input before the cleared draft re-renders, so the blur
+  // handler would still see the typed digits; this marks the edit as cancelled.
+  const cancelled = useRef(false);
 
   const commit = () => {
-    const total = parseDigits(draft);
+    const total = cancelled.current ? null : parseDigits(draft);
+    cancelled.current = false;
     if (total !== null && (total > 0 || canBeZero)) {
       onChange?.(total);
     }
@@ -69,6 +73,7 @@ export default function TimeInput({
           e.preventDefault();
           e.currentTarget.blur();
         } else if (e.key === "Escape") {
+          cancelled.current = true;
           setDraft("");
           e.currentTarget.blur();
         }

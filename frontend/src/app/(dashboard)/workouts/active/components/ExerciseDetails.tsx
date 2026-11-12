@@ -105,17 +105,14 @@ export default function ExerciseDetails({
       (e) => e.id !== currentExerciseId,
     );
 
-    let nextExercise: Exercise | null | undefined = updatedExercises.find(
-      (e) => !isExerciseCompleted(e),
-    );
+    // Move on to the first unfinished exercise, or the first one if all are done.
+    const nextExercise =
+      updatedExercises.find((e) => !isExerciseCompleted(e)) ??
+      updatedExercises[0];
 
-    nextExercise =
-      (nextExercise ?? updatedExercises.length > 0)
-        ? updatedExercises[0]
-        : null;
     setWorkoutData({
       exercises: updatedExercises,
-      currentExerciseId: nextExercise?.id,
+      currentExerciseId: nextExercise?.id ?? 0,
     });
     setRemoveModalOpen(false);
   }
@@ -163,7 +160,7 @@ export default function ExerciseDetails({
               <ProgressionChip exercise={currentExercise} />
             </div>
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger aria-label="Exercise options">
                 <MoreVertical size={16} />
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -301,7 +298,7 @@ export default function ExerciseDetails({
             selectMany={false}
             title="Replace Exercise"
             submitBtnText="Replace"
-            defaultMuscle={currentExercise.muscles[0].name}
+            defaultMuscle={currentExercise.muscles[0]?.name}
           />
         )}
       </div>

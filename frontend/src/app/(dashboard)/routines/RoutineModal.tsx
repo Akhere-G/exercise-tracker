@@ -1,4 +1,5 @@
 "use client";
+import { toast } from "sonner";
 import { Button } from "@/src/components/ui/button";
 import {
   Dialog,
@@ -28,7 +29,10 @@ export default function RoutineModal({ routine }: { routine: Routine }) {
   return (
     <div>
       <DropdownMenu>
-        <DropdownMenuTrigger className="p-2">
+        <DropdownMenuTrigger
+          className="p-2"
+          aria-label={`${routine.name} options`}
+        >
           <MoreVertical size={16} />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
@@ -66,8 +70,14 @@ export default function RoutineModal({ routine }: { routine: Routine }) {
               variant="destructive"
               onClick={async () => {
                 const response = await deleteRoutine(routine.id);
-                if (response.success) track("delete_routine");
-                router.refresh();
+                if (response.success) {
+                  track("delete_routine");
+                  router.refresh();
+                } else {
+                  toast.error(
+                    response.error ?? "Could not delete the routine.",
+                  );
+                }
               }}
             >
               Delete

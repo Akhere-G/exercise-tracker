@@ -78,6 +78,11 @@ export default function RoutineForm({
       setErrorMessages({});
       const response = await submitAction({
         ...data,
+        // Number items by their position, so removals leave no gaps or duplicates.
+        routineItems: data.routineItems.map((item, order) => ({
+          ...item,
+          order,
+        })),
         ...toUtcSchedule(data.day, data.startTime),
       });
       if (response.success) {
@@ -173,6 +178,7 @@ export default function RoutineForm({
                 className="w-10 h-10 md:w-15 md:h-15 rounded-full items-center"
                 type="button"
                 onClick={() => setValue("day", day.value)}
+                aria-pressed={values.day === day.value}
                 variant={values.day === day.value ? "default" : "ghost"}
               >
                 {day.title}
@@ -206,7 +212,10 @@ export default function RoutineForm({
             Add Exercise
           </Button>
 
-          <Button type="submit">{sumbitText}</Button>
+          {/* Disabled while saving so a double click cannot create two routines. */}
+          <Button type="submit" disabled={formState.isSubmitting}>
+            {sumbitText}
+          </Button>
         </div>
       </form>
 

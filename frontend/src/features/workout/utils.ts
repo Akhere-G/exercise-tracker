@@ -23,10 +23,9 @@ export const sameMetrics = (
   exercise: BaseExercise,
   otherExercise: BaseExercise,
 ) => {
-  return (
-    (isRepsExercise(exercise) && isRepsExercise(otherExercise)) ||
-    (isDurationExercise(exercise) && isDurationExercise(otherExercise))
-  );
+  // Sets only carry over when they track exactly the same fields; a bodyweight
+  // exercise's sets have no weight to give a weighted replacement.
+  return exercise.metrics === otherExercise.metrics;
 };
 interface SetValues {
   reps?: number | null;
@@ -76,7 +75,8 @@ export const getDefaultSets = (
   { routineItem, previousSets = [] }: SetSources = {},
 ) => {
   if (oldExercise && sameMetrics(oldExercise, exercise)) {
-    return oldExercise.sets;
+    // Kept sets now belong to the replacement exercise.
+    return oldExercise.sets.map((set) => ({ ...set, exerciseId: exercise.id }));
   }
 
   const lastWorkingSets = previousSets.filter(isWorkingSet);
@@ -139,6 +139,10 @@ export const isWorkoutCompleted = (exercises: Exercise[]) =>
   exercises.every((e) => isExerciseCompleted(e));
 
 export const getOrdinalSuffix = (num: number) => {
+  // 11th, 12th and 13th (and 111th, 112th...) break the last-digit rule.
+  const lastTwoDigits = num % 100;
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 13) return "th";
+
   switch (num % 10) {
     case 1:
       return "st";
@@ -235,24 +239,25 @@ export const getSetVolume = (
 };
 
 export const getVolume = (exercise: Exercise, unit: WeightUnit = "kg") => {
+  const workingSets = exercise.sets.filter(isWorkingSet);
+
   if (isDurationExercise(exercise)) {
-    const totalSecs = exercise.sets.reduce(
-      (prev, curr) => prev + curr.durationSecs!,
+    const totalSecs = workingSets.reduce(
+      (prev, curr) => prev + (curr.durationSecs ?? 0),
       0,
     );
     return getTime(totalSecs) + " mins";
   }
 
   if (isWeightsExercise(exercise)) {
-    const totalWeight = exercise.sets.reduce(
-      (prev, curr) =>
-        curr.setType === "warmup" ? prev : prev + curr.weight! * curr.reps!,
+    const totalWeight = workingSets.reduce(
+      (prev, curr) => prev + (curr.weight ?? 0) * (curr.reps ?? 0),
       0,
     );
     return formatWeight(totalWeight, unit);
   }
 
-  const totalReps = exercise.sets.reduce((prev, curr) => prev + curr.reps!, 0);
+  const totalReps = workingSets.reduce((prev, curr) => prev + (curr.reps ?? 0), 0);
   return totalReps + " reps";
 };
 

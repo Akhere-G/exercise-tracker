@@ -43,5 +43,23 @@ export const getMuscleMapData = (exercises: Exercise[]) => {
   return data;
 };
 
+/** Epley's estimate of a one-rep max from a single set. */
+const epley = (weight: number, reps: number) => weight * (1 + reps / 30);
+
+/**
+ * The best estimated one-rep max across the given sets (Epley), ignoring
+ * warm-ups. Returns 0 when there are no weighted working sets.
+ */
+export const getEstimatedOneRepMax = (
+  sets: { weight?: number | null; reps?: number | null; setType?: string }[],
+) => {
+  let best = 0;
+  for (const set of sets) {
+    if (set.setType === "warmup") continue;
+    best = Math.max(best, epley(set.weight || 0, set.reps || 0));
+  }
+  return best;
+};
+
 export const getImageUrl = (exerciseImage: string) =>
   `https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/refs/heads/main/${exerciseImage}`;
