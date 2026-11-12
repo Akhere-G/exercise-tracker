@@ -51,7 +51,11 @@ export function DemoLoginButton({
       >
         {isLoading ? "Starting demo..." : "Try demo"}
       </Button>
-      {errorMessage && <p className="text-error mt-2">{errorMessage}</p>}
+      {errorMessage && (
+        <p role="alert" className="text-error mt-2">
+          {errorMessage}
+        </p>
+      )}
     </div>
   );
 }

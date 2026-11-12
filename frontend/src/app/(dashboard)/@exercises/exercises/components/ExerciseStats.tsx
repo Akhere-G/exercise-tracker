@@ -14,6 +14,7 @@ import {
   isDurationExercise,
   isRepsExercise,
   isWeightsExercise,
+  getEstimatedOneRepMax,
 } from "@/src/features/exercises/utils";
 import ExerciseStat from "../../../components/ExerciseStat";
 import { BicepsFlexed, Gauge, Route, Tally5, Timer } from "lucide-react";
@@ -45,14 +46,8 @@ export default function ExerciseStats({
     x: date,
   }));
 
-  // Epley Formula for Estimated 1RM: Weight * (1 + Reps / 30)
   const e1rmData = Object.keys(groupedSets).map((date) => {
-    const max1rm = Math.max(
-      0,
-      ...groupedSets[date]
-        .filter(isWorkingSet)
-        .map((s) => (s.weight || 0) * (1 + (s.reps || 0) / 30)),
-    );
+    const max1rm = getEstimatedOneRepMax(groupedSets[date]);
     return {
       y: Math.round(toDisplayWeight(max1rm, unit)),
       x: date,

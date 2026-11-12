@@ -8,7 +8,7 @@ import { track } from "@/src/features/analytics/utils";
 
 export default function StartEmptyWorkoutButton() {
   const [isWorkoutDialogOpen, setIsWorkoutDialogOpen] = useState(false);
-  const { routineId, startedAt, resetState } = useWorkout();
+  const { startedAt, resetState } = useWorkout();
   const router = useRouter();
 
   const handleClick = () => {
@@ -29,7 +29,6 @@ export default function StartEmptyWorkoutButton() {
       <StartWorkoutDialog
         isOpen={isWorkoutDialogOpen}
         setIsOpen={setIsWorkoutDialogOpen}
-        routineId={Number(routineId)}
       />
     </>
   );

@@ -70,8 +70,14 @@ export default function OnboardingFlow({ personas }: { personas: Persona[] }) {
 
   const skip = async () => {
     setIsSaving(true);
-    await skipOnboarding();
-    router.replace("/routines");
+    const response = await skipOnboarding();
+    if (response.success) {
+      router.replace("/routines");
+      return;
+    }
+    // Without onboardedAt saved, the dashboard would send the user straight back.
+    setIsSaving(false);
+    toast.error(response.error ?? "Could not skip onboarding.");
   };
 
   return (

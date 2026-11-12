@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 import { Target } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/src/components/ui/input";
@@ -11,18 +10,22 @@ import { toDisplayWeight, toKg } from "@/src/lib/units";
 export default function GoalsForm() {
   const profile = useProfile();
   const unit = profile.weightUnit;
-  const [isSaving, setIsSaving] = useState(false);
-
+  // Each field saves on its own, so fields stay editable while another saves:
+  // disabling them blurred the field being typed into and lost the input.
   async function save(update: ProfileUpdate) {
-    setIsSaving(true);
     const response = await updateProfile(update);
-    setIsSaving(false);
     if (!response.success) {
       toast.error(response.error ?? "Could not save your goals.");
     }
   }
 
   const parse = (value: string) => (value === "" ? null : Number(value));
+  // Compared in the user's unit: converting the rounded display value back to
+  // kg would differ slightly from the stored value and save a drifted goal.
+  const displayedBodyWeight =
+    profile.targetBodyWeightKg === null
+      ? null
+      : toDisplayWeight(profile.targetBodyWeightKg, unit);
 
   return (
     <div className="bg-card border border-border rounded-2xl p-6 flex flex-col gap-4">
@@ -39,7 +42,6 @@ export default function GoalsForm() {
           type="number"
           min="1"
           max="14"
-          disabled={isSaving}
           defaultValue={profile.workoutsPerWeekTarget ?? ""}
           onBlur={(e) => {
             const target = parse(e.target.value);
@@ -56,17 +58,13 @@ export default function GoalsForm() {
           type="number"
           min="0"
           step="0.1"
-          disabled={isSaving}
-          defaultValue={
-            profile.targetBodyWeightKg === null
-              ? ""
-              : toDisplayWeight(profile.targetBodyWeightKg, unit)
-          }
+          defaultValue={displayedBodyWeight ?? ""}
           onBlur={(e) => {
             const value = parse(e.target.value);
-            const targetKg = value === null ? null : toKg(value, unit);
-            if (targetKg !== profile.targetBodyWeightKg) {
-              save({ targetBodyWeightKg: targetKg });
+            if (value !== displayedBodyWeight) {
+              save({
+                targetBodyWeightKg: value === null ? null : toKg(value, unit),
+              });
             }
           }}
         />

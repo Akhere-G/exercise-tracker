@@ -123,36 +123,36 @@ export default function WorkoutClientProvider({
       }
     } catch {}
 
-    if (routine) {
-      const exercises: Exercise[] = [];
+    if (!routine) return;
 
-      for (const item of routine.routineItems) {
-        const { exercise } = item;
-        const exerciseItem: Exercise = {
-          ...exercise,
-          sets: getDefaultSets(exercise, undefined, {
-            routineItem: item,
-            previousSets: initialPreviousSets?.[exercise.id],
-          }),
-          restSecs: item.restSecs ?? null,
-          supersetGroup: item.supersetGroup ?? null,
-        };
+    const exercises: Exercise[] = [];
 
-        exercises.push(exerciseItem);
-      }
+    for (const item of routine.routineItems) {
+      const { exercise } = item;
+      const exerciseItem: Exercise = {
+        ...exercise,
+        sets: getDefaultSets(exercise, undefined, {
+          routineItem: item,
+          previousSets: initialPreviousSets?.[exercise.id],
+        }),
+        restSecs: item.restSecs ?? null,
+        supersetGroup: item.supersetGroup ?? null,
+      };
 
-      setWorkoutData({
-        routineId: routine.id,
-        routineName: routine.name,
-        currentExerciseId: routine.routineItems[0].exerciseId,
-        exercises,
-        startedAt: new Date(),
-      });
+      exercises.push(exerciseItem);
+    }
 
-      if (!hasTrackedStart.current) {
-        hasTrackedStart.current = true;
-        track("start_workout", { source: "routine" });
-      }
+    setWorkoutData({
+      routineId: routine.id,
+      routineName: routine.name,
+      currentExerciseId: routine.routineItems[0]?.exerciseId ?? 0,
+      exercises,
+      startedAt: new Date(),
+    });
+
+    if (!hasTrackedStart.current) {
+      hasTrackedStart.current = true;
+      track("start_workout", { source: "routine" });
     }
   }, [routine, setWorkoutData]);
 
@@ -166,8 +166,10 @@ export default function WorkoutClientProvider({
 
     let saved = false;
     const completedAt = new Date();
-    const durationInMs = completedAt.getTime() - new Date(startedAt!).getTime();
-    const duration = Math.floor(durationInMs / 1000);
+    const durationInMs = startedAt
+      ? completedAt.getTime() - new Date(startedAt).getTime()
+      : 0;
+    const duration = Math.max(0, Math.floor(durationInMs / 1000));
     const workout: WorkoutSchema = {
       completedAt,
       duration,

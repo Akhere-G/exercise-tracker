@@ -55,11 +55,13 @@ function SetInput({
   onChange,
   canBeZero,
   canBeNegative,
+  "aria-label": ariaLabel,
 }: {
   value: number | string;
   onChange?: (val: string) => void;
   canBeZero?: boolean;
   canBeNegative?: boolean;
+  "aria-label"?: string;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [dirtyValue, setDirtyValue] = useState("");
@@ -79,6 +81,7 @@ function SetInput({
   return (
     <Input
       type="number"
+      aria-label={ariaLabel}
       className="w-16 h-10 text-center font-medium bg-transparent! border-none placeholder-muted-foreground"
       placeholder={value.toString()}
       value={isEditing ? dirtyValue : value}
@@ -252,6 +255,7 @@ function SetRow({
                 ? ""
                 : toDisplayWeight(Number(set.weight), weightUnit)
             }
+            aria-label={`Set ${set.setIndex} weight`}
             onChange={(value) =>
               updateSet({ weight: toKg(Number(value), weightUnit) })
             }
@@ -264,6 +268,7 @@ function SetRow({
         <td>
           <SetInput
             value={set.reps ?? ""}
+            aria-label={`Set ${set.setIndex} reps`}
             onChange={(value) => updateSet({ reps: Number(value) })}
           />
         </td>
@@ -273,6 +278,7 @@ function SetRow({
           <TimeInput
             className="bg-transparent! border-none! w-auto!"
             value={set.durationSecs ?? ""}
+            aria-label={`Set ${set.setIndex} duration`}
             onChange={(value) => updateSet({ durationSecs: Number(value) })}
           />
         </td>
@@ -281,6 +287,7 @@ function SetRow({
         <td>
           <SetInput
             value={set.distanceMeters ?? ""}
+            aria-label={`Set ${set.setIndex} distance`}
             onChange={(value) => updateSet({ distanceMeters: Number(value) })}
           />
         </td>

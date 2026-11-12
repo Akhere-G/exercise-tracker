@@ -73,8 +73,10 @@ export default function Register() {
         </CardHeader>
         <CardContent>
           <form className="form" onSubmit={handleSubmit(onSubmit)}>
-            {errorMessages && (
-              <p className="text-error">{errorMessages.general}</p>
+            {errorMessages.general && (
+              <p role="alert" className="text-error">
+                {errorMessages.general}
+              </p>
             )}
             <FormInput
               id="username"
@@ -107,7 +109,7 @@ export default function Register() {
               error={formState.errors.repeatPassword?.message}
             />
             <Button disabled={isSubmitting}>
-              {isSubmitting ? "Creating account..." : "Login"}
+              {isSubmitting ? "Creating account..." : "Create account"}
             </Button>
             <Link href="/login">Have an account already?</Link>
           </form>

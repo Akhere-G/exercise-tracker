@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models import UserExerciseSetting, UserProfile
@@ -16,6 +17,14 @@ def get_or_create_profile(db: Session, user_id: int) -> UserProfile:
         db.commit()
         db.refresh(profile)
         return profile
+    except IntegrityError:
+        # A new user's first page load asks for the profile from several requests
+        # at once; another one created it between our read and our insert.
+        db.rollback()
+        existing_profile = db.get(UserProfile, user_id)
+        if existing_profile is None:
+            raise
+        return existing_profile
     except Exception:
         db.rollback()
         raise

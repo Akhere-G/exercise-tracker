@@ -8,11 +8,13 @@ export default function SetInput({
   onChange,
   canBeZero,
   canBeNegative,
+  "aria-label": ariaLabel,
 }: {
   value: number | string;
   onChange?: (val: string) => void;
   canBeZero?: boolean;
   canBeNegative?: boolean;
+  "aria-label"?: string;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [dirty, setDirty] = useState("");
@@ -30,6 +32,7 @@ export default function SetInput({
   return (
     <Input
       type="number"
+      aria-label={ariaLabel}
       className="w-16 h-10 text-center font-medium bg-transparent! border-none placeholder-muted-foreground"
       placeholder={value.toString()}
       value={isEditing ? dirty : value}

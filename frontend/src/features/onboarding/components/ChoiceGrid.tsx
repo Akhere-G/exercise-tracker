@@ -19,6 +19,7 @@ export default function ChoiceGrid<T extends string | number>({
           key={option.value}
           type="button"
           variant={option.value === value ? "default" : "secondary"}
+          aria-pressed={option.value === value}
           className="h-auto justify-start py-3 text-left"
           onClick={() => onSelect(option.value)}
         >

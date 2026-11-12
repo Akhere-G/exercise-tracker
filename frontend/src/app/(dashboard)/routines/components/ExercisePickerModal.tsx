@@ -54,7 +54,9 @@ export function ExercisePickerModal({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const [selected, setSelected] = useState<Record<number, Exercise>>({});
+  // A Map keeps exercises in the order they were tapped (an object would sort
+  // the numeric ids).
+  const [selected, setSelected] = useState<Map<number, Exercise>>(new Map());
 
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -74,7 +76,7 @@ export function ExercisePickerModal({
   useEffect(() => {
     if (!isOpen) return;
     function reset() {
-      setSelected({});
+      setSelected(new Map());
       setMuscle(defaultMuscle);
       resetList();
     }
@@ -161,23 +163,23 @@ export function ExercisePickerModal({
     if (addedIds.has(exercise.id)) return;
 
     setSelected((prev) => {
-      if (prev[exercise.id]) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { [exercise.id]: _removed, ...rest } = prev;
+      if (prev.has(exercise.id)) {
+        const rest = new Map(prev);
+        rest.delete(exercise.id);
         return rest;
       }
       return selectMany
-        ? { ...prev, [exercise.id]: exercise }
-        : { [exercise.id]: exercise };
+        ? new Map(prev).set(exercise.id, exercise)
+        : new Map([[exercise.id, exercise]]);
     });
   }
 
   function handleSubmit() {
-    onSelect(Object.values(selected));
-    setSelected({});
+    onSelect([...selected.values()]);
+    setSelected(new Map());
   }
 
-  const selectedCount = Object.keys(selected).length;
+  const selectedCount = selected.size;
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -187,6 +189,7 @@ export function ExercisePickerModal({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close"
             className="text-muted-foreground hover:text-foreground w-min"
           >
             <X size={16} />
@@ -196,6 +199,7 @@ export function ExercisePickerModal({
         <div className="p-5 pt-0">
           <Input
             placeholder="Search"
+            aria-label="Search exercises"
             value={query}
             onChange={(e) => handleQueryChange(e.target.value)}
           />
@@ -203,7 +207,7 @@ export function ExercisePickerModal({
 
         <div className="flex px-5 gap-4">
           <Select value={equipment} onValueChange={handleEquipmentChange}>
-            <SelectTrigger className="flex-1 w-full">
+            <SelectTrigger className="flex-1 w-full" aria-label="Equipment">
               <SelectValue placeholder="Equipment" />
             </SelectTrigger>
             <SelectContent>
@@ -216,7 +220,7 @@ export function ExercisePickerModal({
           </Select>
 
           <Select value={muscle} onValueChange={handleMuscleChange}>
-            <SelectTrigger className="flex-1 w-full">
+            <SelectTrigger className="flex-1 w-full" aria-label="Muscle">
               <SelectValue placeholder="Muscle" />
             </SelectTrigger>
             <SelectContent>
@@ -243,12 +247,14 @@ export function ExercisePickerModal({
           ) : (
             exercises.map((exercise) => {
               const isSelected =
-                !!selected[exercise.id] || addedIds.has(exercise.id);
+                selected.has(exercise.id) || addedIds.has(exercise.id);
 
               return (
                 <button
                   key={exercise.id}
                   type="button"
+                  aria-pressed={isSelected}
+                  aria-disabled={addedIds.has(exercise.id) || undefined}
                   onClick={() => toggleExercise(exercise)}
                   className={`w-full  text-left p-2 rounded-xl border transition-all flex justify-between items-center ${
                     isSelected

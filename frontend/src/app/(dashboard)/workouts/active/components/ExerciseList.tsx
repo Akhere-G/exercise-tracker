@@ -33,8 +33,11 @@ export default function ExerciseList() {
     const previous = await ensurePreviousSets(newExercises.map((e) => e.id));
 
     // Read the store again: it may have changed while the sets were loading.
-    const { exercises: latest, currentExerciseId: latestCurrentId } =
-      useWorkout.getState();
+    const {
+      exercises: latest,
+      currentExerciseId: latestCurrentId,
+      startedAt: latestStartedAt,
+    } = useWorkout.getState();
     const exisitingExerciseLookup = new Set(latest.map((e) => e.id));
 
     const exercisesToAdd: Exercise[] = newExercises
@@ -49,6 +52,8 @@ export default function ExerciseList() {
         exercises: [...latest, ...exercisesToAdd],
         currentExerciseId:
           latest.length === 0 ? exercisesToAdd[0].id : latestCurrentId,
+        // An empty workout starts when its first exercise is added.
+        startedAt: latestStartedAt ?? new Date(),
       });
     }
 
@@ -75,9 +80,14 @@ export default function ExerciseList() {
             exercises.map((item) => {
               const group = getActiveSupersetGroup(exercises, item);
               return (
-                <div
+                <button
+                  type="button"
                   key={item.id}
-                  className={`relative transition-opacity duration-300 ${currentExerciseId === item.id ? "cursor-pointer" : "opacity-50"}`}
+                  aria-label={item.name}
+                  aria-current={
+                    currentExerciseId === item.id ? "step" : undefined
+                  }
+                  className={`relative block transition-opacity duration-300 ${currentExerciseId === item.id ? "cursor-pointer" : "opacity-50"}`}
                   onClick={() => onClick(item.id)}
                 >
                   <ExerciseImage exercise={item} />
@@ -90,7 +100,7 @@ export default function ExerciseList() {
                       className={`absolute -bottom-2 left-0 right-0 h-1 rounded-full ${SUPERSET_COLOURS[(group - 1) % SUPERSET_COLOURS.length]}`}
                     />
                   )}
-                </div>
+                </button>
               );
             })}
           <Button
