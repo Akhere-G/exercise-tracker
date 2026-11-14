@@ -3,15 +3,18 @@
 import { Button } from "@/src/components/ui/button";
 import { demoLoginAction } from "@/src/features/auth/actions";
 import { getFailureReason, track } from "@/src/features/analytics/utils";
+import { cn } from "@/src/lib/componentUtils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export function DemoLoginButton({
   variant = "default",
   className,
+  buttonClassName,
 }: {
   variant?: "default" | "secondary" | "outline";
   className?: string;
+  buttonClassName?: string;
 }) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +48,7 @@ export function DemoLoginButton({
       <Button
         type="button"
         variant={variant}
-        className="text-xl w-full h-12.5 rounded-xl px-6"
+        className={cn("w-full", buttonClassName)}
         disabled={isLoading}
         onClick={onClick}
       >

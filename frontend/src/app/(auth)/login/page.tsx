@@ -79,9 +79,9 @@ export default function Login() {
             <Button disabled={isSubmitting}>
               {isSubmitting ? "Logging in..." : "Login"}
             </Button>
+            <DemoLoginButton variant="secondary" />
             <Link href="/register">Create account?</Link>
           </form>
-          <DemoLoginButton variant="secondary" className="mt-4" />
         </CardContent>
       </Card>
     </div>

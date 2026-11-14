@@ -15,6 +15,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { registerAction } from "../../../features/auth/actions";
 import { getFailureReason, track } from "@/src/features/analytics/utils";
+import { DemoLoginButton } from "@/src/features/auth/components/DemoLoginButton";
 
 export default function Register() {
   const [errorMessages, setErrorMessage] = useState<Record<string, string>>({
@@ -111,6 +112,7 @@ export default function Register() {
             <Button disabled={isSubmitting}>
               {isSubmitting ? "Creating account..." : "Create account"}
             </Button>
+            <DemoLoginButton variant="secondary" />
             <Link href="/login">Have an account already?</Link>
           </form>
         </CardContent>

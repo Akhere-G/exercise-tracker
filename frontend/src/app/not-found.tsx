@@ -22,7 +22,7 @@ export default function NotFound() {
           href="/routines"
           className="bg-primary text-primary-foreground font-semibold px-5 py-2.5 rounded-xl hover:bg-primary/90 transition-colors"
         >
-          s Go to Dashboard
+          Go to Dashboard
         </Link>
         <Link
           href="/"
