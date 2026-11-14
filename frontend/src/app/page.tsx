@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   BarChart3,
+  Bot,
   Dumbbell,
   Flame,
   ListChecks,
@@ -16,6 +17,11 @@ const FEATURES = [
     icon: Zap,
     title: "Smart progression suggestions",
     body: "After each set, Gains suggests the next weight and rep target based on how you performed last time. Progress happens one sensible step at a time, so you stop guessing and start getting stronger.",
+  },
+  {
+    icon: Bot,
+    title: "AI-generated workout plans",
+    body: "Tell Gains your goals, experience and the equipment you have, and it drafts a complete routine built around you. Review the plan, adjust anything you like, then save it in one tap.",
   },
   {
     icon: Flame,
@@ -127,14 +133,13 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left">
-            {FEATURES.map((feature, index) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full text-left">
+            {FEATURES.map((feature) => {
               const Icon = feature.icon;
-              const isLastFeature = index === FEATURES.length - 1;
               return (
                 <div
                   key={feature.title}
-                  className={`bg-card border border-border p-6 rounded-2xl shadow-sm flex flex-col gap-3 ${isLastFeature ? "md:col-span-3" : ""}`}
+                  className="bg-card border border-border p-6 rounded-2xl shadow-sm flex flex-col gap-3"
                 >
                   <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                     <Icon className="h-5 w-5" />
