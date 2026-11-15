@@ -99,7 +99,7 @@ export async function registerAccount(
 ): Promise<Account> {
   const credentials = newCredentials();
   const response = await request.post(`${backendApi}/auth/register`, {
-    data: credentials,
+    data: { ...credentials, termsAccepted: true },
   });
   expect(response.status(), await response.text()).toBe(201);
   const { access_token: token } = await response.json();
@@ -154,6 +154,18 @@ export const test = base.extend<Fixtures>({
       localStorage.setItem(
         "notifications-prompt-dismissed-at",
         String(Date.now()),
+      ),
+    );
+    // Users who have already answered the cookie banner (declined analytics), so it
+    // does not cover the page; the banner has its own unit tests.
+    await page.addInitScript(() =>
+      localStorage.setItem(
+        "gains_cookie_preferences",
+        JSON.stringify({
+          analytics: false,
+          updatedAt: new Date().toISOString(),
+          version: 1,
+        }),
       ),
     );
     await provide(page);

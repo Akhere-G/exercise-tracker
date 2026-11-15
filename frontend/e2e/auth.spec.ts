@@ -21,6 +21,7 @@ test.describe("accounts", () => {
       .getByLabel("Password", { exact: true })
       .fill(credentials.password);
     await page.getByLabel("Repeat Password").fill(credentials.password);
+    await page.getByLabel(/I agree to the/).check();
     await page.getByRole("button", { name: "Create account" }).click();
 
     // New users are taken through onboarding before the dashboard.
@@ -73,6 +74,7 @@ test.describe("accounts", () => {
     await page.getByLabel("Email").fill(existing.email);
     await page.getByLabel("Password", { exact: true }).fill("Password1");
     await page.getByLabel("Repeat Password").fill("Password1");
+    await page.getByLabel(/I agree to the/).check();
     await page.getByRole("button", { name: "Create account" }).click();
 
     await expect(
