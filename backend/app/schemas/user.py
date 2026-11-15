@@ -1,14 +1,17 @@
-from typing import Annotated
+import re
+from typing import Annotated, Literal
 
 from pydantic import (
     BaseModel as Base,
+)
+from pydantic import (
     ConfigDict,
     EmailStr,
     Field,
     StringConstraints,
     field_validator,
 )
-import re
+
 from .base import BaseModel
 
 
@@ -44,6 +47,7 @@ class User(BaseModel):
 
 
 class UserCreate(UserBase):
+    terms_accepted: Literal[True]
     password: str = Field(
         min_length=8, max_length=72, description="Must be 8 characters or more."
     )

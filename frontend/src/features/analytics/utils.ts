@@ -5,6 +5,8 @@ import type {
   AnalyticsEventName,
   PageViewEvent,
 } from "./types";
+import { applyPostHogConsent } from "./consent";
+import { readCookiePreferences } from "../cookie-consent/storage";
 
 const BLOCKED_PROPERTY_KEYS = new Set([
   "email",
@@ -100,7 +102,10 @@ export function track<E extends AnalyticsEventName>(
 
 export function resetAnalytics(): void {
   try {
-    if (posthog.__loaded) posthog.reset();
+    if (posthog.__loaded) {
+      posthog.reset();
+      applyPostHogConsent(readCookiePreferences());
+    }
   } catch {}
 }
 

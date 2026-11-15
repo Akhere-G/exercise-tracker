@@ -14,6 +14,13 @@ export const registerSchema = yup.object({
     .test("passwords-match", "Passwords must match", function (value) {
       return value === this.parent.password;
     }),
+  termsAccepted: yup
+    .boolean()
+    .oneOf(
+      [true],
+      "You must agree to the Terms of Use and Privacy Policy to create an account",
+    )
+    .required(),
 });
 
 export type LoginSchema = yup.InferType<typeof loginSchema>;

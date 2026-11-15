@@ -205,8 +205,11 @@ export default function HomePage() {
             <Link href="/exercises" className="hover:underline">
               Exercises
             </Link>
-            <Link href="/stats" className="hover:underline">
-              Analytics
+            <Link href="/terms" className="hover:underline">
+              Terms
+            </Link>
+            <Link href="/privacy" className="hover:underline">
+              Privacy
             </Link>
           </div>
         </div>

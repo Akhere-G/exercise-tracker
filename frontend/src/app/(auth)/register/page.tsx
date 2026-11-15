@@ -109,7 +109,25 @@ export default function Register() {
               {...register("repeatPassword")}
               error={formState.errors.repeatPassword?.message}
             />
-            <Button disabled={isSubmitting}>
+            <div>
+              <label className="flex cursor-pointer items-start gap-3 text-sm leading-relaxed">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 shrink-0 accent-primary"
+                  {...register("termsAccepted")}
+                />
+                <span>
+                  I agree to the <Link href="/terms">Terms of Use</Link> and{" "}
+                  <Link href="/privacy">Privacy Policy</Link>.
+                </span>
+              </label>
+              {formState.errors.termsAccepted?.message && (
+                <p role="alert" className="mt-1 text-sm text-error">
+                  {formState.errors.termsAccepted.message}
+                </p>
+              )}
+            </div>
+            <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Creating account..." : "Create account"}
             </Button>
             <DemoLoginButton variant="secondary" />

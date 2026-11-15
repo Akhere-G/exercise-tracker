@@ -5,10 +5,17 @@ const posthog = vi.hoisted(() => ({
   capture: vi.fn(),
   reset: vi.fn(),
   register: vi.fn(),
+  opt_in_capturing: vi.fn(),
+  opt_out_capturing: vi.fn(),
 }));
 vi.mock("posthog-js", () => ({ default: posthog }));
 
-import { getFailureReason, getPageEvent, track } from "./utils";
+import {
+  getFailureReason,
+  getPageEvent,
+  resetAnalytics,
+  track,
+} from "./utils";
 
 describe("getPageEvent", () => {
   it.each([
@@ -54,6 +61,23 @@ describe("track", () => {
     posthog.__loaded = false;
     track("register");
     expect(posthog.capture).not.toHaveBeenCalled();
+  });
+});
+
+describe("resetAnalytics", () => {
+  it("restores analytics consent after resetting PostHog on logout", () => {
+    posthog.__loaded = true;
+    localStorage.setItem(
+      "gains_cookie_preferences",
+      JSON.stringify({ analytics: true, updatedAt: "now", version: 1 }),
+    );
+
+    resetAnalytics();
+
+    expect(posthog.reset).toHaveBeenCalledOnce();
+    expect(posthog.opt_in_capturing).toHaveBeenCalledWith({
+      captureEventName: false,
+    });
   });
 });
 

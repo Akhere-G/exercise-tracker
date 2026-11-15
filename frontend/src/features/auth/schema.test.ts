@@ -23,10 +23,25 @@ describe("auth schemas", () => {
       email: "sam@example.com",
       password: "Password1",
       repeatPassword: "Password1",
+      termsAccepted: true,
     };
     expect(registerSchema.isValidSync(valid)).toBe(true);
     await expect(
       registerSchema.validate({ ...valid, repeatPassword: "Password2" }),
     ).rejects.toThrow("Passwords must match");
+  });
+
+  it("register requires agreement to the terms and privacy policy", async () => {
+    const registration = {
+      username: "sam",
+      email: "sam@example.com",
+      password: "Password1",
+      repeatPassword: "Password1",
+      termsAccepted: false,
+    };
+
+    await expect(registerSchema.validate(registration)).rejects.toThrow(
+      "You must agree to the Terms of Use and Privacy Policy",
+    );
   });
 });

@@ -110,6 +110,11 @@ describe("register page", () => {
     vi.mocked(registerAction).mockResolvedValue({ success: true, data: null });
     const { user } = renderWithProviders(<Register />);
     await fill(user);
+    await user.click(
+      screen.getByRole("checkbox", {
+        name: /I agree to the Terms of Use and Privacy Policy/i,
+      }),
+    );
     await user.click(screen.getByRole("button", { name: "Create account" }));
 
     await waitFor(() => expect(router.push).toHaveBeenCalledWith("/routines"));
@@ -126,10 +131,29 @@ describe("register page", () => {
     });
     const { user } = renderWithProviders(<Register />);
     await fill(user);
+    await user.click(
+      screen.getByRole("checkbox", {
+        name: /I agree to the Terms of Use and Privacy Policy/i,
+      }),
+    );
     await user.click(screen.getByRole("button", { name: "Create account" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "Email already registered",
     );
+  });
+
+  it("does not create an account without agreement to the legal terms", async () => {
+    const { user } = renderWithProviders(<Register />);
+    await fill(user);
+
+    await user.click(screen.getByRole("button", { name: "Create account" }));
+
+    expect(
+      await screen.findByText(
+        "You must agree to the Terms of Use and Privacy Policy to create an account",
+      ),
+    ).toBeInTheDocument();
+    expect(registerAction).not.toHaveBeenCalled();
   });
 });

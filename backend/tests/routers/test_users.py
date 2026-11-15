@@ -1,4 +1,8 @@
+from datetime import UTC, datetime
+
+import jwt
 import pytest
+
 from app.config import settings
 from app.limiter import limiter
 from app.models import User
@@ -10,7 +14,12 @@ from tests.helpers import PASSWORD, run_reset
 def _register(client, email):
     return client.post(
         "/api/auth/register",
-        json={"username": "New", "email": email, "password": PASSWORD},
+        json={
+            "username": "New",
+            "email": email,
+            "password": PASSWORD,
+            "termsAccepted": True,
+        },
     )
 
 
@@ -35,6 +44,22 @@ def test_register_rejects_the_same_email_in_a_different_case(client, user):
 
     assert response.status_code == 400
     assert "already exists" in response.json()["detail"]
+
+
+@pytest.mark.parametrize("terms_accepted", [False, None])
+def test_register_requires_terms_acceptance(client, db, terms_accepted):
+    payload = {
+        "username": "New",
+        "email": "new@example.com",
+        "password": PASSWORD,
+    }
+    if terms_accepted is not None:
+        payload["termsAccepted"] = terms_accepted
+
+    response = client.post("/api/auth/register", json=payload)
+
+    assert response.status_code == 422
+    assert db.query(User).count() == 0
 
 
 @pytest.mark.parametrize("login", [_login_json, _login_form])
@@ -77,12 +102,8 @@ def test_demo_endpoint(client, db, fixture, freeze, monkeypatch):
     assert response.status_code == 200
     token = response.json()["access_token"]
 
-    import jwt
-
     claims = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-    from datetime import datetime, timezone
-
-    remaining = claims["exp"] - datetime.now(timezone.utc).timestamp()
+    remaining = claims["exp"] - datetime.now(UTC).timestamp()
     assert 7000 < remaining <= 7200
 
     headers = {"Authorization": f"Bearer {token}"}
@@ -90,7 +111,8 @@ def test_demo_endpoint(client, db, fixture, freeze, monkeypatch):
     assert len(client.get("/api/workouts", headers=headers).json()) == 14
 
     login = client.post(
-        "/api/auth/login", json={"email": fixture["user"]["email"], "password": "Anything1"}
+        "/api/auth/login",
+        json={"email": fixture["user"]["email"], "password": "Anything1"},
     )
     assert login.status_code == 401
 
@@ -107,15 +129,24 @@ def test_demo_quotas(client, db, fixture, freeze, monkeypatch):
     run_reset(db, fixture, freeze)
     monkeypatch.setattr(demo_service, "DEMO_MAX_WORKOUTS", 14)
     monkeypatch.setattr(demo_service, "DEMO_MAX_ROUTINES", 4)
-    headers = {"Authorization": f"Bearer {client.post('/api/auth/demo').json()['access_token']}"}
+    demo_token = client.post("/api/auth/demo").json()["access_token"]
+    headers = {"Authorization": f"Bearer {demo_token}"}
 
     workout = {
-        "completedAt": "2026-10-20T12:00:00", "duration": 60,
+        "completedAt": "2026-10-20T12:00:00",
+        "duration": 60,
         "sets": [{"exerciseId": 577, "setIndex": 1, "reps": 5, "weight": 20}],
     }
-    assert client.post("/api/workouts", json=workout, headers=headers).status_code == 403
+    assert (
+        client.post("/api/workouts", json=workout, headers=headers).status_code == 403
+    )
     routine = {
-        "name": "x", "day": 1,
-        "routineItems": [{"exerciseId": 577, "targetSets": 3, "targetReps": 5, "order": 1}],
+        "name": "x",
+        "day": 1,
+        "routineItems": [
+            {"exerciseId": 577, "targetSets": 3, "targetReps": 5, "order": 1}
+        ],
     }
-    assert client.post("/api/routines", json=routine, headers=headers).status_code == 403
+    assert (
+        client.post("/api/routines", json=routine, headers=headers).status_code == 403
+    )

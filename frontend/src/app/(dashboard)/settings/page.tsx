@@ -10,6 +10,7 @@ import DataPortabilityButtons from "./components/DataPortabilityButtons";
 import GoalsForm from "./components/GoalsForm";
 import PreferencesCard from "./components/PreferencesCard";
 import { getPersonas } from "@/src/features/ai/queries";
+import { CookieSettingsCard } from "@/src/features/cookie-consent/components/CookieSettingsCard";
 
 export default async function SettingsPage() {
   const personasResponse = await getPersonas();
@@ -82,6 +83,8 @@ export default async function SettingsPage() {
             </p>
           </div>
         </Link>
+
+        <CookieSettingsCard />
 
         <div className="bg-card border border-border rounded-2xl p-6 md:col-span-2 flex flex-col gap-4">
           <div className="flex items-center gap-3">

@@ -68,6 +68,7 @@ describe("auth actions", () => {
       email: "sam@example.com",
       password: "Password1",
       repeatPassword: "Password1",
+      termsAccepted: true,
     });
     expect(result.success).toBe(true);
     expect(cookieJar.get("access_token")?.value).toBe("jwt-123");

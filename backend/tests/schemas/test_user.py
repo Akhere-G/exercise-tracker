@@ -1,12 +1,19 @@
 import pytest
-from app.schemas.user import UserCreate, UserLogin
 from pydantic import ValidationError
+
+from app.schemas.user import UserCreate, UserLogin
 from tests.helpers import PASSWORD
 
 
 def _create(**overrides):
     return UserCreate(
-        **{"username": "Ok", "email": "ok@example.com", "password": PASSWORD, **overrides}
+        **{
+            "username": "Ok",
+            "email": "ok@example.com",
+            "password": PASSWORD,
+            "terms_accepted": True,
+            **overrides,
+        }
     )
 
 
@@ -30,3 +37,12 @@ def test_emails_are_trimmed_and_lowercased():
         UserLogin(email="Test@EXAMPLE.com", password=PASSWORD).email
         == "test@example.com"
     )
+
+
+@pytest.mark.parametrize("terms_accepted", [False, None])
+def test_user_create_requires_terms_acceptance(terms_accepted):
+    with pytest.raises(ValidationError):
+        if terms_accepted is None:
+            UserCreate(username="Ok", email="ok@example.com", password=PASSWORD)
+        else:
+            _create(terms_accepted=terms_accepted)
