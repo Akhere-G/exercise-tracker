@@ -12,6 +12,7 @@ import { ExercisePickerModal } from "./ExercisePickerModal";
 import { useRouter } from "next/navigation";
 import { Routine } from "@/src/features/routines/types";
 import {
+  reorderRoutineItems,
   toggleSupersetLink,
   toLocalSchedule,
   toUtcSchedule,
@@ -58,7 +59,7 @@ export default function RoutineForm({
     }
   }, [initalData, setValue]);
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, replace } = useFieldArray({
     control,
     name: "routineItems",
   });
@@ -124,6 +125,10 @@ export default function RoutineForm({
     groups.forEach((group, i) =>
       setValue(`routineItems.${i}.supersetGroup`, group, { shouldDirty: true }),
     );
+  };
+
+  const handleMoveItem = (fromIndex: number, toIndex: number) => {
+    replace(reorderRoutineItems(values.routineItems, fromIndex, toIndex));
   };
 
   const handleAddExerciseToForm = (exercises: Exercise[]) => {
@@ -203,6 +208,7 @@ export default function RoutineForm({
             control={control}
             items={values.routineItems ?? []}
             onToggleSuperset={handleToggleSuperset}
+            onMove={handleMoveItem}
           />
           <Button
             type="button"
