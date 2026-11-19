@@ -20,7 +20,9 @@ import {
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
 import SetInput from "./SetInput";
-import TimeInput from "@/src/components/ui/timeInput";
+import TimeInput, {
+  SET_TIME_INPUT_CLASS,
+} from "@/src/components/ui/timeInput";
 import { useState } from "react";
 import { ExerciseGroup, FormSetRow } from "./types";
 import { useWeightUnit } from "@/src/features/profile/components/ProfileProvider";
@@ -173,9 +175,9 @@ export default function ExerciseSection({
                   </td>
                 )}
                 {hasDuration && (
-                  <td className=" w-30 ">
+                  <td>
                     <TimeInput
-                      className="bg-transparent! border-none max-w-fit"
+                      className={SET_TIME_INPUT_CLASS}
                       value={set.durationSecs ?? ""}
                       aria-label={`Set ${set.setIndex} duration`}
                       onChange={(v) =>

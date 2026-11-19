@@ -11,6 +11,9 @@ interface TimeInputProps {
   "aria-label"?: string;
 }
 
+export const SET_TIME_INPUT_CLASS =
+  "w-16 h-10 px-1 bg-transparent! border-none";
+
 export const formatTime = (value: number | string): string => {
   if (value === "" || value === null || value === undefined) return "";
   const total = Math.round(Number(value));
