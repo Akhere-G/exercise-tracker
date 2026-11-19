@@ -9,6 +9,7 @@ import {
 import {
   buildSetsFromWorkout,
   groupByExercise,
+  moveExerciseSets,
   toDatetimeLocal,
 } from "./workoutFormUtils";
 
@@ -57,5 +58,40 @@ describe("workout edit form helpers", () => {
     expect(toDatetimeLocal("2026-11-02T10:15:00Z")).toBe("2026-11-02T15:45");
     expect(toDatetimeLocal(null)).toBe("");
     expect(toDatetimeLocal("not a date")).toBe("");
+  });
+});
+
+describe("moveExerciseSets", () => {
+  it("moves every set of an exercise together and keeps set order", () => {
+    const sets = [
+      { exerciseId: benchPress.id, setIndex: 1, exercise: benchPress },
+      { exerciseId: pushUp.id, setIndex: 1, exercise: pushUp },
+      { exerciseId: benchPress.id, setIndex: 2, exercise: benchPress },
+      { exerciseId: plank.id, setIndex: 1, exercise: plank },
+    ];
+
+    const reordered = moveExerciseSets(sets, 0, 2);
+
+    expect(reordered.map((s) => [s.exerciseId, s.setIndex])).toEqual([
+      [pushUp.id, 1],
+      [plank.id, 1],
+      [benchPress.id, 1],
+      [benchPress.id, 2],
+    ]);
+  });
+});
+
+describe("moveExerciseSets with unequal set counts", () => {
+  it("keeps one group per exercise", () => {
+    const sets = [
+      { exerciseId: benchPress.id, setIndex: 1, exercise: benchPress },
+      { exerciseId: pushUp.id, setIndex: 1, exercise: pushUp },
+      { exerciseId: pushUp.id, setIndex: 2, exercise: pushUp },
+    ];
+
+    const groups = groupByExercise(moveExerciseSets(sets, 0, 1));
+
+    expect(groups.map((g) => g.exercise.id)).toEqual([pushUp.id, benchPress.id]);
+    expect(groups.map((g) => g.indices.length)).toEqual([2, 1]);
   });
 });

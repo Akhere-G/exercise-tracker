@@ -7,6 +7,7 @@ import {
 import { Exercise as BaseExercise } from "@/src/features/exercises/types";
 import { WorkoutSetSchema } from "@/src/features/workout/schema";
 import { Workout } from "@/src/features/workout/types";
+import { moveItem } from "@/src/lib/reorder";
 import { ExerciseGroup, FormSetRow } from "./types";
 
 export function buildDefaultSet(
@@ -60,4 +61,19 @@ export function toDatetimeLocal(d: Date | string | null | undefined): string {
   if (isNaN(date.getTime())) return "";
   const offset = date.getTimezoneOffset() * 60000;
   return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+}
+
+export function moveExerciseSets(
+  sets: FormSetRow[],
+  fromGroup: number,
+  toGroup: number,
+): FormSetRow[] {
+  const reordered: FormSetRow[] = [];
+  const groups = moveItem(groupByExercise(sets), fromGroup, toGroup);
+  for (const group of groups) {
+    for (const index of group.indices) {
+      reordered.push(sets[index]);
+    }
+  }
+  return reordered;
 }
