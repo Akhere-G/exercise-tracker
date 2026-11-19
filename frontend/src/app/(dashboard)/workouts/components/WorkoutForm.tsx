@@ -16,7 +16,7 @@ import { ActionResponse } from "@/src/lib/apiTypes";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useFieldArray, useForm, useWatch } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import ExerciseSection from "./ExerciseSection";
 import { FormSetRow } from "./types";
@@ -24,8 +24,14 @@ import {
   buildDefaultSet,
   buildSetsFromWorkout,
   groupByExercise,
+  moveExerciseSets,
   toDatetimeLocal,
 } from "./workoutFormUtils";
+import {
+  DragHandle,
+  SortableItem,
+  SortableList,
+} from "@/src/components/SortableList";
 
 export default function WorkoutForm({
   submitAction,
@@ -52,12 +58,10 @@ export default function WorkoutForm({
 
   const completedAtValue = watch("completedAt");
 
-  const { fields, append, remove, update } = useFieldArray({
+  const { fields, append, remove, update, replace } = useFieldArray({
     control,
     name: "sets",
   });
-
-  const watchedSets = useWatch({ control, name: "sets" }) as FormSetRow[];
 
   useEffect(() => {
     if (!initialData) return;
@@ -73,11 +77,7 @@ export default function WorkoutForm({
     setValue("sets", rows as WorkoutSetSchema[]);
   }, [initialData, setValue]);
 
-  const currentSets: FormSetRow[] = fields.map((f, i) => ({
-    ...(watchedSets[i] ?? f),
-
-    exercise: (f as unknown as FormSetRow).exercise,
-  }));
+  const currentSets = fields as unknown as FormSetRow[];
 
   const groups = groupByExercise(currentSets);
 
@@ -88,6 +88,11 @@ export default function WorkoutForm({
   ) => {
     const existing = currentSets[fieldIndex];
     update(fieldIndex, { ...existing, [key]: value } as WorkoutSetSchema);
+  };
+
+  const handleMoveExercise = (fromIndex: number, toIndex: number) => {
+    const reordered = moveExerciseSets(currentSets, fromIndex, toIndex);
+    replace(reordered as unknown as WorkoutSetSchema[]);
   };
 
   const handleAddSet = (exerciseId: number) => {
@@ -241,19 +246,33 @@ export default function WorkoutForm({
             </p>
           )}
 
-          {groups.map((group) => (
-            <ExerciseSection
-              key={group.exercise.id}
-              group={group}
-              allSets={currentSets}
-              onUpdateSet={handleUpdateSet}
-              onAddSet={handleAddSet}
-              onRemoveLastSet={handleRemoveLastSet}
-              onRemoveExercise={handleRemoveExercise}
-              onReplaceExercise={handleReplaceExercise}
-              addedExercises={addedExercises}
-            />
-          ))}
+          <SortableList
+            ids={groups.map((group) => group.exercise.id)}
+            onMove={handleMoveExercise}
+          >
+            {groups.map((group) => (
+              <SortableItem key={group.exercise.id} id={group.exercise.id}>
+                {(handle) => (
+                  <ExerciseSection
+                    group={group}
+                    allSets={currentSets}
+                    onUpdateSet={handleUpdateSet}
+                    onAddSet={handleAddSet}
+                    onRemoveLastSet={handleRemoveLastSet}
+                    onRemoveExercise={handleRemoveExercise}
+                    onReplaceExercise={handleReplaceExercise}
+                    addedExercises={addedExercises}
+                    dragHandle={
+                      <DragHandle
+                        handle={handle}
+                        label={`Reorder ${group.exercise.name}`}
+                      />
+                    }
+                  />
+                )}
+              </SortableItem>
+            ))}
+          </SortableList>
 
           <Button
             type="button"
