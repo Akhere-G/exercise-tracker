@@ -15,9 +15,14 @@ import {
 } from "@/src/features/exercises/utils";
 import { Exercise } from "@/src/features/exercises/types";
 import { Controller } from "react-hook-form";
+import {
+  DragHandle,
+  SortableItem,
+  SortableList,
+} from "@/src/components/SortableList";
 
 interface RoutineItemsTableProps {
-  fields: RoutineItemSchema[];
+  fields: (RoutineItemSchema & { id: string })[];
   register: UseFormRegister<RoutineSchema>;
   remove: (index: number) => void;
   errors: FieldErrors<RoutineSchema>;
@@ -25,6 +30,7 @@ interface RoutineItemsTableProps {
   /** Current form values, so superset links reflect edits straight away. */
   items: RoutineItemSchema[];
   onToggleSuperset: (index: number) => void;
+  onMove: (fromIndex: number, toIndex: number) => void;
 }
 
 export function RoutineItemsTable({
@@ -35,6 +41,7 @@ export function RoutineItemsTable({
   control,
   items,
   onToggleSuperset,
+  onMove,
 }: RoutineItemsTableProps) {
   return (
     <div>
@@ -43,6 +50,10 @@ export function RoutineItemsTable({
           <h2 className="text-center">No Exercises</h2>
         </div>
       ) : (
+        <SortableList
+          ids={fields.map((field) => field.id)}
+          onMove={onMove}
+        >
         <div className="flex flex-col gap-4 my-4">
           {fields.map((field, index) => {
             const exercise = field.exercise;
@@ -60,14 +71,19 @@ export function RoutineItemsTable({
             const hasNext = index < fields.length - 1;
 
             return (
+              <SortableItem key={field.id} id={field.id}>
+                {(handle) => (
               <div
-                key={field.exerciseId}
                 role="group"
                 aria-label={exercise?.name || "Unknown"}
                 className="card-custom p-4 bg-muted/20 rounded-lg flex flex-col gap-3"
               >
                 <div className="flex justify-between items-start gap-2">
                   <div className="flex items-start gap-2 min-w-0">
+                    <DragHandle
+                      handle={handle}
+                      label={`Reorder ${exercise?.name || "exercise"}`}
+                    />
                     <span className="font-mono text-xs text-muted-foreground bg-muted/50 px-2 py-0.5 rounded mt-0.5">
                       {index + 1}
                     </span>
@@ -190,9 +206,12 @@ export function RoutineItemsTable({
                   </Button>
                 )}
               </div>
+                )}
+              </SortableItem>
             );
           })}
         </div>
+        </SortableList>
       )}
     </div>
   );

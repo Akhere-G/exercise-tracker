@@ -2,7 +2,9 @@
 
 import { Button } from "@/src/components/ui/button";
 import { Input } from "@/src/components/ui/input";
-import TimeInput from "@/src/components/ui/timeInput";
+import TimeInput, {
+  SET_TIME_INPUT_CLASS,
+} from "@/src/components/ui/timeInput";
 import { Check } from "lucide-react";
 import { ActiveSet, Exercise, useWorkout } from "@/src/features/workout/store";
 import { Routine, RoutineItem } from "@/src/features/routines/types";
@@ -276,7 +278,7 @@ function SetRow({
       {hasDuration && (
         <td>
           <TimeInput
-            className="bg-transparent! border-none! w-auto!"
+            className={SET_TIME_INPUT_CLASS}
             value={set.durationSecs ?? ""}
             aria-label={`Set ${set.setIndex} duration`}
             onChange={(value) => updateSet({ durationSecs: Number(value) })}

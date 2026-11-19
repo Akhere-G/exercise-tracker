@@ -18,6 +18,10 @@ const eslintConfig = defineConfig([
     "blob-report/**",
     "e2e/.tmp/**",
   ]),
+  {
+    files: ["src/components/SortableList.tsx"],
+    rules: { "react-hooks/refs": "off" },
+  },
 ]);
 
 export default eslintConfig;

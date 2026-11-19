@@ -1,3 +1,5 @@
+import { moveItem } from "@/src/lib/reorder";
+
 export const getDayStr = (day: number) => {
   switch (day) {
     case 0:
@@ -125,3 +127,35 @@ export function diffRoutine(
 
 export const hasRoutineDiff = (diff: RoutineDiff) =>
   diff.added.length + diff.removed.length + diff.changed.length > 0;
+
+function clearBrokenSupersetLinks(
+  groups: (number | null)[],
+): (number | null)[] {
+  const result: (number | null)[] = groups.map(() => null);
+  for (let index = 0; index < groups.length; index++) {
+    const group = groups[index];
+    if (group === null) continue;
+
+    const linkedToNext = groups[index + 1] === group;
+    const linkedToPrevious = groups[index - 1] === group;
+    if (linkedToNext || linkedToPrevious) {
+      result[index] = group;
+    }
+  }
+  return result;
+}
+
+export function reorderRoutineItems<T extends { supersetGroup?: number | null }>(
+  items: readonly T[],
+  fromIndex: number,
+  toIndex: number,
+): T[] {
+  const reordered = moveItem(items, fromIndex, toIndex);
+  const groups = clearBrokenSupersetLinks(
+    reordered.map((item) => item.supersetGroup ?? null),
+  );
+  return reordered.map((item, index) => ({
+    ...item,
+    supersetGroup: groups[index],
+  }));
+}

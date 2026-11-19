@@ -1,13 +1,13 @@
 import logging
 from datetime import date, datetime, time, timedelta
-from typing import Optional
+
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session, selectinload
 
 from app.models import Exercise, ExerciseMuscle, Workout, WorkoutSet
 from app.schemas.workout import MAX_NEW_WORKOUT_SECS, WorkoutCreate, WorkoutUpdate
 from app.services import achievement as achievement_service
 from app.services import milestones as milestones_service
-from sqlalchemy import func, select
-from sqlalchemy.orm import Session, selectinload
 
 logger = logging.getLogger(__name__)
 
@@ -17,9 +17,9 @@ ONE_WEEK = timedelta(weeks=1)
 def get_workouts(
     db: Session,
     user_id: int,
-    routine_id: Optional[int] = None,
-    start: Optional[date] = None,
-    end: Optional[date] = None,
+    routine_id: int | None = None,
+    start: date | None = None,
+    end: date | None = None,
 ):
     stmt = _filter_workouts(_workout_query(), user_id, routine_id)
     if start is not None:
@@ -148,7 +148,10 @@ def create_workout(db: Session, user_id: int, workout_in: WorkoutCreate):
             routine_id=workout_in.routine_id,
             completed_at=workout_in.completed_at,
             duration=duration,
-            sets=[_build_set(set_data) for set_data in workout_in.sets],
+            sets=[
+                _build_set(set_data, position)
+                for position, set_data in enumerate(workout_in.sets)
+            ],
         )
         db.add(workout)
         db.commit()
@@ -179,7 +182,9 @@ def update_workout(
         if workout_in.sets is not None:
             workout.sets.clear()
             db.flush()
-            workout.sets.extend(_build_set(s) for s in workout_in.sets)
+            workout.sets.extend(
+                _build_set(s, position) for position, s in enumerate(workout_in.sets)
+            )
 
         db.commit()
         db.refresh(workout)
@@ -221,10 +226,11 @@ def _filter_workouts(stmt, user_id: int, routine_id: int | None):
     return stmt
 
 
-def _build_set(set_data) -> WorkoutSet:
+def _build_set(set_data, position: int) -> WorkoutSet:
     return WorkoutSet(
         exercise_id=set_data.exercise_id,
         set_index=set_data.set_index,
+        position=position,
         reps=set_data.reps,
         weight=set_data.weight,
         duration_secs=set_data.duration_secs,
@@ -260,7 +266,7 @@ def _week_start(day: date) -> date:
 
 
 def _recent_week_counts(
-    db: Session, user_id: int, routine_id: Optional[int]
+    db: Session, user_id: int, routine_id: int | None
 ) -> dict[date, int]:
     """Workouts per week for the latest unbroken run of active weeks.
 

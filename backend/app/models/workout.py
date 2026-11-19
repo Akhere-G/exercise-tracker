@@ -1,16 +1,18 @@
-from app.database import Base
-from .audit_mixin import AuditMixin
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, Float, DateTime, ForeignKey, Index, String
 from datetime import datetime
-from typing import Optional, List
+
+from sqlalchemy import DateTime, Float, ForeignKey, Index, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.database import Base
+
+from .audit_mixin import AuditMixin
 from .exercise import Exercise
 
 
 class Workout(Base, AuditMixin):
     __tablename__ = "workouts"
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    routine_id: Mapped[Optional[int]] = mapped_column(
+    routine_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("routines.id", ondelete="SET NULL"), index=True
     )
     user_id: Mapped[int] = mapped_column(
@@ -18,8 +20,11 @@ class Workout(Base, AuditMixin):
     )
     completed_at: Mapped[datetime] = mapped_column(DateTime)
     duration: Mapped[int] = mapped_column(Integer)
-    sets: Mapped[List["WorkoutSet"]] = relationship(
-        "WorkoutSet", back_populates="workout", cascade="all, delete-orphan"
+    sets: Mapped[list["WorkoutSet"]] = relationship(
+        "WorkoutSet",
+        back_populates="workout",
+        cascade="all, delete-orphan",
+        order_by="WorkoutSet.position, WorkoutSet.id",
     )
 
     __table_args__ = (
@@ -37,16 +42,17 @@ class WorkoutSet(Base, AuditMixin):
         Integer, ForeignKey("exercises.id", ondelete="CASCADE"), index=True
     )
     set_index: Mapped[int] = mapped_column(Integer, default=1)
-    reps: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    weight: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    distance_meters: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    duration_secs: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    position: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    reps: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    weight: Mapped[float | None] = mapped_column(Float, nullable=True)
+    distance_meters: Mapped[float | None] = mapped_column(Float, nullable=True)
+    duration_secs: Mapped[int | None] = mapped_column(Integer, nullable=True)
     set_type: Mapped[str] = mapped_column(
         String(10), default="normal", server_default="normal"
     )
-    rpe: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
-    rir: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    superset_group: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    rpe: Mapped[float | None] = mapped_column(Float, nullable=True)
+    rir: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    superset_group: Mapped[int | None] = mapped_column(Integer, nullable=True)
 
     workout: Mapped[Workout] = relationship(Workout, back_populates="sets")
     exercise: Mapped[Exercise] = relationship(Exercise)

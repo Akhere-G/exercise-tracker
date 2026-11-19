@@ -12,8 +12,14 @@ import {
 import { ExerciseImage } from "../../components/ExerciseImage";
 import { useRouter } from "next/navigation";
 import { useEnsurePreviousSets } from "@/src/features/workout/components/WorkoutContext";
+import {
+  SortableItem,
+  SortableList,
+} from "@/src/components/SortableList";
+import { moveItem } from "@/src/lib/reorder";
 
 const SUPERSET_COLOURS = ["bg-primary", "bg-warning", "bg-info"];
+const TOUCH_REORDER_DELAY_MS = 200;
 
 export default function ExerciseList() {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,6 +33,10 @@ export default function ExerciseList() {
     } else {
       setWorkoutData({ currentExerciseId: exerciseId });
     }
+  };
+
+  const handleMoveExercise = (fromIndex: number, toIndex: number) => {
+    setWorkoutData({ exercises: moveItem(exercises, fromIndex, toIndex) });
   };
 
   async function addExercises(newExercises: BaseExercise[]) {
@@ -76,41 +86,54 @@ export default function ExerciseList() {
     <div className="flex flex-col">
       <div className="px-2 py-4 bg-secondary overflow-x-scroll">
         <div className="flex gap-2 w-max">
-          {!!exercises.length &&
-            exercises.map((item) => {
-              const group = getActiveSupersetGroup(exercises, item);
-              return (
-                <button
-                  type="button"
-                  key={item.id}
-                  aria-label={item.name}
-                  aria-current={
-                    currentExerciseId === item.id ? "step" : undefined
-                  }
-                  className={`relative block transition-opacity duration-300 ${currentExerciseId === item.id ? "cursor-pointer" : "opacity-50"}`}
-                  onClick={() => onClick(item.id)}
-                >
-                  <ExerciseImage exercise={item} />
-                  {isExerciseCompleted(item) && (
-                    <Check className="absolute right-1 bottom-1 bg-white w-5 h-5 rounded-full text-success " />
-                  )}
-                  {group !== null && (
-                    <span
-                      title={`Superset ${group}`}
-                      className={`absolute -bottom-2 left-0 right-0 h-1 rounded-full ${SUPERSET_COLOURS[(group - 1) % SUPERSET_COLOURS.length]}`}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          <Button
-            className={`h-12 ${noExercises ? "" : "w-17"}`}
-            onClick={() => setIsOpen(true)}
+          <SortableList
+            ids={exercises.map((item) => item.id)}
+            onMove={handleMoveExercise}
+            direction="horizontal"
+            touchDelayMs={TOUCH_REORDER_DELAY_MS}
           >
-            {noExercises && "Add Exercise"}
+            {!!exercises.length &&
+              exercises.map((item) => {
+                const group = getActiveSupersetGroup(exercises, item);
+                return (
+                  <SortableItem key={item.id} id={item.id}>
+                    {(handle) => (
+                      <button
+                        type="button"
+                        ref={handle.setActivatorNodeRef}
+                        {...handle.attributes}
+                        {...handle.listeners}
+                        aria-label={item.name}
+                        aria-current={
+                          currentExerciseId === item.id ? "step" : undefined
+                        }
+                        className={`relative block transition-opacity duration-300 ${currentExerciseId === item.id ? "cursor-pointer" : "opacity-50"}`}
+                        onClick={() => onClick(item.id)}
+                      >
+                        <ExerciseImage exercise={item} />
+                        {isExerciseCompleted(item) && (
+                          <Check className="absolute right-1 bottom-1 bg-white w-5 h-5 rounded-full text-success " />
+                        )}
+                        {group !== null && (
+                          <span
+                            title={`Superset ${group}`}
+                            className={`absolute -bottom-2 left-0 right-0 h-1 rounded-full ${SUPERSET_COLOURS[(group - 1) % SUPERSET_COLOURS.length]}`}
+                          />
+                        )}
+                      </button>
+                    )}
+                  </SortableItem>
+                );
+              })}
+            <Button
+              className={`h-12 ${noExercises ? "" : "w-17"}`}
+              onClick={() => setIsOpen(true)}
+            >
+              {noExercises && "Add Exercise"}
 
-            <Plus />
-          </Button>
+              <Plus />
+            </Button>
+          </SortableList>
         </div>
       </div>
       <progress

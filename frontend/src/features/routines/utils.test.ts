@@ -4,6 +4,7 @@ import {
   diffRoutine,
   getDayStr,
   hasRoutineDiff,
+  reorderRoutineItems,
   toggleSupersetLink,
   toLocalSchedule,
   toUtcSchedule,
@@ -102,5 +103,44 @@ describe("diffRoutine", () => {
       { exerciseId: pushUp.id, name: "Push Up", sets: 3 },
     ]);
     expect(hasRoutineDiff(diff)).toBe(false);
+  });
+});
+
+describe("reorderRoutineItems", () => {
+  const item = (exerciseId: number, supersetGroup: number | null) => ({
+    exerciseId,
+    supersetGroup,
+  });
+  const groupsOf = (items: { supersetGroup: number | null }[]) =>
+    items.map((i) => i.supersetGroup);
+
+  it("moves the item to its new position", () => {
+    const items = [item(1, null), item(2, null), item(3, null)];
+
+    const reordered = reorderRoutineItems(items, 0, 2);
+
+    expect(reordered.map((i) => i.exerciseId)).toEqual([2, 3, 1]);
+  });
+
+  it("keeps a superset whose members are still next to each other", () => {
+    const items = [item(1, 1), item(2, 1), item(3, null)];
+
+    expect(groupsOf(reorderRoutineItems(items, 2, 0))).toEqual([null, 1, 1]);
+  });
+
+  it("clears a superset when a member is moved away from its partner", () => {
+    const items = [item(1, 1), item(2, 1), item(3, null)];
+
+    expect(groupsOf(reorderRoutineItems(items, 0, 2))).toEqual([
+      null,
+      null,
+      null,
+    ]);
+  });
+
+  it("clears a member left next to a different group", () => {
+    const items = [item(1, 2), item(2, 1), item(3, 1)];
+
+    expect(groupsOf(reorderRoutineItems(items, 0, 0))).toEqual([null, 1, 1]);
   });
 });

@@ -20,8 +20,10 @@ import {
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
 import SetInput from "./SetInput";
-import TimeInput from "@/src/components/ui/timeInput";
-import { useState } from "react";
+import TimeInput, {
+  SET_TIME_INPUT_CLASS,
+} from "@/src/components/ui/timeInput";
+import { ReactNode, useState } from "react";
 import { ExerciseGroup, FormSetRow } from "./types";
 import { useWeightUnit } from "@/src/features/profile/components/ProfileProvider";
 import { toDisplayWeight, toKg } from "@/src/lib/units";
@@ -36,7 +38,9 @@ export default function ExerciseSection({
   onRemoveExercise,
   onReplaceExercise,
   addedExercises,
+  dragHandle,
 }: {
+  dragHandle?: ReactNode;
   group: ExerciseGroup;
   allSets: FormSetRow[];
   onUpdateSet: (
@@ -68,7 +72,9 @@ export default function ExerciseSection({
       aria-label={exercise.name}
     >
       <div className="flex items-start justify-between">
-        <div>
+        <div className="flex items-start gap-2 min-w-0">
+          {dragHandle}
+          <div>
           <h3 className="font-semibold">{exercise.name}</h3>
           <div className="flex items-center">
             <p className="capitalize text-sm text-muted-foreground">
@@ -78,6 +84,7 @@ export default function ExerciseSection({
             <p className="capitalize text-sm text-muted-foreground">
               {exercise.muscles.map((m) => m.name).join(", ")}
             </p>
+          </div>
           </div>
         </div>
 
@@ -173,9 +180,9 @@ export default function ExerciseSection({
                   </td>
                 )}
                 {hasDuration && (
-                  <td className=" w-30 ">
+                  <td>
                     <TimeInput
-                      className="bg-transparent! border-none max-w-fit"
+                      className={SET_TIME_INPUT_CLASS}
                       value={set.durationSecs ?? ""}
                       aria-label={`Set ${set.setIndex} duration`}
                       onChange={(v) =>
