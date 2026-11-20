@@ -15,8 +15,6 @@ else:
         pool_size=settings.db_pool_size,
         max_overflow=settings.db_max_overflow,
         connect_args={
-            "sslmode": "require",
-            "sslrootcert": settings.db_ca_cert_path,
             "connect_timeout": settings.db_connect_timeout_secs,
         },
     )
