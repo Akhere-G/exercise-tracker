@@ -1,5 +1,6 @@
-from app.schemas.exercise import ExerciseResponseSimple
 from pydantic import BaseModel
+
+from app.schemas.exercise import ExerciseResponseSimple
 
 from .base import UtcDatetime
 

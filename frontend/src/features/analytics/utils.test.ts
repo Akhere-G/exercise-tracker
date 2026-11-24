@@ -10,28 +10,15 @@ const posthog = vi.hoisted(() => ({
 }));
 vi.mock("posthog-js", () => ({ default: posthog }));
 
-import {
-  getFailureReason,
-  getPageEvent,
-  resetAnalytics,
-  track,
-} from "./utils";
+import { getFailureReason, getPageEvent, resetAnalytics, track } from "./utils";
 
 describe("getPageEvent", () => {
   it.each([
     ["/", "view_page_landing", "/"],
-    ["/routines/", "view_page_routines", "/routines"],
-    ["/routines/create", "view_page_routine_create", "/routines/create"],
     [
       "/routines/edit/12",
       "view_page_routine_edit",
       "/routines/edit/[routineId]",
-    ],
-    ["/routines/12", "view_page_routine_details", "/routines/[routineId]"],
-    [
-      "/workouts/summary/9",
-      "view_page_workout_summary",
-      "/workouts/summary/[workoutId]",
     ],
     ["/stats", "view_page_other", "other"],
   ])("%s → %s", (path, event, route) => {

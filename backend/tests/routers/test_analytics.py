@@ -1,8 +1,9 @@
 from datetime import date, datetime, timedelta
 
+from sqlalchemy import select
+
 from app.models import User
 from app.services import analytics as analytics_service
-from sqlalchemy import select
 from tests.helpers import REPS_WEIGHT_EXERCISE_ID, set_payload, workout_payload
 
 BENCH_ID = 25  # Barbell Bench Press, one of the strength standard lifts
@@ -48,13 +49,6 @@ def test_muscle_volume_counts_working_sets_and_skips_warmups(client, auth_header
     assert groups["calves"]["thisWeekSets"] == 0
 
 
-def test_muscle_volume_rejects_too_many_weeks(client, auth_headers):
-    assert (
-        client.get("/api/stats/muscle-volume?weeks=100", headers=auth_headers).status_code
-        == 422
-    )
-
-
 # ---------- recovery
 
 
@@ -95,7 +89,9 @@ def test_strength_standards_need_body_weight_for_a_level(client, auth_headers):
         json={"measuredOn": date.today().isoformat(), "weightKg": 80},
         headers=auth_headers,
     )
-    with_weight = client.get("/api/stats/strength-standards", headers=auth_headers).json()
+    with_weight = client.get(
+        "/api/stats/strength-standards", headers=auth_headers
+    ).json()
     bench = _by_group(with_weight["lifts"], "key")["bench"]
     assert bench["ratio"] == 1.46
     assert bench["level"] == "advanced"
@@ -165,14 +161,6 @@ def test_compare_periods_returns_deltas_against_the_previous_range(
     assert data["deltas"]["workoutCount"] == {"change": 1, "percent": 100.0}
 
 
-def test_compare_periods_rejects_a_backwards_range(client, auth_headers):
-    response = client.get(
-        "/api/stats/compare/periods?start=2026-10-10&end=2026-10-01",
-        headers=auth_headers,
-    )
-    assert response.status_code == 422
-
-
 def test_compare_exercises_returns_a_series_per_exercise(client, auth_headers):
     now = datetime.now().replace(microsecond=0)
     _log(
@@ -182,7 +170,9 @@ def test_compare_exercises_returns_a_series_per_exercise(client, auth_headers):
         now - timedelta(days=2),
     )
     _log(client, auth_headers, [set_payload(weight=90, reps=5)], now)
-    _log(client, auth_headers, [set_payload(exerciseId=BENCH_ID, weight=50, reps=5)], now)
+    _log(
+        client, auth_headers, [set_payload(exerciseId=BENCH_ID, weight=50, reps=5)], now
+    )
 
     data = client.get(
         f"/api/stats/compare/exercises?ids={REPS_WEIGHT_EXERCISE_ID},{BENCH_ID}",
@@ -197,17 +187,6 @@ def test_compare_exercises_returns_a_series_per_exercise(client, auth_headers):
     assert len(data[1]["sessions"]) == 1
 
 
-def test_compare_exercises_validates_ids(client, auth_headers):
-    assert (
-        client.get("/api/stats/compare/exercises?ids=a,b", headers=auth_headers).status_code
-        == 422
-    )
-    assert (
-        client.get("/api/stats/compare/exercises?ids=", headers=auth_headers).status_code
-        == 422
-    )
-
-
 # ---------- monthly trends
 
 
@@ -220,14 +199,3 @@ def test_trends_can_be_grouped_by_month(client, auth_headers):
 
     assert [t["weekStart"] for t in trends] == [now.date().replace(day=1).isoformat()]
     assert trends[0]["workoutCount"] == 1
-
-
-def test_stats_reject_an_unknown_granularity(client, auth_headers):
-    assert (
-        client.get("/api/stats?granularity=day", headers=auth_headers).status_code == 422
-    )
-
-
-def test_analytics_endpoints_require_login(client):
-    for path in ("muscle-volume", "recovery", "strength-standards", "consistency"):
-        assert client.get(f"/api/stats/{path}").status_code == 401

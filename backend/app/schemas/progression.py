@@ -1,13 +1,11 @@
-from typing import Optional
-
 from .base import BaseModel
 
 
 class ProgressionSuggestion(BaseModel):
     exercise_id: int
     action: str
-    weight: Optional[float] = None
-    reps: Optional[int] = None
+    weight: float | None = None
+    reps: int | None = None
     reason: str
 
 
@@ -31,7 +29,7 @@ class DeloadSuggestion(BaseModel):
 
 class DeloadAssessment(BaseModel):
     should_deload: bool
-    message: Optional[str] = None
+    message: str | None = None
     reasons: list[str] = []
     stalled_exercises: list[StalledExercise] = []
-    suggestion: Optional[DeloadSuggestion] = None
+    suggestion: DeloadSuggestion | None = None

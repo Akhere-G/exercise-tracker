@@ -2,7 +2,7 @@ import json
 import re
 import sys
 from collections import Counter
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -12,10 +12,10 @@ from app.models.exercise import Exercise
 from app.models.exercise_muscle import ExerciseMuscle
 from app.models.muscle import Muscle
 
-Contribution = Tuple[str, str]  # (muscle name, "primary" | "secondary")
+Contribution = tuple[str, str]  # (muscle name, "primary" | "secondary")
 
 # exercises.json `muscle_group` / `secondary_muscles` are unreliable, but `target` is correct.
-TARGET_TO_MUSCLE: Dict[str, str] = {
+TARGET_TO_MUSCLE: dict[str, str] = {
     "abs": "Abdominals",
     "pectorals": "Chest",
     "biceps": "Biceps",
@@ -37,23 +37,51 @@ TARGET_TO_MUSCLE: Dict[str, str] = {
 }
 
 # (name regex, name exclude regex, targets the rule applies to (empty = any), secondary muscles)
-KeywordRule = Tuple[str, str, Set[str], List[str]]
+KeywordRule = tuple[str, str, set[str], list[str]]
 
-KEYWORD_RULES: List[KeywordRule] = [
+KEYWORD_RULES: list[KeywordRule] = [
     # Arms
-    (r"\bcurl", r"\bleg\b|wrist|hamstring|nordic", {"biceps", "forearms"},
-     ["Biceps", "Brachialis", "Forearms"]),
+    (
+        r"\bcurl",
+        r"\bleg\b|wrist|hamstring|nordic",
+        {"biceps", "forearms"},
+        ["Biceps", "Brachialis", "Forearms"],
+    ),
     (r"wrist curl", r"reverse", set(), ["Wrist Flexors", "Forearms"]),
     (r"reverse wrist curl|wrist extension", "", set(), ["Wrist Extensors", "Forearms"]),
-    (r"pushdown|push-down|kickback|skull|overhead extension", "", {"triceps"},
-     ["Triceps"]),
-    (r"close-grip|close grip|\bdip\b|\bdips\b", "", {"triceps", "pectorals"},
-     ["Triceps", "Chest", "Shoulders"]),
+    (
+        r"pushdown|push-down|kickback|skull|overhead extension",
+        "",
+        {"triceps"},
+        ["Triceps"],
+    ),
+    (
+        r"close-grip|close grip|\bdip\b|\bdips\b",
+        "",
+        {"triceps", "pectorals"},
+        ["Triceps", "Chest", "Shoulders"],
+    ),
     # Back
-    (r"pull-up|pullup|chin-up|chinup|pulldown|pull-down|pull down", "", {"lats"},
-     ["Lats", "Biceps", "Brachialis", "Rhomboids", "Rear Deltoids", "Forearms", "Grip Muscles"]),
-    (r"\brow\b|\brows\b", "", {"upper back", "lats"},
-     ["Lats", "Biceps", "Rhomboids", "Rear Deltoids", "Forearms", "Traps"]),
+    (
+        r"pull-up|pullup|chin-up|chinup|pulldown|pull-down|pull down",
+        "",
+        {"lats"},
+        [
+            "Lats",
+            "Biceps",
+            "Brachialis",
+            "Rhomboids",
+            "Rear Deltoids",
+            "Forearms",
+            "Grip Muscles",
+        ],
+    ),
+    (
+        r"\brow\b|\brows\b",
+        "",
+        {"upper back", "lats"},
+        ["Lats", "Biceps", "Rhomboids", "Rear Deltoids", "Forearms", "Traps"],
+    ),
     (r"shrug", "", set(), ["Traps", "Upper Back", "Forearms", "Grip Muscles"]),
     # Chest
     (r".*", "", {"pectorals"}, ["Triceps", "Shoulders"]),
@@ -62,34 +90,69 @@ KEYWORD_RULES: List[KeywordRule] = [
     (r".*", "", {"delts"}, ["Shoulders"]),
     (r"press", "", {"delts"}, ["Triceps", "Upper Chest", "Traps"]),
     (r"raise|shrug", "press", {"delts"}, ["Traps"]),
-    (r"reverse fly|rear delt|reverse flye|face pull", "", set(),
-     ["Rear Deltoids", "Rhomboids", "Traps"]),
+    (
+        r"reverse fly|rear delt|reverse flye|face pull",
+        "",
+        set(),
+        ["Rear Deltoids", "Rhomboids", "Traps"],
+    ),
     # Legs / glutes
-    (r"squat|leg press|lunge|step-up|step up|hack", "", {"glutes", "quads", "hamstrings"},
-     ["Quadriceps", "Glutes", "Hamstrings", "Calves"]),
-    (r"deadlift|good morning|hip thrust|bridge|hip extension|romanian", "",
-     {"glutes", "hamstrings", "spine"}, ["Glutes", "Hamstrings", "Lower Back"]),
-    (r"deadlift", "", set(), ["Quadriceps", "Traps", "Forearms", "Grip Muscles", "Core"]),
+    (
+        r"squat|leg press|lunge|step-up|step up|hack",
+        "",
+        {"glutes", "quads", "hamstrings"},
+        ["Quadriceps", "Glutes", "Hamstrings", "Calves"],
+    ),
+    (
+        r"deadlift|good morning|hip thrust|bridge|hip extension|romanian",
+        "",
+        {"glutes", "hamstrings", "spine"},
+        ["Glutes", "Hamstrings", "Lower Back"],
+    ),
+    (
+        r"deadlift",
+        "",
+        set(),
+        ["Quadriceps", "Traps", "Forearms", "Grip Muscles", "Core"],
+    ),
     (r"leg curl|hamstring curl", "", set(), ["Hamstrings", "Calves"]),
     (r"abduction", "", set(), ["Glutes"]),
     (r"adduction", "", set(), ["Inner Thighs"]),
     (r"calf|calves", "", {"calves"}, ["Calves", "Soleus"]),
     # Core
     (r".*", "", {"abs"}, ["Core"]),
-    (r"leg raise|knee raise|hip raise|knee tuck|reverse crunch", "", {"abs"},
-     ["Lower Abs", "Hip Flexors"]),
-    (r"oblique|twist|side bend|side crunch|woodchop|wood chop", "", {"abs"},
-     ["Obliques"]),
+    (
+        r"leg raise|knee raise|hip raise|knee tuck|reverse crunch",
+        "",
+        {"abs"},
+        ["Lower Abs", "Hip Flexors"],
+    ),
+    (
+        r"oblique|twist|side bend|side crunch|woodchop|wood chop",
+        "",
+        {"abs"},
+        ["Obliques"],
+    ),
     (r"plank", "", {"abs"}, ["Obliques", "Shoulders"]),
     (r"back extension|hyperextension", "", {"spine"}, ["Glutes", "Hamstrings"]),
 ]
 
 # Exercises that need more than the rules infer. Applied first, so these win on contribution type.
-MANUAL_FIXES: Dict[int, List[Contribution]] = {
-    32: [("Glutes", "primary"), ("Quadriceps", "secondary"), ("Traps", "secondary"),
-         ("Forearms", "secondary"), ("Grip Muscles", "secondary"), ("Core", "secondary")],
+MANUAL_FIXES: dict[int, list[Contribution]] = {
+    32: [
+        ("Glutes", "primary"),
+        ("Quadriceps", "secondary"),
+        ("Traps", "secondary"),
+        ("Forearms", "secondary"),
+        ("Grip Muscles", "secondary"),
+        ("Core", "secondary"),
+    ],
     43: [("Glutes", "primary"), ("Lower Back", "secondary")],
-    50: [("Shoulders", "secondary"), ("Upper Chest", "secondary"), ("Core", "secondary")],
+    50: [
+        ("Shoulders", "secondary"),
+        ("Upper Chest", "secondary"),
+        ("Core", "secondary"),
+    ],
     58: [("Glutes", "primary"), ("Lower Back", "secondary")],
     586: [("Hamstrings", "primary"), ("Glutes", "secondary")],
     597: [("Hip Flexors", "secondary")],
@@ -99,8 +162,8 @@ MANUAL_FIXES: Dict[int, List[Contribution]] = {
 }
 
 
-def matching_keyword_muscles(name: str, target: str) -> List[str]:
-    muscles: List[str] = []
+def matching_keyword_muscles(name: str, target: str) -> list[str]:
+    muscles: list[str] = []
     for pattern, exclude, targets, rule_muscles in KEYWORD_RULES:
         if targets and target not in targets:
             continue
@@ -112,12 +175,12 @@ def matching_keyword_muscles(name: str, target: str) -> List[str]:
     return muscles
 
 
-def planned_contributions(item: Dict[str, Any]) -> List[Contribution]:
+def planned_contributions(item: dict[str, Any]) -> list[Contribution]:
     ex_id = int(item["id"])
     name = item["name"].strip().lower()
     target = item.get("target", "").strip().lower()
 
-    planned: List[Contribution] = list(MANUAL_FIXES.get(ex_id, []))
+    planned: list[Contribution] = list(MANUAL_FIXES.get(ex_id, []))
 
     target_muscle = TARGET_TO_MUSCLE.get(target)
     if target_muscle:
@@ -128,7 +191,7 @@ def planned_contributions(item: Dict[str, Any]) -> List[Contribution]:
 
 
 def fix_exercise_muscles(
-    session: Session, data: List[Dict[str, Any]], dry_run: bool
+    session: Session, data: list[dict[str, Any]], dry_run: bool
 ) -> None:
     muscle_ids = {m.name: m.id for m in session.execute(select(Muscle)).scalars()}
     exercise_ids = set(session.execute(select(Exercise.id)).scalars())
@@ -145,7 +208,9 @@ def fix_exercise_muscles(
 
         for muscle_name, contribution_type in planned_contributions(item):
             if muscle_name not in muscle_ids:
-                raise ValueError(f"Muscle '{muscle_name}' does not exist in the database")
+                raise ValueError(
+                    f"Muscle '{muscle_name}' does not exist in the database"
+                )
 
             key = (ex_id, muscle_ids[muscle_name])
             if key in existing:
@@ -154,7 +219,9 @@ def fix_exercise_muscles(
             existing.add(key)
             inserted[contribution_type] += 1
             if dry_run:
-                print(f"{ex_id:>5} {item['name']}: + {muscle_name} ({contribution_type})")
+                print(
+                    f"{ex_id:>5} {item['name']}: + {muscle_name} ({contribution_type})"
+                )
             else:
                 session.add(
                     ExerciseMuscle(
@@ -173,7 +240,7 @@ def fix_exercise_muscles(
 def main(filepath: str = "./exercises.json") -> None:
     dry_run = "--dry-run" in sys.argv
 
-    with open(filepath, "r", encoding="utf-8") as jsonfile:
+    with open(filepath, encoding="utf-8") as jsonfile:
         data = json.load(jsonfile)
 
     session = SessionLocal()

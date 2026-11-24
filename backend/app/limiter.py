@@ -23,6 +23,29 @@ limiter = Limiter(
 )
 
 
+def find_rate_limit_warnings(
+    trusted_proxy_count: int | None, redis_url: str | None
+) -> list[str]:
+    """What is wrong or weak about the rate-limit setup, for the startup log.
+
+    Without a trusted proxy count the limiter cannot tell clients apart behind a
+    proxy (they would all share one limit), so it stays off until it is set.
+    """
+    if trusted_proxy_count is None:
+        return [
+            "Rate limiting is OFF: login, register and AI requests are not "
+            "throttled. Set TRUSTED_PROXY_COUNT to the number of proxies in front "
+            "of the API (0 if clients connect directly) to turn it on."
+        ]
+    warnings = []
+    if not redis_url:
+        warnings.append(
+            "REDIS_URL is not set, so rate limits are counted per instance, not "
+            "across all of them."
+        )
+    return warnings
+
+
 def rate_limit_exceeded_handler(request: Request, exc: RateLimitExceeded):
     return JSONResponse(
         {"detail": "Too many requests. Try again later."},

@@ -1,7 +1,9 @@
 """Strength levels relative to body weight."""
 
 from datetime import datetime, time, timedelta
-from typing import Optional
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.constants.strength_standards import LEVELS, STANDARD_LIFTS, sex_factor
 from app.models import (
@@ -11,8 +13,6 @@ from app.models import (
 )
 from app.services import body as body_service
 from app.services import profile as profile_service
-from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 from .common import estimate_one_rep_max, today
 
@@ -21,7 +21,7 @@ STRENGTH_WINDOW_DAYS = 180
 
 def _level_for(
     ratio: float, multiples: list[float]
-) -> tuple[Optional[str], Optional[str], float]:
+) -> tuple[str | None, str | None, float]:
     """The level reached, the next one, and progress towards it from 0 to 1."""
     reached = -1
     for i, threshold in enumerate(multiples):
@@ -46,12 +46,11 @@ def get_strength_standards(db: Session, user_id: int) -> dict:
 
     since = datetime.combine(today() - timedelta(days=STRENGTH_WINDOW_DAYS), time.min)
     names = [lift["name"] for lift in STANDARD_LIFTS.values()]
-    exercise_ids = {
-        name: exercise_id
-        for name, exercise_id in db.execute(
+    exercise_ids = dict(
+        db.execute(
             select(Exercise.name, Exercise.id).where(Exercise.name.in_(names))
         ).all()
-    }
+    )
     best: dict[int, float] = {}
     if exercise_ids:
         stmt = (

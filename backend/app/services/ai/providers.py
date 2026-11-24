@@ -1,4 +1,4 @@
-from typing import Optional, Protocol
+from typing import Protocol
 
 from app.config import settings
 
@@ -6,17 +6,20 @@ TIMEOUT_SECS = 10
 
 
 class TextProvider(Protocol):
-    """Anything that can turn a prompt into text. Add a provider by implementing this."""
+    """Anything that can turn a prompt into text.
+
+    Add a provider by implementing this.
+    """
 
     name: str
 
-    def generate(self, prompt: str, system: str) -> Optional[str]: ...
+    def generate(self, prompt: str, system: str) -> str | None: ...
 
 
 class GeminiProvider:
     name = "Gemini"
 
-    def generate(self, prompt: str, system: str) -> Optional[str]:
+    def generate(self, prompt: str, system: str) -> str | None:
         from google import genai
         from google.genai import types
 
@@ -35,7 +38,7 @@ class GeminiProvider:
 class GroqProvider:
     name = "Groq"
 
-    def generate(self, prompt: str, system: str) -> Optional[str]:
+    def generate(self, prompt: str, system: str) -> str | None:
         from groq import Groq
 
         completion = Groq(api_key=settings.groq_api_key).chat.completions.create(

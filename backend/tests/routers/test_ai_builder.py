@@ -1,6 +1,7 @@
 import json
 
 import pytest
+
 from app.exceptions import AIUnavailable
 from app.services import ai_builder
 

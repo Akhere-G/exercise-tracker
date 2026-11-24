@@ -1,28 +1,37 @@
-from fastapi import APIRouter, Body, Depends, HTTPException, status
-from ..services import (
-    demo as demo_service,
-    exercise as exercise_service,
-    routine as routine_service,
-    user as user_service,
-    workout as workout_service,
-)
 from typing import Annotated
+
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+
 from app.database import get_db
 from app.schemas.routine import (
+    Routine,
     RoutineCreate,
     RoutineFromWorkout,
-    Routine,
     RoutineUpdate,
 )
-from ..models import User
-from typing import List
 
+from ..models import User
+from ..services import (
+    demo as demo_service,
+)
+from ..services import (
+    exercise as exercise_service,
+)
+from ..services import (
+    routine as routine_service,
+)
+from ..services import (
+    user as user_service,
+)
+from ..services import (
+    workout as workout_service,
+)
 
 router = APIRouter(prefix="/api/routines", tags=["Routines"])
 
 
-@router.get("", response_model=List[Routine])
+@router.get("", response_model=list[Routine])
 def get_routines(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Session = Depends(get_db),
@@ -60,25 +69,23 @@ def create_routine(
         db, (item.exercise_id for item in routine.routine_items)
     )
 
-    new_routine = routine_service.create_routine(
+    return routine_service.create_routine(
         db,
         user.id,
         routine,
     )
-
-    return new_routine
 
 
 MAX_BATCH_ROUTINES = 7
 
 
 @router.post(
-    "/batch", status_code=status.HTTP_201_CREATED, response_model=List[Routine]
+    "/batch", status_code=status.HTTP_201_CREATED, response_model=list[Routine]
 )
 def create_routines(
     user: Annotated[User, Depends(user_service.get_current_user)],
     routines: Annotated[
-        List[RoutineCreate], Body(min_length=1, max_length=MAX_BATCH_ROUTINES)
+        list[RoutineCreate], Body(min_length=1, max_length=MAX_BATCH_ROUTINES)
     ],
     db: Session = Depends(get_db),
 ):
@@ -122,14 +129,10 @@ def create_routine_from_workout(
         )
 
     workout = _get_workout_or_404(db, user.id, workout_id)
-    return routine_service.create_routine_from_workout(
-        db, user.id, workout, routine_in
-    )
+    return routine_service.create_routine_from_workout(db, user.id, workout, routine_in)
 
 
-@router.put(
-    "/{routine_id}/sync-from-workout/{workout_id}", response_model=Routine
-)
+@router.put("/{routine_id}/sync-from-workout/{workout_id}", response_model=Routine)
 def sync_routine_from_workout(
     user: Annotated[User, Depends(user_service.get_current_user)],
     routine_id: int,

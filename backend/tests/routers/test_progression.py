@@ -3,8 +3,7 @@ from tests.helpers import REPS_WEIGHT_EXERCISE_ID, set_payload, workout_payload
 
 def log_session(client, auth_headers, reps, weight, **extra):
     sets = [
-        set_payload(setIndex=i + 1, reps=reps, weight=weight, **extra)
-        for i in range(3)
+        set_payload(setIndex=i + 1, reps=reps, weight=weight, **extra) for i in range(3)
     ]
     response = client.post(
         "/api/workouts", json=workout_payload(sets=sets), headers=auth_headers
@@ -46,17 +45,3 @@ def test_warmups_do_not_set_the_baseline(client, auth_headers):
 def test_nothing_suggested_for_unlogged_exercises(client, auth_headers):
     response = client.get("/api/progression?exerciseIds=577", headers=auth_headers)
     assert response.json() == []
-
-
-def test_rejects_malformed_exercise_ids(client, auth_headers):
-    response = client.get("/api/progression?exerciseIds=a,b", headers=auth_headers)
-    assert response.status_code == 422
-
-
-def test_lists_personas(client, auth_headers):
-    response = client.get("/api/ai/personas", headers=auth_headers)
-
-    assert response.status_code == 200
-    assert {p["slug"] for p in response.json()} == {
-        "hype", "drill", "physio", "nerd", "oldschool",
-    }

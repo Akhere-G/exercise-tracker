@@ -1,14 +1,16 @@
 import json
-from typing import Any, Dict, List, Set
-from sqlalchemy.orm import Session
+from typing import Any
+
 from sqlalchemy import select
+from sqlalchemy.orm import Session
+
 from app.database import get_db
 from app.models.exercise import Exercise
-from app.models.muscle import Muscle
 from app.models.exercise_muscle import ExerciseMuscle
+from app.models.muscle import Muscle
 
 
-def infer_metrics(item: Dict[str, Any]) -> str:
+def infer_metrics(item: dict[str, Any]) -> str:
     """Infers the metric type based on names, categories, and equipment."""
     name = item.get("name", "").lower()
     equipment = item.get("equipment", "").lower()
@@ -40,13 +42,13 @@ def infer_metrics(item: Dict[str, Any]) -> str:
     return "reps" if equipment in ["body weight", "bodyweight"] else "reps+weight"
 
 
-def seed_all_muscles(session: Session, data: List[Dict[str, Any]]) -> Dict[str, int]:
+def seed_all_muscles(session: Session, data: list[dict[str, Any]]) -> dict[str, int]:
     """Pass 1: Extracts every unique muscle string and ensures it exists in the DB."""
     db_muscles_stmt = select(Muscle)
     db_muscles = session.execute(db_muscles_stmt).scalars().all()
     muscle_mapping = {m.name: m.id for m in db_muscles}
 
-    json_muscles: Set[str] = set()
+    json_muscles: set[str] = set()
     for item in data:
         json_muscles.add(item["muscle_group"].strip().title())
         for secondary in item.get("secondary_muscles", []):
@@ -63,13 +65,13 @@ def seed_all_muscles(session: Session, data: List[Dict[str, Any]]) -> Dict[str, 
 
 
 def seed_exercises_and_junctions(
-    session: Session, data: List[Dict[str, Any]], muscle_mapping: Dict[str, int]
+    session: Session, data: list[dict[str, Any]], muscle_mapping: dict[str, int]
 ) -> None:
     """Pass 2: Safely inserts unique exercises and links their junction rows."""
     existing_exercises_stmt = select(Exercise.name)
     existing_exercises = set(session.execute(existing_exercises_stmt).scalars().all())
 
-    seen_names: Set[str] = set()
+    seen_names: set[str] = set()
 
     for item in data:
         ex_name = item["name"].strip().title()
@@ -118,7 +120,7 @@ def seed_exercises_and_junctions(
 
 
 def seed_database(filepath: str = "./exercises.json") -> None:
-    with open(filepath, "r", encoding="utf-8") as jsonfile:
+    with open(filepath, encoding="utf-8") as jsonfile:
         data = json.load(jsonfile)
 
     session = next(get_db())

@@ -1,11 +1,12 @@
 from datetime import date
-from typing import Annotated, Literal, Optional
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User
+from app.routers.params import parse_id_list
 from app.schemas.stats import (
     Consistency,
     ExerciseSeries,
@@ -26,8 +27,8 @@ router = APIRouter(prefix="/api/stats", tags=["Stats"])
 def get_stats(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Annotated[Session, Depends(get_db)],
-    start: Optional[date] = None,
-    end: Optional[date] = None,
+    start: date | None = None,
+    end: date | None = None,
     granularity: Literal["week", "month"] = "week",
 ):
     if start and end and end < start:
@@ -67,7 +68,7 @@ def get_strength_standards(
 def get_consistency(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Annotated[Session, Depends(get_db)],
-    year: Annotated[Optional[int], Query(ge=2000, le=2100)] = None,
+    year: Annotated[int | None, Query(ge=2000, le=2100)] = None,
 ):
     return analytics_service.get_consistency(db, user.id, year or date.today().year)
 
@@ -92,16 +93,10 @@ def compare_exercises(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Annotated[Session, Depends(get_db)],
     ids: Annotated[str, Query(description="Comma separated exercise ids, up to 3.")],
-    start: Optional[date] = None,
-    end: Optional[date] = None,
+    start: date | None = None,
+    end: date | None = None,
 ):
-    try:
-        exercise_ids = [int(i) for i in ids.split(",") if i.strip()]
-    except ValueError:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="ids must be comma separated numbers.",
-        )
+    exercise_ids = parse_id_list(ids, "ids")
     if not exercise_ids:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,

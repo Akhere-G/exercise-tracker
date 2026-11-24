@@ -1,7 +1,10 @@
 """Comparisons between periods and between exercises."""
 
 from datetime import date, timedelta
-from typing import Optional
+
+from pydantic.alias_generators import to_camel
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.models import (
     Exercise,
@@ -9,9 +12,6 @@ from app.models import (
     WorkoutSet,
 )
 from app.services import stats as stats_service
-from pydantic.alias_generators import to_camel
-from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 from .common import estimate_one_rep_max
 
@@ -58,17 +58,16 @@ def compare_exercises(
     db: Session,
     user_id: int,
     exercise_ids: list[int],
-    start: Optional[date] = None,
-    end: Optional[date] = None,
+    start: date | None = None,
+    end: date | None = None,
 ) -> list[dict]:
     """Per-session strength and volume for each exercise, oldest first."""
     exercise_ids = list(dict.fromkeys(exercise_ids))[:MAX_COMPARED_EXERCISES]
-    names = {
-        exercise_id: name
-        for exercise_id, name in db.execute(
+    names = dict(
+        db.execute(
             select(Exercise.id, Exercise.name).where(Exercise.id.in_(exercise_ids))
         ).all()
-    }
+    )
 
     stmt = (
         select(

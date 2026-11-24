@@ -1,4 +1,7 @@
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
+
+from sqlalchemy import delete, func, select
+from sqlalchemy.orm import Session, selectinload
 
 from app.constants.milestones import MILESTONES
 from app.models import (
@@ -9,8 +12,6 @@ from app.models import (
     WorkoutSet,
 )
 from app.schemas.achievement import UserAchievementResponse
-from sqlalchemy import delete, func, select
-from sqlalchemy.orm import Session, selectinload
 
 FREQUENCIES = range(1, 6)
 
@@ -90,16 +91,16 @@ def seed_achievements(db: Session) -> None:
             )
         )
 
-    for milestone in MILESTONES:
-        definitions.append(
-            Achievement(
-                name=milestone.name,
-                description=milestone.description,
-                type=milestone.type,
-                icon=milestone.icon,
-                criteria=milestone.description,
-            )
+    definitions.extend(
+        Achievement(
+            name=milestone.name,
+            description=milestone.description,
+            type=milestone.type,
+            icon=milestone.icon,
+            criteria=milestone.description,
         )
+        for milestone in MILESTONES
+    )
 
     existing_types = set(db.execute(select(Achievement.type)).scalars().all())
     for definition in definitions:
@@ -168,7 +169,7 @@ def check_and_award_prs(
         key = (user_achievement.achievement_id, user_achievement.exercise_id)
         existing_prs[key] = user_achievement
 
-    now = awarded_at or datetime.now(timezone.utc)
+    now = awarded_at or datetime.now(UTC)
     changed: list[UserAchievement] = []
 
     for exercise_id, sets in sets_by_exercise.items():
@@ -217,10 +218,11 @@ def check_and_award_frequency_streaks(
 
     streaks = calculate_current_frequency_streaks(db, user_id, None, this_week)
 
-    streak_types = []
-    for frequency in FREQUENCIES:
-        if streaks.get(frequency, 0) > 0:
-            streak_types.append(_streak_type(frequency))
+    streak_types = [
+        _streak_type(frequency)
+        for frequency in FREQUENCIES
+        if streaks.get(frequency, 0) > 0
+    ]
 
     if not streak_types:
         return []
@@ -252,7 +254,7 @@ def check_and_award_frequency_streaks(
     for user_achievement in db.execute(stmt).scalars():
         existing_streaks[user_achievement.achievement_id] = user_achievement
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     changed = []
 
     for frequency in FREQUENCIES:
@@ -563,7 +565,4 @@ def _commit_and_serialize(
 
 
 def _serialize(rows) -> list[UserAchievementResponse]:
-    responses = []
-    for row in rows:
-        responses.append(UserAchievementResponse.model_validate(row))
-    return responses
+    return [UserAchievementResponse.model_validate(row) for row in rows]

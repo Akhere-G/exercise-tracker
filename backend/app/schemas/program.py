@@ -1,5 +1,4 @@
 from datetime import time
-from typing import Optional
 
 from pydantic import Field, field_validator
 
@@ -29,6 +28,6 @@ class ProgramOut(BaseModel):
 
 class ProgramApply(BaseModel):
     start_day: int = Field(ge=0, le=6)
-    start_time: Optional[time] = None
+    start_time: time | None = None
 
     _validate_start_time = field_validator("start_time")(_require_utc)

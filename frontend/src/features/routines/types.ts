@@ -5,7 +5,9 @@ export interface RoutineItem {
   exerciseId: number;
   targetSets: number;
   targetReps: number | null;
+  targetWeight: number | null;
   targetDurationSecs: number | null;
+  targetDistanceMeters: number | null;
   order: number;
   restSecs: number | null;
   supersetGroup: number | null;

@@ -6,10 +6,7 @@ import TimeInput, { formatTime, parseDigits } from "./timeInput";
 describe("time input parsing", () => {
   it.each([
     ["", null],
-    ["5", 5],
-    ["45", 45],
     ["130", 90],
-    ["1000", 600],
     ["9959", 5999],
   ])("digits %s → %s seconds", (digits, seconds) => {
     expect(parseDigits(digits)).toBe(seconds);

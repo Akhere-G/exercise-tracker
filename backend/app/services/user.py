@@ -1,16 +1,17 @@
-from passlib.context import CryptContext
-from app.schemas.user import UserCreate, Token
-from app.models import User
-from sqlalchemy.orm import Session
-from sqlalchemy import func, select
-from fastapi import Depends, HTTPException, status
-from app.config import settings
-from app.database import get_db
-from datetime import datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta
+
 import jwt
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
+from passlib.context import CryptContext
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session
 
+from app.config import settings
+from app.database import get_db
+from app.models import User
+from app.schemas.user import Token, UserCreate
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 DEMO_TOKEN_TTL = timedelta(hours=2)
@@ -24,16 +25,11 @@ pwd_context = CryptContext(schemes=["bcrypt_sha256"], deprecated="auto")
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
+        expire = datetime.now(UTC) + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(
-            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
-        )
+        expire = datetime.now(UTC) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(
-        to_encode, settings.secret_key, algorithm=settings.algorithm
-    )
-    return encoded_jwt
+    return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
 
 def get_current_user(
@@ -51,8 +47,8 @@ def get_current_user(
         email: str | None = payload.get("sub")
         if email is None:
             raise credentials_exception
-    except InvalidTokenError:
-        raise credentials_exception
+    except InvalidTokenError as error:
+        raise credentials_exception from error
 
     user = get_user_by_email(db, email=email)
     if user is None:

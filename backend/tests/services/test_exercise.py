@@ -1,12 +1,13 @@
 from datetime import datetime
 
 import pytest
+from fastapi import HTTPException
+from sqlalchemy import select
+
 from app.models import Exercise
 from app.schemas.workout import WorkoutCreate, WorkoutSetCreate, WorkoutUpdate
 from app.services import exercise as exercise_service
 from app.services import workout as workout_service
-from fastapi import HTTPException
-from sqlalchemy import select
 from tests.helpers import REPS_WEIGHT_EXERCISE_ID
 
 
@@ -14,7 +15,9 @@ def test_ensure_exercises_exist_lists_the_unknown_ids(db):
     exercise_service.ensure_exercises_exist(db, [REPS_WEIGHT_EXERCISE_ID])
 
     with pytest.raises(HTTPException) as error:
-        exercise_service.ensure_exercises_exist(db, [REPS_WEIGHT_EXERCISE_ID, 999_998, 999_999])
+        exercise_service.ensure_exercises_exist(
+            db, [REPS_WEIGHT_EXERCISE_ID, 999_998, 999_999]
+        )
 
     assert error.value.status_code == 422
     assert "[999998, 999999]" in error.value.detail

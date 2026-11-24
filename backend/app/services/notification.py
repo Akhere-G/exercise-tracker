@@ -1,5 +1,6 @@
-from sqlalchemy.orm import Session
 from sqlalchemy import select
+from sqlalchemy.orm import Session
+
 from ..models import Notification, NotificationSubscription
 
 NOTIFICATION_LIMIT = 50

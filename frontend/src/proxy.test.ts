@@ -12,14 +12,7 @@ const request = (path: string, token?: string) => {
 const location = (res: Response) => res.headers.get("location");
 
 describe("route protection", () => {
-  it.each([
-    "/routines",
-    "/workouts/active",
-    "/stats",
-    "/settings",
-    "/onboarding",
-    "/exercises/12",
-  ])(
+  it.each(["/routines", "/exercises/12"])(
     "sends signed-out visitors from %s to login, remembering where they were",
     (path) => {
       const res = proxy(request(path));

@@ -1,8 +1,13 @@
-from ..database import Base
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Boolean, Index, Integer, String, false, text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from ..database import Base
 from .audit_mixin import AuditMixin
-from typing import List
+
+if TYPE_CHECKING:
+    from .achievement import UserAchievement
 
 
 class User(Base, AuditMixin):
@@ -14,7 +19,7 @@ class User(Base, AuditMixin):
     is_demo: Mapped[bool] = mapped_column(
         Boolean, default=False, server_default=false()
     )
-    user_achievements: Mapped[List["UserAchievement"]] = relationship(
+    user_achievements: Mapped[list["UserAchievement"]] = relationship(
         "UserAchievement", back_populates="user"
     )
 

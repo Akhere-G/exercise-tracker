@@ -4,7 +4,7 @@ import jwt
 import pytest
 
 from app.config import settings
-from app.limiter import limiter
+from app.limiter import find_rate_limit_warnings, limiter
 from app.models import User
 from app.services import demo as demo_service
 from app.services import user as user_service
@@ -44,6 +44,20 @@ def test_register_rejects_the_same_email_in_a_different_case(client, user):
 
     assert response.status_code == 400
     assert "already exists" in response.json()["detail"]
+
+
+def test_register_rejects_a_username_longer_than_the_column(client, db):
+    response = client.post(
+        "/api/auth/register",
+        json={
+            "username": "x" * 51,
+            "email": "long@example.com",
+            "password": PASSWORD,
+            "termsAccepted": True,
+        },
+    )
+
+    assert response.status_code == 422
 
 
 @pytest.mark.parametrize("terms_accepted", [False, None])
@@ -171,3 +185,15 @@ def test_the_tests_do_not_read_the_developers_env_file():
     assert settings.redis_url is None
     assert settings.trusted_proxy_count is None
     assert settings.vapid_private_key is None
+
+
+def test_startup_warns_when_rate_limiting_is_off_or_per_instance():
+    off = find_rate_limit_warnings(None, None)
+    assert len(off) == 1
+    assert "TRUSTED_PROXY_COUNT" in off[0]
+
+    per_instance = find_rate_limit_warnings(1, None)
+    assert len(per_instance) == 1
+    assert "REDIS_URL" in per_instance[0]
+
+    assert find_rate_limit_warnings(1, "redis://cache:6379") == []

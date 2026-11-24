@@ -1,7 +1,9 @@
+from typing import Literal
+
 from pydantic import Field, model_validator
-from typing import Literal, Optional, List
-from .exercise import Exercise
+
 from .base import BaseModel, UtcDatetime, not_nullable
+from .exercise import Exercise
 
 SetType = Literal["warmup", "normal", "drop", "failure"]
 
@@ -9,14 +11,14 @@ SetType = Literal["warmup", "normal", "drop", "failure"]
 class WorkoutSetBase(BaseModel):
     exercise_id: int
     set_index: int = 1
-    reps: Optional[int] = None
-    weight: Optional[float] = None
-    distance_meters: Optional[float] = None
-    duration_secs: Optional[int] = None
+    reps: int | None = None
+    weight: float | None = None
+    distance_meters: float | None = None
+    duration_secs: int | None = None
     set_type: SetType = "normal"
-    rpe: Optional[float] = None
-    rir: Optional[int] = None
-    superset_group: Optional[int] = None
+    rpe: float | None = None
+    rir: int | None = None
+    superset_group: int | None = None
 
     @model_validator(mode="after")
     def validate_set_data(self) -> "WorkoutSetBase":
@@ -38,17 +40,17 @@ MAX_INT32 = 2_147_483_647
 
 class WorkoutSetCreate(WorkoutSetBase):
     set_index: int = Field(default=1, ge=1, le=1000)
-    reps: Optional[int] = Field(default=None, ge=0, le=10_000)
-    weight: Optional[float] = Field(
+    reps: int | None = Field(default=None, ge=0, le=10_000)
+    weight: float | None = Field(
         default=None, ge=-10_000, le=10_000, allow_inf_nan=False
     )
-    distance_meters: Optional[float] = Field(
+    distance_meters: float | None = Field(
         default=None, ge=0, le=1_000_000, allow_inf_nan=False
     )
-    duration_secs: Optional[int] = Field(default=None, ge=0, le=24 * 60 * 60)
-    rpe: Optional[float] = Field(default=None, ge=1, le=10, multiple_of=0.5)
-    rir: Optional[int] = Field(default=None, ge=0, le=10)
-    superset_group: Optional[int] = Field(default=None, ge=0, le=1000)
+    duration_secs: int | None = Field(default=None, ge=0, le=24 * 60 * 60)
+    rpe: float | None = Field(default=None, ge=1, le=10, multiple_of=0.5)
+    rir: int | None = Field(default=None, ge=0, le=10)
+    superset_group: int | None = Field(default=None, ge=0, le=1000)
 
 
 class WorkoutSet(WorkoutSetBase):
@@ -64,31 +66,32 @@ class WorkoutSetWithDate(WorkoutSet):
 class PreviousSet(BaseModel):
     exercise_id: int
     set_index: int
-    reps: Optional[int] = None
-    weight: Optional[float] = None
-    distance_meters: Optional[float] = None
-    duration_secs: Optional[int] = None
+    reps: int | None = None
+    weight: float | None = None
+    distance_meters: float | None = None
+    duration_secs: int | None = None
     set_type: SetType = "normal"
-    rpe: Optional[float] = None
-    rir: Optional[int] = None
+    rpe: float | None = None
+    rir: int | None = None
 
 
 class WorkoutBase(BaseModel):
-    routine_id: Optional[int] = None
+    routine_id: int | None = None
     completed_at: UtcDatetime
     duration: int
 
 
 class WorkoutCreate(WorkoutBase):
-    # Over-long durations are clamped to MAX_NEW_WORKOUT_SECS by the service, not rejected.
+    # Over-long durations are clamped to MAX_NEW_WORKOUT_SECS by the service,
+    # not rejected.
     duration: int = Field(ge=0, le=MAX_INT32)
-    sets: List[WorkoutSetCreate] = Field(max_length=MAX_SETS_PER_WORKOUT)
+    sets: list[WorkoutSetCreate] = Field(max_length=MAX_SETS_PER_WORKOUT)
 
 
 class WorkoutUpdate(BaseModel):
-    completed_at: Optional[UtcDatetime] = None
-    duration: Optional[int] = Field(default=None, ge=0, le=MAX_WORKOUT_SECS)
-    sets: Optional[List[WorkoutSetCreate]] = Field(
+    completed_at: UtcDatetime | None = None
+    duration: int | None = Field(default=None, ge=0, le=MAX_WORKOUT_SECS)
+    sets: list[WorkoutSetCreate] | None = Field(
         default=None, max_length=MAX_SETS_PER_WORKOUT
     )
 
@@ -99,4 +102,4 @@ class Workout(WorkoutBase):
     id: int
     user_id: int
     duration_capped: bool = False
-    sets: List[WorkoutSet] = []
+    sets: list[WorkoutSet] = []

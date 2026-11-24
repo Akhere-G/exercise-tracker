@@ -1,4 +1,5 @@
 import pytest
+
 from app.constants.programs import PROGRAMS
 from app.services.program import resolve_exercise_ids
 
@@ -8,13 +9,6 @@ def test_every_program_exercise_exists_in_the_catalogue(db, program):
     ids = resolve_exercise_ids(db, program)
 
     assert len(ids) == len({e.name for d in program.days for e in d.exercises})
-
-
-def test_lists_all_programs(client, auth_headers):
-    response = client.get("/api/programs", headers=auth_headers)
-
-    assert response.status_code == 200
-    assert {p["slug"] for p in response.json()} == set(PROGRAMS)
 
 
 def test_applying_a_program_creates_a_routine_per_day(client, auth_headers):

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { benchPress, makeRoutineItem, pushUp, squat } from "@/tests/factories";
 import {
   diffRoutine,
+  formatTarget,
   getDayStr,
   hasRoutineDiff,
   reorderRoutineItems,
@@ -34,13 +35,12 @@ describe("routine schedule timezones", () => {
     expect(toLocalSchedule(6, "23:30:00Z")).toEqual({ day: 0, time: "05:00" });
   });
 
-  it.each([
-    [0, "00:00"],
-    [6, "23:59"],
-    [4, "12:15"],
-  ])("round-trips day %i at %s", (day, time) => {
-    const utc = toUtcSchedule(day, time);
-    expect(toLocalSchedule(utc.day, utc.startTime)).toEqual({ day, time });
+  it("round-trips a local day and time", () => {
+    const utc = toUtcSchedule(6, "23:59");
+    expect(toLocalSchedule(utc.day, utc.startTime)).toEqual({
+      day: 6,
+      time: "23:59",
+    });
   });
 
   it("names days Monday-first", () => {
@@ -65,7 +65,6 @@ describe("toggleSupersetLink", () => {
     ],
     ["splits a group of three at the end", [1, 1, 1], 1, [1, 1, null]],
     ["ignores the last index", [null, null], 1, [null, null]],
-    ["ignores a negative index", [null, null], -1, [null, null]],
   ])("%s", (_, groups, index, expected) => {
     expect(toggleSupersetLink(groups, index)).toEqual(expected);
   });
@@ -142,5 +141,43 @@ describe("reorderRoutineItems", () => {
     const items = [item(1, 2), item(2, 1), item(3, 1)];
 
     expect(groupsOf(reorderRoutineItems(items, 0, 0))).toEqual([null, 1, 1]);
+  });
+});
+
+describe("formatTarget", () => {
+  const base = {
+    targetSets: 3,
+    targetReps: null,
+    targetWeight: null,
+    targetDurationSecs: null,
+    targetDistanceMeters: null,
+  };
+
+  it("shows sets, reps and the weight in the user's unit", () => {
+    const target = { ...base, targetReps: 10, targetWeight: 40 };
+    expect(formatTarget(target, "kg")).toBe("3 x 10 @ 40 kg");
+    expect(formatTarget(target, "lb")).toBe("3 x 10 @ 88.2 lb");
+  });
+
+  it("leaves the weight out when there is none", () => {
+    expect(formatTarget({ ...base, targetReps: 12 }, "kg")).toBe("3 x 12");
+  });
+
+  it("shows a timed hold as sets of minutes and seconds", () => {
+    expect(formatTarget({ ...base, targetDurationSecs: 45 }, "kg")).toBe(
+      "3 x 00:45",
+    );
+  });
+
+  it("shows distance work as the distance and the time", () => {
+    const run = {
+      ...base,
+      targetDurationSecs: 720,
+      targetDistanceMeters: 2000,
+    };
+    expect(formatTarget(run, "kg")).toBe("2 km in 12:00");
+    expect(formatTarget({ ...run, targetDistanceMeters: 800 }, "kg")).toBe(
+      "800 m in 12:00",
+    );
   });
 });

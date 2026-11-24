@@ -1,6 +1,7 @@
-from ..database import Base
+from sqlalchemy import Boolean, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import String, Integer, Boolean, ForeignKey, Text
+
+from ..database import Base
 from .audit_mixin import AuditMixin
 
 

@@ -1,22 +1,12 @@
 from logging import getLogger
 
+from sqlalchemy import select
+
 from app.database import SessionLocal
 from app.models import (
-    Achievement,
-    Exercise,
-    ExerciseMuscle,
-    Muscle,
-    Notification,
-    NotificationSubscription,
-    Routine,
-    RoutineItem,
     User,
-    UserAchievement,
-    Workout,
-    WorkoutSet,
 )
 from app.services.achievement import backfill_user_achievements
-from sqlalchemy import select
 
 logger = getLogger(__name__)
 

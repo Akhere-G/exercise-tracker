@@ -34,11 +34,14 @@ def find_target_problems(
     if rules is None:
         return [f"Unknown exercise type '{metrics}'."]
 
-    problems = []
-    for field in rules.required:
-        if not _is_set(targets.get(field)):
-            problems.append(f"needs a target {TARGET_LABELS[field]}")
-    for field in TARGET_FIELDS:
-        if field not in rules.allowed and _is_set(targets.get(field)):
-            problems.append(f"cannot have a target {TARGET_LABELS[field]}")
-    return problems
+    missing = [
+        f"needs a target {TARGET_LABELS[field]}"
+        for field in rules.required
+        if not _is_set(targets.get(field))
+    ]
+    not_allowed = [
+        f"cannot have a target {TARGET_LABELS[field]}"
+        for field in TARGET_FIELDS
+        if field not in rules.allowed and _is_set(targets.get(field))
+    ]
+    return missing + not_allowed

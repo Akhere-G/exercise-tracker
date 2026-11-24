@@ -1,5 +1,4 @@
 from datetime import date
-from typing import Optional
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -11,8 +10,8 @@ from app.schemas.body import BodyWeightUpsert
 def get_body_weights(
     db: Session,
     user_id: int,
-    start: Optional[date] = None,
-    end: Optional[date] = None,
+    start: date | None = None,
+    end: date | None = None,
 ) -> list[BodyWeight]:
     stmt = select(BodyWeight).where(BodyWeight.user_id == user_id)
     if start is not None:
@@ -22,7 +21,7 @@ def get_body_weights(
     return list(db.execute(stmt.order_by(BodyWeight.measured_on)).scalars())
 
 
-def get_latest_body_weight(db: Session, user_id: int) -> Optional[BodyWeight]:
+def get_latest_body_weight(db: Session, user_id: int) -> BodyWeight | None:
     stmt = (
         select(BodyWeight)
         .where(BodyWeight.user_id == user_id)
@@ -53,7 +52,7 @@ def upsert_body_weight(
         raise
 
 
-def delete_body_weight(db: Session, user_id: int, entry_id: int) -> Optional[int]:
+def delete_body_weight(db: Session, user_id: int, entry_id: int) -> int | None:
     try:
         entry = db.execute(
             select(BodyWeight).where(

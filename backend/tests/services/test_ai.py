@@ -1,4 +1,5 @@
 import pytest
+
 from app.exceptions import AIUnavailable
 from app.services import ai
 
@@ -25,7 +26,11 @@ def test_generate_text_uses_the_first_provider_that_answers():
 
 
 def test_generate_text_falls_back_when_a_provider_fails_or_is_empty():
-    failing, empty, working = Stub("a", error=RuntimeError()), Stub("b", ""), Stub("c", "ok")
+    failing, empty, working = (
+        Stub("a", error=RuntimeError()),
+        Stub("b", ""),
+        Stub("c", "ok"),
+    )
 
     assert ai.generate_text("p", "s", [failing, empty, working]) == "ok"
 

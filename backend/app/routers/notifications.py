@@ -1,16 +1,19 @@
-from fastapi import APIRouter, Depends, status, HTTPException
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import Annotated, List
-from ..models import User
+
 from ..database import get_db
-from ..services import user as user_service
+from ..models import User
+from ..schemas.notification import NotificationBase as Notification
+from ..schemas.notification import SubscriptionCreate
 from ..services import notification as notification_service
-from ..schemas.notification import NotificationBase as Notification, SubscriptionCreate
+from ..services import user as user_service
 
 router = APIRouter(prefix="/api/notifications", tags=["Notifications"])
 
 
-@router.get("", response_model=List[Notification])
+@router.get("", response_model=list[Notification])
 def get_notifications_route(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Annotated[Session, Depends(get_db)],

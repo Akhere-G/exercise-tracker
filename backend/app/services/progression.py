@@ -1,13 +1,14 @@
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Iterable, Optional
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session, selectinload
 
 from app.constants.muscle_groups import group_for_muscle
 from app.constants.personas import get_persona
 from app.models import Exercise, ExerciseMuscle, WorkoutSet
 from app.services import profile as profile_service
 from app.services import workout as workout_service
-from sqlalchemy import select
-from sqlalchemy.orm import Session, selectinload
 
 KG_PER_LB = 0.45359237
 
@@ -25,17 +26,17 @@ MIN_MANAGEABLE_RIR = 1
 
 @dataclass(frozen=True)
 class SetResult:
-    reps: Optional[int]
-    weight: Optional[float]
-    rpe: Optional[float] = None
-    rir: Optional[int] = None
+    reps: int | None
+    weight: float | None
+    rpe: float | None = None
+    rir: int | None = None
 
 
 @dataclass(frozen=True)
 class Suggestion:
     action: str
-    weight: Optional[float]
-    reps: Optional[int]
+    weight: float | None
+    reps: int | None
 
 
 def load_category(exercise: Exercise) -> str:
@@ -64,8 +65,8 @@ def _manageable(result: SetResult) -> bool:
 def suggest_next(
     last_session: Iterable[SetResult],
     increment_kg: float,
-    target_reps: Optional[int] = None,
-) -> Optional[Suggestion]:
+    target_reps: int | None = None,
+) -> Suggestion | None:
     """Double progression: add load once every set hits the target comfortably,
     otherwise work towards the target reps at the same load."""
     sets = [s for s in last_session if s.reps]
@@ -102,9 +103,7 @@ def _working_results(sets: Iterable[WorkoutSet]) -> list[SetResult]:
     ]
 
 
-def get_suggestions(
-    db: Session, user_id: int, exercise_ids: list[int]
-) -> list[dict]:
+def get_suggestions(db: Session, user_id: int, exercise_ids: list[int]) -> list[dict]:
     profile = profile_service.get_or_create_profile(db, user_id)
     previous = workout_service.get_previous_sets_for_exercises(
         db, user_id, exercise_ids
@@ -129,7 +128,9 @@ def get_suggestions(
                 "action": suggestion.action,
                 "weight": suggestion.weight,
                 "reps": suggestion.reps,
-                "reason": describe(profile.coach_persona, suggestion, profile.weight_unit),
+                "reason": describe(
+                    profile.coach_persona, suggestion, profile.weight_unit
+                ),
             }
         )
     return results

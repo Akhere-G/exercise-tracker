@@ -17,10 +17,33 @@ select = [
     "PERF",     # perflint
     "RUF",      # ruff-specific
 ]
-ignore = ["PLR0913"]  # service functions take explicit arguments
+ignore = [
+    "PLR0913",  # service functions take explicit arguments
+    "PLC0415",  # a few imports sit inside functions to avoid import cycles
+    "PLR0917",  # FastAPI route parameters are positional by nature
+    "N818",  # AIUnavailable is a public name used across the API
+]
+
+[lint.flake8-bugbear]
+# FastAPI dependencies are meant to be called in argument defaults.
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Header",
+    "fastapi.Body",
+    "fastapi.Path",
+    "fastapi.Form",
+]
 
 [lint.isort]
 known-first-party = ["app", "tests", "seed"]
 
 [lint.per-file-ignores]
 "tests/**" = ["PLR2004"]  # magic numbers are fine in assertions
+"app/constants/**" = ["E501"]  # prose and data tables
+"app/services/ai_builder.py" = ["E501"]  # the prompt text
+"app/routers/workouts.py" = ["N803"]  # query parameters are camelCase in the API
+"app/schemas/**" = ["RUF012"]  # pydantic copies mutable defaults per instance
+"app/services/demo.py" = ["PLR0912", "PLR0915", "PLR2004", "E501"]  # fixture validator
+"fix_exercise_muscles.py" = ["E501"]  # one-off script with long comments
+"tests/services/test_demo.py" = ["E501", "PLR2004"]  # a long SQL regex

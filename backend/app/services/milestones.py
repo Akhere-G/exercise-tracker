@@ -1,8 +1,8 @@
 """One-off achievements that are awarded once and never improved on."""
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta, timezone
-from typing import Callable
+from datetime import UTC, date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import func, select
@@ -63,10 +63,8 @@ CHECKS: dict[str, Callable[[WorkoutContext], bool]] = {
 
 def local_start(completed_at: datetime, duration_secs: int, timezone_name: str | None):
     """When the workout began on the user's wall clock (stored times are UTC)."""
-    zone = ZoneInfo(timezone_name) if timezone_name else timezone.utc
-    started = completed_at.replace(tzinfo=timezone.utc) - timedelta(
-        seconds=duration_secs
-    )
+    zone = ZoneInfo(timezone_name) if timezone_name else UTC
+    started = completed_at.replace(tzinfo=UTC) - timedelta(seconds=duration_secs)
     return started.astimezone(zone)
 
 
@@ -81,7 +79,7 @@ def check_and_award_milestones(
         return []
 
     achievements = achievement_service._get_achievements_by_type(db, earned)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     rows = [
         UserAchievement(
             user_id=user_id,
