@@ -46,6 +46,15 @@ class User(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class UserOut(BaseModel):
+    """The signed-in user as shown to the client. Never includes the password hash."""
+
+    id: int
+    username: str
+    email: str
+    is_demo: bool
+
+
 class UserCreate(UserBase):
     terms_accepted: Literal[True]
     password: str = Field(

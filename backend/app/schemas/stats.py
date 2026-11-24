@@ -1,6 +1,6 @@
-from datetime import date, datetime
+from datetime import date
 
-from .base import BaseModel
+from .base import BaseModel, UtcDatetime
 
 
 class StatsOverview(BaseModel):
@@ -32,7 +32,7 @@ class TopExercise(BaseModel):
     name: str
     set_count: int
     workout_count: int
-    last_used: datetime | None = None
+    last_used: UtcDatetime | None = None
 
 
 class PersonalRecord(BaseModel):
@@ -41,7 +41,7 @@ class PersonalRecord(BaseModel):
     value: float
     exercise_id: int
     exercise_name: str
-    unlocked_at: datetime
+    unlocked_at: UtcDatetime
 
 
 class Stats(BaseModel):

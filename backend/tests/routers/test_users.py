@@ -150,3 +150,15 @@ def test_demo_quotas(client, db, fixture, freeze, monkeypatch):
     assert (
         client.post("/api/routines", json=routine, headers=headers).status_code == 403
     )
+
+
+def test_me_never_exposes_the_password_hash(client, user, auth_headers):
+    response = client.get("/api/auth/me", headers=auth_headers)
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": user.id,
+        "username": "Test",
+        "email": "test@example.com",
+        "isDemo": False,
+    }

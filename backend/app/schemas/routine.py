@@ -2,7 +2,7 @@ from datetime import time, timedelta
 from typing import List, Optional
 from pydantic import Field, field_validator, model_validator
 from .exercise import Exercise
-from .base import BaseModel
+from .base import BaseModel, not_nullable
 
 
 MAX_ROUTINE_ITEMS = 100
@@ -108,6 +108,7 @@ class RoutineUpdate(BaseModel):
     )
 
     _validate_start_time = field_validator("start_time")(_require_utc)
+    _no_nulls = not_nullable("name", "day")
 
     @model_validator(mode="after")
     def validate_unique_exercises(self) -> "RoutineUpdate":

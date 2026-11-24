@@ -123,3 +123,31 @@ def test_reordering_sets_on_update_is_kept_after_reload(client, auth_headers):
         SECOND_EXERCISE_ID,
         REPS_WEIGHT_EXERCISE_ID,
     ]
+
+
+def test_a_workout_time_survives_an_edit_unchanged(client, auth_headers):
+    created = client.post(
+        "/api/workouts",
+        json=workout_payload(completedAt="2026-10-20T23:30:00Z"),
+        headers=auth_headers,
+    ).json()
+    assert created["completedAt"] == "2026-10-20T23:30:00Z"
+
+    # The edit form sends back exactly what the API returned, in the user's local
+    # time zone (here UTC+1, so the same moment reads as 00:30 the next day).
+    edited = client.patch(
+        f"/api/workouts/{created['id']}",
+        json={"completedAt": "2026-10-21T00:30:00+01:00"},
+        headers=auth_headers,
+    ).json()
+
+    assert edited["completedAt"] == "2026-10-20T23:30:00Z"
+
+
+def test_a_required_field_cannot_be_nulled_by_an_update(client, auth_headers):
+    created = client.post("/api/workouts", json=workout_payload(), headers=auth_headers)
+    url = f"/api/workouts/{created.json()['id']}"
+
+    for field in ("completedAt", "duration"):
+        response = client.patch(url, json={field: None}, headers=auth_headers)
+        assert response.status_code == 422, field

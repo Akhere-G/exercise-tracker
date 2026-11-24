@@ -7,6 +7,7 @@ from app.database import get_db
 from app.models import User
 from app.schemas.goals import Goals
 from app.schemas.profile import Profile, ProfileUpdate
+from app.services import exercise as exercise_service
 from app.services import goals as goals_service
 from app.services import profile as profile_service
 from app.services import user as user_service
@@ -36,4 +37,8 @@ def update_profile(
     db: Annotated[Session, Depends(get_db)],
     profile_in: ProfileUpdate,
 ):
+    if profile_in.target_lift_exercise_id is not None:
+        exercise_service.ensure_exercises_exist(
+            db, [profile_in.target_lift_exercise_id]
+        )
     return profile_service.update_profile(db, user.id, profile_in)

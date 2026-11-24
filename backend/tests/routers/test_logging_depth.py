@@ -147,8 +147,29 @@ def test_profile_defaults_and_updates(client, auth_headers):
 
 
 def test_profile_rejects_bad_values(client, auth_headers):
-    for body in ({"weightUnit": "stone"}, {"timezone": "Mars/Base"}):
-        assert client.patch("/api/profile", json=body, headers=auth_headers).status_code == 422
+    bad_bodies = (
+        {"weightUnit": "stone"},
+        {"timezone": "Mars/Base"},
+        {"weightUnit": None},
+        {"effortMetric": None},
+        {"coachPersona": None},
+        {"targetLiftExerciseId": 999_999, "targetLiftKg": 100},
+    )
+    for body in bad_bodies:
+        response = client.patch("/api/profile", json=body, headers=auth_headers)
+        assert response.status_code == 422, body
+
+
+def test_profile_fields_that_may_be_empty_can_be_cleared(client, auth_headers):
+    client.patch("/api/profile", json={"sex": "male", "timezone": "Europe/London"}, headers=auth_headers)
+
+    response = client.patch(
+        "/api/profile", json={"sex": None, "timezone": None}, headers=auth_headers
+    )
+
+    assert response.status_code == 200
+    assert response.json()["sex"] is None
+    assert response.json()["timezone"] is None
 
 
 def test_exercise_rest_setting_is_saved_per_user(client, auth_headers):
