@@ -1,8 +1,8 @@
 from app.database import Base
 from .audit_mixin import AuditMixin
-from sqlalchemy import Float, Integer, String, Time, ForeignKey
+from sqlalchemy import DateTime, Float, Integer, String, Time, ForeignKey
 from sqlalchemy.orm import mapped_column, Mapped, relationship
-from datetime import time
+from datetime import datetime, time
 from typing import Optional, List
 from .exercise import Exercise
 
@@ -16,6 +16,10 @@ class Routine(Base, AuditMixin):
     )
     day: Mapped[int] = mapped_column(Integer)
     start_time: Mapped[Optional[time]] = mapped_column(Time(timezone=True))
+    # When a start-time reminder last went out (naive UTC), to avoid sending twice.
+    last_reminded_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True
+    )
 
     routine_items: Mapped[List["RoutineItem"]] = relationship(
         "RoutineItem",

@@ -118,7 +118,10 @@ def test_demo_endpoint(client, db, fixture, freeze, monkeypatch):
 
     subscribe = client.post(
         "/api/notifications/subscribe",
-        json={"endpoint": "e", "keys": {"p256dh": "p", "auth": "a"}},
+        json={
+            "endpoint": "https://fcm.googleapis.com/fcm/send/abc",
+            "keys": {"p256dh": "p", "auth": "a"},
+        },
         headers=headers,
     )
     assert subscribe.status_code == 403

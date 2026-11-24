@@ -1,6 +1,7 @@
 #!/bin/sh
 echo "Running run_reminder..."
 
-python3 run_reminder.py
+# The image runs from /app, where `app` is the package.
+python3 -m app.run_reminder
 
 echo "Success"

@@ -71,13 +71,15 @@ def get_exercises(
         stmt = stmt.where(Exercise.equipment.ilike(_like_pattern(equipment), escape="\\"))
 
     if muscle and muscle != "all":
-        stmt = (
-            stmt.join(ExerciseMuscle)
-            .join(Muscle)
+        # A subquery rather than a join plus DISTINCT: PostgreSQL rejects DISTINCT
+        # when ORDER BY uses expressions that are not selected, as the search
+        # ranking below does.
+        matching_exercise_ids = (
+            select(ExerciseMuscle.exercise_id)
+            .join(Muscle, Muscle.id == ExerciseMuscle.muscle_id)
             .where(Muscle.name.ilike(_like_pattern(muscle), escape="\\"))
         )
-
-        stmt = stmt.distinct()
+        stmt = stmt.where(Exercise.id.in_(matching_exercise_ids))
 
     if search:
         stmt = stmt.where(Exercise.name.ilike(_like_pattern(search), escape="\\"))

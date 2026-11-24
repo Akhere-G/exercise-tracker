@@ -1,96 +1,153 @@
 import json
-from datetime import datetime, timedelta, timezone
-from pywebpush import webpush, WebPushException
-from sqlalchemy.orm import Session
-from sqlalchemy import select
-from app.database import SessionLocal
-from app.models import Routine, NotificationSubscription, Notification, User
-from app.config import settings
-from typing import Dict
 import logging
+from dataclasses import dataclass
+from datetime import UTC, datetime, time, timedelta
 
-VAPID_PRIVATE_KEY = settings.vapid_private_key
-VAPID_CLAIMS: Dict[str, str | int] = {"sub": "mailto:101akhere5@gmail.com"}
+from pywebpush import WebPushException, webpush
+from sqlalchemy import and_, or_, select
+from sqlalchemy.orm import Session
+
+from app.config import settings
+from app.database import SessionLocal
+from app.models import Notification, NotificationSubscription, Routine, User
 
 logger = logging.getLogger(__name__)
 
+# How far ahead of a routine's start time its reminder goes out.
+REMINDER_LEAD = timedelta(hours=1)
+# A routine is weekly, so one reminder per routine within this period is enough.
+# It also stops an hourly job and a manual re-run from sending the same one twice.
+REMINDER_COOLDOWN = timedelta(hours=12)
+
+# Push services answer 404 or 410 when a subscription has been revoked.
+GONE_STATUS_CODES = (404, 410)
+
+START_OF_DAY = time.min.replace(tzinfo=UTC)
+END_OF_DAY = time.max.replace(tzinfo=UTC)
+
+
+@dataclass(frozen=True)
+class ReminderWindow:
+    """Routines on this weekday starting between these two UTC times get a reminder."""
+
+    weekday: int
+    earliest: time
+    latest: time
+
+
+def find_reminder_windows(now: datetime) -> list[ReminderWindow]:
+    """The span from now to one lead time ahead, split where it crosses midnight."""
+    window_end = now + REMINDER_LEAD
+    if window_end.date() == now.date():
+        return [ReminderWindow(now.weekday(), now.timetz(), window_end.timetz())]
+    return [
+        ReminderWindow(now.weekday(), now.timetz(), END_OF_DAY),
+        ReminderWindow(window_end.weekday(), START_OF_DAY, window_end.timetz()),
+    ]
+
+
+def build_vapid_claims() -> dict[str, str] | None:
+    if not settings.vapid_private_key or not settings.vapid_contact:
+        return None
+    contact = settings.vapid_contact
+    if contact.startswith(("mailto:", "https://")):
+        return {"sub": contact}
+    return {"sub": f"mailto:{contact}"}
+
 
 def send_push_to_user_subscriptions(
-    db: Session, user_id: int, title: str, message: str
-):
-    db_notif = Notification(user_id=user_id, title=title, message=message)
-    db.add(db_notif)
+    db: Session,
+    user_id: int,
+    title: str,
+    message: str,
+) -> int:
+    """Push a reminder to every device the user subscribed. Returns how many got it."""
+    vapid_claims = build_vapid_claims()
+    if vapid_claims is None:
+        logger.warning("VAPID_PRIVATE_KEY or VAPID_CONTACT is not set; not sending.")
+        return 0
+
+    statement = select(NotificationSubscription).where(
+        NotificationSubscription.user_id == user_id,
+    )
+    subscriptions = db.execute(statement).scalars().all()
+    if not subscriptions:
+        return 0
+
+    db.add(Notification(user_id=user_id, title=title, message=message))
     db.commit()
 
-    stmt = select(NotificationSubscription).where(
-        NotificationSubscription.user_id == user_id
-    )
-    subscriptions = db.execute(stmt).scalars().all()
-
     payload = json.dumps({"title": title, "message": message})
-
-    print(f"{len(subscriptions)} (s) subscriptions")
-
-    total_subscriptions = 0
-    for sub in subscriptions:
+    delivered = 0
+    for subscription in subscriptions:
         try:
             webpush(
                 subscription_info={
-                    "endpoint": sub.endpoint,
-                    "keys": {"p256dh": sub.p256dh, "auth": sub.auth},
+                    "endpoint": subscription.endpoint,
+                    "keys": {"p256dh": subscription.p256dh, "auth": subscription.auth},
                 },
                 data=payload,
-                vapid_private_key=VAPID_PRIVATE_KEY,
-                vapid_claims=VAPID_CLAIMS,
+                vapid_private_key=settings.vapid_private_key,
+                vapid_claims=vapid_claims,
             )
-            print("Sucessfully pushed notification")
-            total_subscriptions += 1
-        except WebPushException as ex:
-            import traceback
-
-            print("CRITICAL ERROR IN SCHEDULER, could not push notifications:")
-            print(traceback.format_exc())
-            if ex.response is not None and ex.response.status_code in [404, 410]:
-                db.delete(sub)
+            delivered += 1
+        except WebPushException as error:
+            logger.warning(
+                "Could not push to subscription %s: %s", subscription.id, error
+            )
+            if (
+                error.response is not None
+                and error.response.status_code in GONE_STATUS_CODES
+            ):
+                db.delete(subscription)
                 db.commit()
-            logger.exception(ex)  # noqa: TRY401
-    return total_subscriptions
+    return delivered
 
 
-def check_routine_reminders():
+def find_routines_to_remind(db: Session, now: datetime):
+    window_filters = [
+        and_(
+            Routine.day == window.weekday,
+            Routine.start_time >= window.earliest,
+            Routine.start_time <= window.latest,
+        )
+        for window in find_reminder_windows(now)
+    ]
+    reminded_before = now.replace(tzinfo=None) - REMINDER_COOLDOWN
+    statement = (
+        select(Routine)
+        .join(User, User.id == Routine.user_id)
+        .where(
+            User.is_demo.is_(False),
+            or_(*window_filters),
+            or_(
+                Routine.last_reminded_at.is_(None),
+                Routine.last_reminded_at < reminded_before,
+            ),
+        )
+    )
+    return db.execute(statement).scalars().all()
+
+
+def check_routine_reminders() -> None:
     db = SessionLocal()
     try:
-        now = datetime.now(timezone.utc)
-        current_time = now.timetz()
-        one_hour_ahead = (now + timedelta(hours=1)).timetz()
-        current_day = now.weekday()
+        now = datetime.now(UTC)
+        routines = find_routines_to_remind(db, now)
+        logger.info("%s routine(s) due a reminder at %s UTC", len(routines), now)
 
-        print(f"UTC time: {current_time}")
-        print(f"Querying for day: {current_day}")
-
-        stmt = (
-            select(Routine)
-            .join(User, User.id == Routine.user_id)
-            .where(User.is_demo.is_(False))
-            .where(
-                Routine.start_time >= current_time,
-                Routine.start_time <= one_hour_ahead,
-                Routine.day == current_day,
-            )
-        )
-        active_routines = db.execute(stmt).scalars().all()
-
-        print(f"{len(active_routines)} (s) upcoming routines")
-
-        total_notifications = 0
-        for routine in active_routines:
-            notifications = send_push_to_user_subscriptions(
+        delivered_total = 0
+        for routine in routines:
+            delivered = send_push_to_user_subscriptions(
                 db=db,
                 user_id=routine.user_id,
                 title="Time for Gains",
                 message=f"It is time to start {routine.name}",
             )
-            total_notifications += notifications
-        print(f"Sent {total_notifications} notification(s)")
+            if delivered > 0:
+                routine.last_reminded_at = now.replace(tzinfo=None)
+                db.commit()
+            delivered_total += delivered
+        logger.info("Sent %s notification(s)", delivered_total)
     finally:
         db.close()

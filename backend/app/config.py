@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     trusted_proxy_count: int | None = None
 
     vapid_private_key: str | None = None
+    # Contact the push services can reach (an email or https URL) if we misbehave.
+    vapid_contact: str | None = None
 
     gemini_api_key: str | None = None
     gemini_model: str = "gemini-3.5-flash"
