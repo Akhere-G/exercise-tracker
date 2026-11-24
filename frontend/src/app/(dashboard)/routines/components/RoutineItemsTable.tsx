@@ -10,9 +10,14 @@ import { Input } from "@/src/components/ui/input";
 import TimeInput from "@/src/components/ui/timeInput";
 import { Link2, Link2Off, Trash2 } from "lucide-react";
 import {
+  isCardioExercise,
   isDurationExercise,
   isRepsExercise,
+  isWeightsExercise,
 } from "@/src/features/exercises/utils";
+import { useWeightUnit } from "@/src/features/profile/components/ProfileProvider";
+import { toDisplayWeight, toKg } from "@/src/lib/units";
+import { TargetNumberInput } from "./TargetNumberInput";
 import { Exercise } from "@/src/features/exercises/types";
 import { Controller } from "react-hook-form";
 import {
@@ -43,6 +48,8 @@ export function RoutineItemsTable({
   onToggleSuperset,
   onMove,
 }: RoutineItemsTableProps) {
+  const weightUnit = useWeightUnit();
+
   return (
     <div>
       {fields.length === 0 ? (
@@ -63,6 +70,14 @@ export function RoutineItemsTable({
 
             const hasDuration = exercise
               ? isDurationExercise(exercise as Exercise)
+              : false;
+
+            const hasWeight = exercise
+              ? isWeightsExercise(exercise as Exercise)
+              : false;
+
+            const hasDistance = exercise
+              ? isCardioExercise(exercise as Exercise)
               : false;
 
             const group = items[index]?.supersetGroup ?? null;
@@ -148,6 +163,38 @@ export function RoutineItemsTable({
                     </div>
                   )}
 
+                  {hasWeight && (
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] uppercase text-muted-foreground">
+                        Weight ({weightUnit})
+                      </label>
+                      <Controller
+                        name={`routineItems.${index}.targetWeight`}
+                        control={control}
+                        render={({ field }) => (
+                          <TargetNumberInput
+                            aria-label="Target weight"
+                            step={weightUnit === "lb" ? 5 : 2.5}
+                            hasError={
+                              !!errors.routineItems?.[index]?.targetWeight
+                                ?.message
+                            }
+                            value={
+                              field.value == null
+                                ? null
+                                : toDisplayWeight(field.value, weightUnit)
+                            }
+                            onChange={(typed) =>
+                              field.onChange(
+                                typed == null ? null : toKg(typed, weightUnit),
+                              )
+                            }
+                          />
+                        )}
+                      />
+                    </div>
+                  )}
+
                   <div className="flex flex-col gap-1">
                     <label
                       htmlFor={`routine-item-${index}-rest`}
@@ -178,6 +225,30 @@ export function RoutineItemsTable({
                           <TimeInput
                             aria-label="Mins"
                             value={field.value ?? ""}
+                            onChange={field.onChange}
+                          />
+                        )}
+                      />
+                    </div>
+                  )}
+
+                  {hasDistance && (
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] uppercase text-muted-foreground">
+                        Distance (m)
+                      </label>
+                      <Controller
+                        name={`routineItems.${index}.targetDistanceMeters`}
+                        control={control}
+                        render={({ field }) => (
+                          <TargetNumberInput
+                            aria-label="Target distance"
+                            step={100}
+                            hasError={
+                              !!errors.routineItems?.[index]
+                                ?.targetDistanceMeters?.message
+                            }
+                            value={field.value}
                             onChange={field.onChange}
                           />
                         )}

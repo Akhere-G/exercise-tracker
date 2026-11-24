@@ -11,6 +11,7 @@ import {
   makeRoutineItem,
   plank,
   pushUp,
+  running,
   squat,
 } from "@/tests/factories";
 import { renderWithProviders } from "@/tests/render";
@@ -28,7 +29,7 @@ const ranked = (exercise: Exercise): RankedExercise => ({
   workoutCount: 0,
   lastUser: null,
 });
-const library = [benchPress, squat, pushUp, plank].map(ranked);
+const library = [benchPress, squat, pushUp, plank, running].map(ranked);
 
 beforeEach(() => {
   vi.mocked(getAllExercises).mockImplementation(async ({ page, search }) =>
@@ -356,5 +357,88 @@ describe("exercise picker", () => {
     expect(
       await within(picker).findByText("Failed to load exercises."),
     ).toBeInTheDocument();
+  });
+});
+
+describe("routine targets", () => {
+  it("takes the target weight in the user's unit and saves it in kg", async () => {
+    submitAction.mockResolvedValue({ success: true, data: { id: 3 } });
+    const { user } = renderWithProviders(
+      <RoutineForm submitAction={submitAction} sumbitText="Create" />,
+      { profile: { weightUnit: "lb" } },
+    );
+    await user.type(screen.getByLabelText("Name"), "Push day");
+    await addExercises(user, ["Bench Press"]);
+
+    const bench = card("Bench Press");
+    await user.type(within(bench).getByLabelText("Reps"), "5");
+    await user.type(within(bench).getByLabelText("Target weight"), "135");
+    await user.click(screen.getByRole("button", { name: "Create" }));
+
+    await waitFor(() => expect(submitAction).toHaveBeenCalledTimes(1));
+    // 135 lb is 61.235 kg.
+    expect(submitAction.mock.calls[0][0].routineItems[0]).toMatchObject({
+      targetReps: 5,
+      targetWeight: 61.235,
+    });
+  });
+
+  it("shows a saved target weight in the user's unit", async () => {
+    renderWithProviders(
+      <RoutineForm
+        submitAction={submitAction}
+        sumbitText="Edit"
+        initalData={makeRoutine({
+          routineItems: [
+            makeRoutineItem(benchPress, {
+              targetReps: 5,
+              targetWeight: 61.235,
+            }),
+          ],
+        })}
+      />,
+      { profile: { weightUnit: "lb" } },
+    );
+
+    expect(
+      await within(card("Bench Press")).findByLabelText("Target weight"),
+    ).toHaveValue(135);
+  });
+
+  it("only offers the targets an exercise can have", async () => {
+    const { user } = renderForm();
+    await addExercises(user, ["Push Up", "Running"]);
+
+    expect(
+      within(card("Push Up")).queryByLabelText("Target weight"),
+    ).not.toBeInTheDocument();
+    expect(
+      within(card("Push Up")).queryByLabelText("Target distance"),
+    ).not.toBeInTheDocument();
+    expect(
+      within(card("Running")).queryByLabelText("Target weight"),
+    ).not.toBeInTheDocument();
+    expect(
+      within(card("Running")).getByLabelText("Target distance"),
+    ).toBeInTheDocument();
+  });
+
+  it("saves a target distance in metres", async () => {
+    submitAction.mockResolvedValue({ success: true, data: { id: 3 } });
+    const { user } = renderForm();
+    await user.type(screen.getByLabelText("Name"), "Cardio");
+    await addExercises(user, ["Running"]);
+
+    const run = card("Running");
+    await user.click(within(run).getByRole("textbox", { name: "Mins" }));
+    await user.keyboard("1200{Enter}"); // 12:00
+    await user.type(within(run).getByLabelText("Target distance"), "2000");
+    await user.click(screen.getByRole("button", { name: "Create" }));
+
+    await waitFor(() => expect(submitAction).toHaveBeenCalledTimes(1));
+    expect(submitAction.mock.calls[0][0].routineItems[0]).toMatchObject({
+      targetDuration: 720,
+      targetDistanceMeters: 2000,
+    });
   });
 });

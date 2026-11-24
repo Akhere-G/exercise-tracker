@@ -23,6 +23,18 @@ export const routineItemSchema = yup.object({
         (this.parent.targetReps && this.parent.targetReps > 0)
       );
     }),
+  targetWeight: yup
+    .number()
+    .transform((value, original) => (original === "" ? null : value))
+    .nullable()
+    .notRequired()
+    .min(0, "Cannot be negative"),
+  targetDistanceMeters: yup
+    .number()
+    .transform((value, original) => (original === "" ? null : value))
+    .nullable()
+    .notRequired()
+    .min(0, "Cannot be negative"),
   order: yup.number().required(),
   restSecs: yup
     .number()

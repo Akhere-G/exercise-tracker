@@ -141,7 +141,9 @@ export default function RoutineForm({
         exerciseId: exercise.id,
         targetSets: 3,
         targetReps: null,
+        targetWeight: null,
         targetDuration: null,
+        targetDistanceMeters: null,
         order: fields.length,
       });
     }

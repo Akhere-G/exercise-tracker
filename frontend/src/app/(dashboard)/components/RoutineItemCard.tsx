@@ -5,6 +5,7 @@ import {
   CardTitle,
 } from "@/src/components/card";
 import { getImageUrl } from "@/src/features/exercises/utils";
+import { TargetText } from "@/src/features/routines/components/TargetText";
 import { RoutineItem } from "@/src/features/routines/types";
 import { Dot } from "lucide-react";
 import Image from "next/image";
@@ -15,12 +16,9 @@ export default function RoutineItemCard({
 }: {
   routineItem: RoutineItem;
 }) {
-  const { exercise, targetSets, targetReps, targetDurationSecs } = routineItem;
+  const { exercise } = routineItem;
 
   const { equipment, muscles } = exercise;
-  const duration = targetDurationSecs
-    ? Math.ceil(targetDurationSecs / 60)
-    : null;
 
   return (
     <Link href={`/exercises/${exercise.id}`}>
@@ -45,18 +43,8 @@ export default function RoutineItemCard({
               </span>
             </CardDescription>
             <CardDescription>
-              <p className="flex gap-2 items-center font-bold brightness-110">
-                {targetSets} set{targetSets === 1 ? "" : "s"}
-                {targetReps && (
-                  <span>
-                    {targetReps} rep{targetReps === 1 ? "" : "s"}
-                  </span>
-                )}
-                {duration && (
-                  <span>
-                    {duration} min{duration === 1 ? "" : "s"}
-                  </span>
-                )}
+              <p className="font-bold brightness-110">
+                <TargetText target={routineItem} />
               </p>
             </CardDescription>
           </div>
