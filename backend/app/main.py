@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -6,7 +7,11 @@ from slowapi.errors import RateLimitExceeded
 
 from app.config import settings
 from app.database import SessionLocal
-from app.limiter import limiter, rate_limit_exceeded_handler
+from app.limiter import (
+    find_rate_limit_warnings,
+    limiter,
+    rate_limit_exceeded_handler,
+)
 from app.routers import (
     achievements,
     ai,
@@ -24,9 +29,15 @@ from app.routers import (
 )
 from app.services import achievement as achievement_service
 
+logger = logging.getLogger(__name__)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    for warning in find_rate_limit_warnings(
+        settings.trusted_proxy_count, settings.redis_url
+    ):
+        logger.warning(warning)
     with SessionLocal() as db:
         achievement_service.seed_achievements(db)
     yield

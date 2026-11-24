@@ -3,8 +3,7 @@ from tests.helpers import REPS_WEIGHT_EXERCISE_ID, set_payload, workout_payload
 
 def log_session(client, auth_headers, reps, weight, **extra):
     sets = [
-        set_payload(setIndex=i + 1, reps=reps, weight=weight, **extra)
-        for i in range(3)
+        set_payload(setIndex=i + 1, reps=reps, weight=weight, **extra) for i in range(3)
     ]
     response = client.post(
         "/api/workouts", json=workout_payload(sets=sets), headers=auth_headers
@@ -58,5 +57,9 @@ def test_lists_personas(client, auth_headers):
 
     assert response.status_code == 200
     assert {p["slug"] for p in response.json()} == {
-        "hype", "drill", "physio", "nerd", "oldschool",
+        "hype",
+        "drill",
+        "physio",
+        "nerd",
+        "oldschool",
     }

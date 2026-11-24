@@ -1,6 +1,7 @@
 import json
 import logging
-from typing import Any, Optional, Sequence
+from collections.abc import Sequence
+from typing import Any
 
 from app.exceptions import AIUnavailable
 from app.services.ai.providers import DEFAULT_PROVIDERS, TextProvider
@@ -11,7 +12,7 @@ logger = logging.getLogger(__name__)
 def generate_text(
     prompt: str,
     system: str,
-    providers: Optional[Sequence[TextProvider]] = None,
+    providers: Sequence[TextProvider] | None = None,
 ) -> str:
     """The first provider's answer, falling back to the next when one fails."""
     for provider in providers or DEFAULT_PROVIDERS:
@@ -23,7 +24,7 @@ def generate_text(
     raise AIUnavailable()
 
 
-def extract_json(raw: Optional[str]) -> Any:
+def extract_json(raw: str | None) -> Any:
     """Parse a JSON reply, tolerating a Markdown code fence around it."""
     text = (raw or "").strip()
     if "```" in text:

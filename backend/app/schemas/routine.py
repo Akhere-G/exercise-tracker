@@ -1,9 +1,9 @@
 from datetime import time, timedelta
-from typing import List, Optional
-from pydantic import Field, field_validator, model_validator
-from .exercise import Exercise
-from .base import BaseModel, not_nullable
 
+from pydantic import Field, field_validator, model_validator
+
+from .base import BaseModel, not_nullable
+from .exercise import Exercise
 
 MAX_ROUTINE_ITEMS = 100
 
@@ -11,13 +11,13 @@ MAX_ROUTINE_ITEMS = 100
 class RoutineItemBase(BaseModel):
     exercise_id: int
     target_sets: int
-    target_reps: Optional[int] = None
-    target_weight: Optional[float] = None
-    target_duration_secs: Optional[int] = None
-    target_distance_meters: Optional[float] = None
+    target_reps: int | None = None
+    target_weight: float | None = None
+    target_duration_secs: int | None = None
+    target_distance_meters: float | None = None
     order: int
-    rest_secs: Optional[int] = None
-    superset_group: Optional[int] = None
+    rest_secs: int | None = None
+    superset_group: int | None = None
 
     @model_validator(mode="after")
     def validate_reps_duration(self) -> "RoutineItemBase":
@@ -31,20 +31,20 @@ class RoutineItemBase(BaseModel):
 
 class RoutineItemCreate(RoutineItemBase):
     target_sets: int = Field(ge=1, le=100)
-    target_reps: Optional[int] = Field(default=None, ge=0, le=10_000)
-    target_weight: Optional[float] = Field(
+    target_reps: int | None = Field(default=None, ge=0, le=10_000)
+    target_weight: float | None = Field(
         default=None, ge=0, le=10_000, allow_inf_nan=False
     )
-    target_duration_secs: Optional[int] = Field(default=None, ge=0, le=24 * 60 * 60)
-    target_distance_meters: Optional[float] = Field(
+    target_duration_secs: int | None = Field(default=None, ge=0, le=24 * 60 * 60)
+    target_distance_meters: float | None = Field(
         default=None, ge=0, le=1_000_000, allow_inf_nan=False
     )
     order: int = Field(ge=0, le=1000)
-    rest_secs: Optional[int] = Field(default=None, ge=0, le=60 * 60)
-    superset_group: Optional[int] = Field(default=None, ge=0, le=1000)
+    rest_secs: int | None = Field(default=None, ge=0, le=60 * 60)
+    superset_group: int | None = Field(default=None, ge=0, le=1000)
 
 
-def _require_utc(value: Optional[time]) -> Optional[time]:
+def _require_utc(value: time | None) -> time | None:
     if value is not None and (
         value.tzinfo is None or value.utcoffset() != timedelta(0)
     ):
@@ -69,13 +69,13 @@ class RoutineItem(RoutineItemBase):
 class RoutineBase(BaseModel):
     name: str
     day: int
-    start_time: Optional[time] = None
+    start_time: time | None = None
 
 
 class RoutineCreate(RoutineBase):
     name: str = Field(min_length=1, max_length=255)
     day: int = Field(ge=0, le=6)
-    routine_items: List[RoutineItemCreate] = Field(max_length=MAX_ROUTINE_ITEMS)
+    routine_items: list[RoutineItemCreate] = Field(max_length=MAX_ROUTINE_ITEMS)
 
     _validate_start_time = field_validator("start_time")(_require_utc)
 
@@ -88,7 +88,7 @@ class RoutineCreate(RoutineBase):
 class RoutineFromWorkout(BaseModel):
     name: str = Field(min_length=1, max_length=255)
     day: int = Field(ge=0, le=6)
-    start_time: Optional[time] = None
+    start_time: time | None = None
 
     _validate_start_time = field_validator("start_time")(_require_utc)
 
@@ -96,14 +96,14 @@ class RoutineFromWorkout(BaseModel):
 class Routine(RoutineBase):
     id: int
     user_id: int
-    routine_items: List[RoutineItem] = []
+    routine_items: list[RoutineItem] = []
 
 
 class RoutineUpdate(BaseModel):
-    name: Optional[str] = Field(default=None, min_length=1, max_length=255)
-    day: Optional[int] = Field(default=None, ge=0, le=6)
-    start_time: Optional[time] = None
-    routine_items: Optional[List[RoutineItemCreate]] = Field(
+    name: str | None = Field(default=None, min_length=1, max_length=255)
+    day: int | None = Field(default=None, ge=0, le=6)
+    start_time: time | None = None
+    routine_items: list[RoutineItemCreate] | None = Field(
         default=None, max_length=MAX_ROUTINE_ITEMS
     )
 

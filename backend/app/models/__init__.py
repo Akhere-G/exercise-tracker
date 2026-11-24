@@ -1,28 +1,28 @@
-from .user import User
-from .muscle import Muscle
+from .achievement import Achievement, UserAchievement
+from .body import BodyWeight
 from .exercise import Exercise
 from .exercise_muscle import ExerciseMuscle
-from .routine import Routine, RoutineItem
-from .workout import Workout, WorkoutSet
+from .muscle import Muscle
 from .notifications import Notification, NotificationSubscription
-from .achievement import Achievement, UserAchievement
-from .profile import UserProfile, UserExerciseSetting
-from .body import BodyWeight
+from .profile import UserExerciseSetting, UserProfile
+from .routine import Routine, RoutineItem
+from .user import User
+from .workout import Workout, WorkoutSet
 
 __all__ = [
-    "User",
-    "Muscle",
+    "Achievement",
+    "BodyWeight",
     "Exercise",
     "ExerciseMuscle",
-    "Routine",
-    "RoutineItem",
-    "Workout",
-    "WorkoutSet",
+    "Muscle",
     "Notification",
     "NotificationSubscription",
-    "Achievement",
+    "Routine",
+    "RoutineItem",
+    "User",
     "UserAchievement",
-    "UserProfile",
     "UserExerciseSetting",
-    "BodyWeight",
+    "UserProfile",
+    "Workout",
+    "WorkoutSet",
 ]

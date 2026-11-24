@@ -1,5 +1,6 @@
-from app.models import Routine
 from sqlalchemy import func, select
+
+from app.models import Routine
 from tests.helpers import item_payload, routine_payload
 
 
@@ -41,7 +42,10 @@ def test_batch_creates_nothing_when_one_routine_is_invalid(client, auth_headers)
     bad_item = item_payload(exerciseId=999_999)
     response = client.post(
         "/api/routines/batch",
-        json=[routine_payload(name="A"), routine_payload(name="B", routineItems=[bad_item])],
+        json=[
+            routine_payload(name="A"),
+            routine_payload(name="B", routineItems=[bad_item]),
+        ],
         headers=auth_headers,
     )
 

@@ -2,14 +2,14 @@
 
 import math
 from datetime import UTC, datetime, time, timedelta
-from typing import Optional
+
+from sqlalchemy.orm import Session
 
 from app.constants.muscle_groups import (
     GROUPS,
     RECOVERY_HALF_LIFE_HOURS,
 )
 from app.services import workout as workout_service
-from sqlalchemy.orm import Session
 
 from .common import today, working_sets_with_groups
 
@@ -64,14 +64,12 @@ def _recovery_status(fatigue: float) -> str:
     return "fatigued"
 
 
-def get_recovery(
-    db: Session, user_id: int, now: Optional[datetime] = None
-) -> list[dict]:
+def get_recovery(db: Session, user_id: int, now: datetime | None = None) -> list[dict]:
     """Fatigue per muscle group from recent sets, decaying with a half-life."""
     now = now or datetime.now(UTC).replace(tzinfo=None)
     since = now - timedelta(days=RECOVERY_WINDOW_DAYS)
 
-    load = {g: 0.0 for g in GROUPS}
+    load = dict.fromkeys(GROUPS, 0.0)
     last_trained: dict[str, datetime] = {}
     for completed_at, _reps, _weight, weights in working_sets_with_groups(
         db, user_id, since

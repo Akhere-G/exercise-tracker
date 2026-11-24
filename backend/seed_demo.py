@@ -1,7 +1,12 @@
 import argparse
 
 from app.database import SessionLocal, engine
-from app.services.demo import DEFAULT_FIXTURE_PATH, DemoSeedError, load_fixture, reset_demo_user
+from app.services.demo import (
+    DEFAULT_FIXTURE_PATH,
+    DemoSeedError,
+    load_fixture,
+    reset_demo_user,
+)
 
 
 def main() -> None:
@@ -25,9 +30,12 @@ def main() -> None:
         try:
             summary = reset_demo_user(db, fixture, commit=not args.dry_run)
         except DemoSeedError as error:
-            raise SystemExit(f"Demo seed aborted: {error}")
+            raise SystemExit(f"Demo seed aborted: {error}") from error
 
-    print(("Dry run (rolled back): " if args.dry_run else "Reset complete: ") + str(summary))
+    print(
+        ("Dry run (rolled back): " if args.dry_run else "Reset complete: ")
+        + str(summary)
+    )
 
 
 if __name__ == "__main__":

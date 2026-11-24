@@ -23,7 +23,7 @@ def get_progression(
         exercise_ids = [int(i) for i in exerciseIds.split(",") if i.strip()]
     except ValueError:
         raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="exerciseIds must be a comma-separated list of integers.",
         )
     return progression_service.get_suggestions(db, user.id, exercise_ids)

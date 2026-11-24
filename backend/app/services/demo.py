@@ -5,6 +5,10 @@ from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from typing import Any
 
+from pydantic import ValidationError
+from sqlalchemy import func, select, text, update
+from sqlalchemy.orm import Session
+
 from app.models import (
     Exercise,
     Notification,
@@ -21,9 +25,6 @@ from app.schemas.workout import WorkoutSetCreate
 from app.services import achievement as achievement_service
 from app.services import user as user_service
 from app.services import workout as workout_service
-from pydantic import ValidationError
-from sqlalchemy import func, select, text, update
-from sqlalchemy.orm import Session
 
 DEFAULT_FIXTURE_PATH = Path(__file__).resolve().parents[2] / "demo_fixture.json"
 SCHEMA_VERSION = 1
@@ -58,7 +59,7 @@ class DemoResetSummary:
 
 
 def load_fixture(path: Path | str = DEFAULT_FIXTURE_PATH) -> dict[str, Any]:
-    with open(path, "r", encoding="utf-8") as fixture_file:
+    with open(path, encoding="utf-8") as fixture_file:
         return json.load(fixture_file)
 
 
@@ -105,19 +106,27 @@ def validate_fixture(
 ) -> dict[str, datetime]:
     """Check the fixture against the catalogue. Returns {workout key: completed_at}."""
     if fixture.get("schemaVersion") != SCHEMA_VERSION:
-        raise DemoSeedError(f"Unsupported fixture schemaVersion: {fixture.get('schemaVersion')}")
+        raise DemoSeedError(
+            f"Unsupported fixture schemaVersion: {fixture.get('schemaVersion')}"
+        )
 
     user = fixture.get("user") or {}
     if not user.get("email") or not user.get("username"):
         raise DemoSeedError("Fixture user needs a username and email.")
     if len(user["email"]) > 50 or len(user["username"]) > 50:
-        raise DemoSeedError("Fixture username/email exceed the 50 character column limit.")
+        raise DemoSeedError(
+            "Fixture username/email exceed the 50 character column limit."
+        )
 
-    expected = {e["id"]: (e["name"], e["metrics"]) for e in fixture.get("exercises", [])}
+    expected = {
+        e["id"]: (e["name"], e["metrics"]) for e in fixture.get("exercises", [])
+    }
     for exercise_id, (name, metrics) in expected.items():
         actual = catalogue.get(exercise_id)
         if actual is None:
-            raise DemoSeedError(f"Exercise {exercise_id} does not exist in the database.")
+            raise DemoSeedError(
+                f"Exercise {exercise_id} does not exist in the database."
+            )
         if actual != (name, metrics):
             raise DemoSeedError(
                 f"Exercise {exercise_id} is {actual}, fixture expects {(name, metrics)}."
@@ -131,15 +140,21 @@ def validate_fixture(
         if not 0 <= routine["day"] <= 6:
             raise DemoSeedError(f"Routine {routine['key']} has an invalid day.")
         if routine.get("startTime") is not None:
-            raise DemoSeedError("Demo routines must not have a startTime (reminder pushes).")
+            raise DemoSeedError(
+                "Demo routines must not have a startTime (reminder pushes)."
+            )
 
         seen_ids: set[int] = set()
         seen_orders: set[int] = set()
         for item in routine["items"]:
             if item["exerciseId"] not in expected:
-                raise DemoSeedError(f"Routine item uses unlisted exercise {item['exerciseId']}.")
+                raise DemoSeedError(
+                    f"Routine item uses unlisted exercise {item['exerciseId']}."
+                )
             if item["exerciseId"] in seen_ids or item["order"] in seen_orders:
-                raise DemoSeedError(f"Routine {routine['key']} repeats an exercise or order.")
+                raise DemoSeedError(
+                    f"Routine {routine['key']} repeats an exercise or order."
+                )
             seen_ids.add(item["exerciseId"])
             seen_orders.add(item["order"])
             _validate_model(RoutineItemCreate, item)
@@ -154,7 +169,10 @@ def validate_fixture(
         key = workout["key"]
         if key in completed:
             raise DemoSeedError(f"Duplicate workout key {key}.")
-        if workout["routineKey"] is not None and workout["routineKey"] not in routine_keys:
+        if (
+            workout["routineKey"] is not None
+            and workout["routineKey"] not in routine_keys
+        ):
             raise DemoSeedError(f"Workout {key} references unknown routine.")
         if not 0 <= workout["weekday"] <= 6 or workout["weekOffset"] > -1:
             raise DemoSeedError(f"Workout {key} has an invalid weekday/weekOffset.")
@@ -173,22 +191,32 @@ def validate_fixture(
         for set_data in workout["sets"]:
             exercise_id = set_data["exerciseId"]
             if exercise_id not in expected:
-                raise DemoSeedError(f"Workout {key} uses unlisted exercise {exercise_id}.")
+                raise DemoSeedError(
+                    f"Workout {key} uses unlisted exercise {exercise_id}."
+                )
             parsed = _validate_model(WorkoutSetCreate, set_data)
             _validate_metric_fields(key, expected[exercise_id][1], parsed)
             indexes.setdefault(exercise_id, []).append(set_data["setIndex"])
             if parsed.weight is not None:
                 if parsed.weight != int(parsed.weight):
-                    raise DemoSeedError(f"Workout {key}: weights must be whole numbers.")
-                session_best[exercise_id] = max(session_best.get(exercise_id, 0), parsed.weight)
+                    raise DemoSeedError(
+                        f"Workout {key}: weights must be whole numbers."
+                    )
+                session_best[exercise_id] = max(
+                    session_best.get(exercise_id, 0), parsed.weight
+                )
 
         for exercise_id, found in indexes.items():
             if found != list(range(1, len(found) + 1)):
-                raise DemoSeedError(f"Workout {key}: set indexes for {exercise_id} are not 1..n.")
+                raise DemoSeedError(
+                    f"Workout {key}: set indexes for {exercise_id} are not 1..n."
+                )
 
         for exercise_id, best in session_best.items():
             if best < best_weight.get(exercise_id, 0):
-                raise DemoSeedError(f"Workout {key}: weight for {exercise_id} goes down.")
+                raise DemoSeedError(
+                    f"Workout {key}: weight for {exercise_id} goes down."
+                )
             best_weight[exercise_id] = best
 
     return completed
@@ -230,7 +258,9 @@ def reset_demo_user(
 
     try:
         if db.get_bind().dialect.name == "postgresql":
-            db.execute(text("SELECT pg_advisory_xact_lock(:key)"), {"key": RESET_LOCK_KEY})
+            db.execute(
+                text("SELECT pg_advisory_xact_lock(:key)"), {"key": RESET_LOCK_KEY}
+            )
 
         created = existing is None
         user = existing or User(email=email, is_demo=True)
@@ -332,7 +362,9 @@ def _delete_demo_data(db: Session, demo_id: int) -> None:
     db.expire_all()
 
 
-def _insert_routines(db: Session, demo_id: int, fixture: dict[str, Any]) -> dict[str, int]:
+def _insert_routines(
+    db: Session, demo_id: int, fixture: dict[str, Any]
+) -> dict[str, int]:
     routines: dict[str, Routine] = {}
     for data in fixture["routines"]:
         routine = Routine(
@@ -400,7 +432,9 @@ def _verify_expectations(
         select(func.count()).select_from(Workout).where(Workout.user_id == demo_id)
     ).scalar_one()
     if count != expectations["workoutCount"]:
-        raise DemoSeedError(f"Expected {expectations['workoutCount']} workouts, got {count}.")
+        raise DemoSeedError(
+            f"Expected {expectations['workoutCount']} workouts, got {count}."
+        )
 
     # Streak maths reads date.today() internally, so only check against the real date.
     if today == date.today():
@@ -422,4 +456,6 @@ def _verify_expectations(
     )
     missing = set(expectations["prExerciseIds"]) - pr_ids
     if missing:
-        raise DemoSeedError(f"No PR achievements derived for exercises {sorted(missing)}.")
+        raise DemoSeedError(
+            f"No PR achievements derived for exercises {sorted(missing)}."
+        )

@@ -28,10 +28,14 @@ def test_body_weight_is_upserted_by_day(client, auth_headers):
     day = date.today().isoformat()
 
     first = client.put(
-        "/api/body/weights", json={"measuredOn": day, "weightKg": 80}, headers=auth_headers
+        "/api/body/weights",
+        json={"measuredOn": day, "weightKg": 80},
+        headers=auth_headers,
     )
     second = client.put(
-        "/api/body/weights", json={"measuredOn": day, "weightKg": 79.5}, headers=auth_headers
+        "/api/body/weights",
+        json={"measuredOn": day, "weightKg": 79.5},
+        headers=auth_headers,
     )
     listing = client.get("/api/body/weights", headers=auth_headers).json()
 
@@ -55,8 +59,14 @@ def test_body_weights_can_be_limited_to_a_range_and_deleted(client, auth_headers
     ranged = client.get(f"/api/body/weights?start={start}", headers=auth_headers).json()
     assert [e["id"] for e in ranged] == [ids[5], ids[0]]
 
-    assert client.delete(f"/api/body/weights/{ids[5]}", headers=auth_headers).status_code == 200
-    assert client.delete(f"/api/body/weights/{ids[5]}", headers=auth_headers).status_code == 404
+    assert (
+        client.delete(f"/api/body/weights/{ids[5]}", headers=auth_headers).status_code
+        == 200
+    )
+    assert (
+        client.delete(f"/api/body/weights/{ids[5]}", headers=auth_headers).status_code
+        == 404
+    )
 
 
 def test_body_weight_rejects_bad_values(client, auth_headers):
@@ -66,7 +76,10 @@ def test_body_weight_rejects_bad_values(client, auth_headers):
         {"measuredOn": today.isoformat(), "weightKg": 5000},
         {"measuredOn": (today + timedelta(days=30)).isoformat(), "weightKg": 80},
     ):
-        assert client.put("/api/body/weights", json=body, headers=auth_headers).status_code == 422
+        assert (
+            client.put("/api/body/weights", json=body, headers=auth_headers).status_code
+            == 422
+        )
 
 
 # ---------- routine from workout
@@ -77,7 +90,14 @@ def test_a_routine_can_be_built_from_a_workout(client, auth_headers):
         client,
         auth_headers,
         [
-            set_payload(exerciseId=EX_A, setIndex=1, reps=10, weight=20, setType="warmup", supersetGroup=1),
+            set_payload(
+                exerciseId=EX_A,
+                setIndex=1,
+                reps=10,
+                weight=20,
+                setType="warmup",
+                supersetGroup=1,
+            ),
             set_payload(exerciseId=EX_A, setIndex=2, reps=8, supersetGroup=1),
             set_payload(exerciseId=EX_A, setIndex=3, reps=6, supersetGroup=1),
             set_payload(exerciseId=EX_A, setIndex=4, reps=10, supersetGroup=1),
@@ -125,7 +145,9 @@ def test_building_a_routine_from_a_workout_with_no_sets_is_a_422(client, auth_he
     assert response.status_code == 422
 
 
-def test_a_routine_can_be_synced_from_a_workout_keeping_rest_times(client, auth_headers):
+def test_a_routine_can_be_synced_from_a_workout_keeping_rest_times(
+    client, auth_headers
+):
     routine = client.post(
         "/api/routines",
         json=routine_payload(
@@ -176,7 +198,7 @@ def test_syncing_an_unknown_routine_is_a_404(client, auth_headers):
 def test_workouts_export_as_csv_with_one_row_per_set(client, auth_headers):
     routine = client.post(
         "/api/routines",
-        json=routine_payload(name="=HYPERLINK(\"http://evil\")"),
+        json=routine_payload(name='=HYPERLINK("http://evil")'),
         headers=auth_headers,
     ).json()
     _workout(

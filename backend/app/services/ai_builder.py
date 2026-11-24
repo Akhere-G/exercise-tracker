@@ -1,4 +1,4 @@
-from typing import Optional, Sequence
+from collections.abc import Sequence
 
 from pydantic import ValidationError
 from sqlalchemy import select
@@ -138,7 +138,7 @@ def build_routines(
     db: Session,
     user_id: int,
     request: BuildRoutineRequest,
-    providers: Optional[Sequence[TextProvider]] = None,
+    providers: Sequence[TextProvider] | None = None,
 ) -> RoutinePreview:
     profile = profile_service.get_or_create_profile(db, user_id)
     candidates = find_candidates(db, request.equipment)

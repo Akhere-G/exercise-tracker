@@ -1,10 +1,11 @@
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
 from .audit_mixin import AuditMixin
 from .exercise import Exercise
 
@@ -54,7 +55,7 @@ class UserAchievement(Base, AuditMixin):
         Integer, ForeignKey("workouts.id", ondelete="SET NULL"), nullable=True
     )
     unlocked_at: Mapped[datetime] = mapped_column(
-        DateTime, default=lambda: datetime.now(timezone.utc)
+        DateTime, default=lambda: datetime.now(UTC)
     )
 
     achievement: Mapped[Achievement] = relationship(

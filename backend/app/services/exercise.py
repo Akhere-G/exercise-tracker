@@ -1,17 +1,15 @@
 from fastapi import HTTPException, status
+from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session, selectinload
-from sqlalchemy import select, func, case
-from app.models import Exercise, Muscle, ExerciseMuscle, Workout, Routine, WorkoutSet
-from typing import Optional
+
+from app.models import Exercise, ExerciseMuscle, Muscle, Workout, WorkoutSet
 
 # The most sets of one exercise sent back as history, newest kept.
 MAX_HISTORY_SETS = 1000
 
 
 def _escape_like(term: str) -> str:
-    return (
-        term.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
-    )
+    return term.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
 
 def _like_pattern(term: str) -> str:
@@ -36,9 +34,9 @@ def ensure_exercises_exist(db: Session, exercise_ids) -> None:
 def get_exercises(
     db: Session,
     user_id: int,
-    search: Optional[str] = None,
-    equipment: Optional[str] = None,
-    muscle: Optional[str] = None,
+    search: str | None = None,
+    equipment: str | None = None,
+    muscle: str | None = None,
     page: int = 1,
     limit: int = 10,
 ):
@@ -71,7 +69,9 @@ def get_exercises(
     )
 
     if equipment and equipment != "all":
-        stmt = stmt.where(Exercise.equipment.ilike(_like_pattern(equipment), escape="\\"))
+        stmt = stmt.where(
+            Exercise.equipment.ilike(_like_pattern(equipment), escape="\\")
+        )
 
     if muscle and muscle != "all":
         # A subquery rather than a join plus DISTINCT: PostgreSQL rejects DISTINCT
@@ -108,8 +108,7 @@ def get_exercises(
     offset = limit * (page - 1)
     stmt = stmt.limit(limit).offset(offset)
 
-    exercises = db.execute(stmt).all()
-    return exercises
+    return db.execute(stmt).all()
 
 
 def get_exercise(db: Session, exercise_id: int):

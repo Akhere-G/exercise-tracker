@@ -1,10 +1,11 @@
 from datetime import date, datetime
 
+from sqlalchemy import func, select
+
 from app.models import Workout
 from app.schemas.workout import WorkoutCreate, WorkoutSetCreate, WorkoutUpdate
 from app.services import achievement as achievement_service
 from app.services import workout as workout_service
-from sqlalchemy import func, select
 from tests.helpers import REPS_WEIGHT_EXERCISE_ID
 
 

@@ -1,6 +1,8 @@
 from collections import defaultdict
 from datetime import date, datetime, time, timedelta
-from typing import Optional
+
+from sqlalchemy import case, func, select
+from sqlalchemy.orm import Session
 
 from app.models import (
     Achievement,
@@ -13,8 +15,6 @@ from app.models import (
 )
 from app.models.achievement import AchievementType
 from app.services import workout as workout_service
-from sqlalchemy import case, func, select
-from sqlalchemy.orm import Session
 
 PR_TYPES = (
     AchievementType.PR_WEIGHT,
@@ -30,8 +30,8 @@ WARMUP = WorkoutSet.set_type == "warmup"
 def get_stats(
     db: Session,
     user_id: int,
-    start: Optional[date] = None,
-    end: Optional[date] = None,
+    start: date | None = None,
+    end: date | None = None,
     granularity: str = "week",
 ) -> dict:
     workouts = _get_workout_totals(db, user_id, start, end)
@@ -48,8 +48,8 @@ def get_stats(
 def get_muscle_breakdown(
     db: Session,
     user_id: int,
-    start: Optional[date] = None,
-    end: Optional[date] = None,
+    start: date | None = None,
+    end: date | None = None,
 ) -> list[dict]:
     stmt = (
         select(
@@ -70,9 +70,7 @@ def get_muscle_breakdown(
         lambda: {"primary_sets": 0, "secondary_sets": 0}
     )
     for name, contribution_type, set_count in db.execute(stmt):
-        field = (
-            "primary_sets" if contribution_type == "primary" else "secondary_sets"
-        )
+        field = "primary_sets" if contribution_type == "primary" else "secondary_sets"
         muscles[name][field] += set_count
 
     breakdown = [{"name": name, **counts} for name, counts in muscles.items()]
@@ -85,8 +83,8 @@ def get_muscle_breakdown(
 def get_top_exercises(
     db: Session,
     user_id: int,
-    start: Optional[date] = None,
-    end: Optional[date] = None,
+    start: date | None = None,
+    end: date | None = None,
     limit: int = TOP_EXERCISE_LIMIT,
 ) -> list[dict]:
     set_count = func.count(WorkoutSet.id).label("set_count")
@@ -139,7 +137,7 @@ def get_personal_records(
 
 
 def _get_workout_totals(
-    db: Session, user_id: int, start: Optional[date], end: Optional[date]
+    db: Session, user_id: int, start: date | None, end: date | None
 ):
     """One row per workout with its set count, volume and distance."""
     stmt = (
@@ -204,8 +202,8 @@ def _next_period(period: date, granularity: str) -> date:
 
 def _build_trends(
     workouts,
-    start: Optional[date],
-    end: Optional[date],
+    start: date | None,
+    end: date | None,
     granularity: str = "week",
 ) -> list[dict]:
     """Workouts, volume and time per week or month, with empty periods filled in.
@@ -247,7 +245,7 @@ def _build_trends(
     return list(periods.values())
 
 
-def _filter_range(stmt, start: Optional[date], end: Optional[date]):
+def _filter_range(stmt, start: date | None, end: date | None):
     if start is not None:
         stmt = stmt.where(Workout.completed_at >= datetime.combine(start, time.min))
     if end is not None:

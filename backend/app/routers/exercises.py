@@ -1,4 +1,4 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
@@ -12,7 +12,6 @@ from app.services import exercise as exercise_service
 from app.services import profile as profile_service
 from app.services import user as user_service
 
-
 router = APIRouter(prefix="/api/exercises", tags=["Exercises"])
 
 
@@ -20,9 +19,9 @@ router = APIRouter(prefix="/api/exercises", tags=["Exercises"])
 def get_exercises(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Session = Depends(get_db),
-    search: Optional[str] = None,
-    equipment: Optional[str] = None,
-    muscle: Optional[str] = None,
+    search: str | None = None,
+    equipment: str | None = None,
+    muscle: str | None = None,
     page: Annotated[int, Query(ge=1)] = 1,
     limit: Annotated[int, Query(ge=1, le=100)] = 10,
 ):
@@ -47,9 +46,7 @@ def update_exercise_setting(
     db: Session = Depends(get_db),
 ):
     exercise_service.ensure_exercises_exist(db, [exercise_id])
-    return profile_service.upsert_exercise_setting(
-        db, user.id, exercise_id, setting_in
-    )
+    return profile_service.upsert_exercise_setting(db, user.id, exercise_id, setting_in)
 
 
 @router.get("/{exercise_id}", response_model=Exercise)
@@ -74,6 +71,4 @@ def get_exercise_workouts(
     exercise_id: int,
     db: Session = Depends(get_db),
 ):
-    workouts = exercise_service.get_workouts(db, user.id, exercise_id)
-
-    return workouts
+    return exercise_service.get_workouts(db, user.id, exercise_id)

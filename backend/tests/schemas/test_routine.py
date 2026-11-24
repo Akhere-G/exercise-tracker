@@ -1,8 +1,9 @@
 from datetime import timedelta
 
 import pytest
-from app.schemas.routine import RoutineCreate, RoutineItemBase, RoutineUpdate
 from pydantic import ValidationError
+
+from app.schemas.routine import RoutineCreate, RoutineItemBase, RoutineUpdate
 from tests.helpers import item_payload, routine_payload
 
 
@@ -38,7 +39,9 @@ def test_stored_items_outside_the_input_bounds_can_still_be_read():
     RoutineItemBase(exercise_id=1, target_sets=0, target_reps=1, order=0)
 
 
-@pytest.mark.parametrize("start_time", ["06:00", "06:00:00", "06:00:00+02:00", "06:00:00-05:00"])
+@pytest.mark.parametrize(
+    "start_time", ["06:00", "06:00:00", "06:00:00+02:00", "06:00:00-05:00"]
+)
 def test_start_time_must_be_utc(start_time):
     with pytest.raises(ValidationError):
         RoutineCreate.model_validate(routine_payload(startTime=start_time))

@@ -1,8 +1,11 @@
-from app.database import Base
-from .audit_mixin import AuditMixin
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Date, Float, ForeignKey, Integer, UniqueConstraint
 from datetime import date
+
+from sqlalchemy import Date, Float, ForeignKey, Integer, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column
+
+from app.database import Base
+
+from .audit_mixin import AuditMixin
 
 
 class BodyWeight(Base, AuditMixin):

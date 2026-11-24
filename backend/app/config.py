@@ -5,7 +5,6 @@ from typing import Literal
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 # The test suite sets this so a developer's own backend/.env (a real Redis, AI
 # keys, proxy settings) never leaks into tests.
 SKIP_ENV_FILE_VARIABLE = "GAINS_SKIP_ENV_FILE"

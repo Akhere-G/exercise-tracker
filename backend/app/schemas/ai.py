@@ -1,4 +1,4 @@
-from typing import Literal, Optional
+from typing import Literal
 
 from pydantic import Field
 
@@ -15,8 +15,8 @@ class BuildRoutineRequest(BaseModel):
     equipment: list[Equipment] = Field(min_length=1)
     minutes: int = Field(ge=15, le=180)
     days_per_week: int = Field(ge=1, le=7)
-    focus: Optional[str] = Field(default=None, max_length=100)
-    notes: Optional[str] = Field(default=None, max_length=500)
+    focus: str | None = Field(default=None, max_length=100)
+    notes: str | None = Field(default=None, max_length=500)
 
 
 class PlannedItem(BaseModel):
@@ -24,7 +24,7 @@ class PlannedItem(BaseModel):
     sets: int
     reps: int
     rest_secs: int
-    superset_group: Optional[int] = None
+    superset_group: int | None = None
 
 
 class PlannedRoutine(BaseModel):

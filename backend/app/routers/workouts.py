@@ -1,24 +1,33 @@
+from datetime import date
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy.orm import Session
+
+from app.database import get_db
 from app.models import User
 from app.schemas.workout import (
     PreviousSet,
     Workout,
     WorkoutCreate,
-    WorkoutUpdate,
     WorkoutSet,
+    WorkoutUpdate,
 )
-from typing import Annotated
-from app.database import get_db
 from app.services import (
-    user as user_service,
-    workout as workout_service,
-    routine as routine_service,
     demo as demo_service,
+)
+from app.services import (
     exercise as exercise_service,
 )
-from sqlalchemy.orm import Session
-from datetime import date
-from typing import Optional, List
+from app.services import (
+    routine as routine_service,
+)
+from app.services import (
+    user as user_service,
+)
+from app.services import (
+    workout as workout_service,
+)
 
 router = APIRouter(prefix="/api/workouts", tags=["Workout"])
 
@@ -27,22 +36,22 @@ router = APIRouter(prefix="/api/workouts", tags=["Workout"])
 def get_workouts_stats(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Annotated[Session, Depends(get_db)],
-    routineId: Optional[int] = None,
+    routineId: int | None = None,
 ):
     return workout_service.get_stats(db, user.id, routineId)
 
 
-@router.get("", response_model=List[Workout])
+@router.get("", response_model=list[Workout])
 def get_workouts(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Annotated[Session, Depends(get_db)],
-    routineId: Optional[int] = None,
-    start: Optional[date] = None,
-    end: Optional[date] = None,
+    routineId: int | None = None,
+    start: date | None = None,
+    end: date | None = None,
 ):
     if start and end and end < start:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="end must not be before start.",
         )
     return workout_service.get_workouts(db, user.id, routineId, start, end)
@@ -51,7 +60,7 @@ def get_workouts(
 MAX_PREVIOUS_EXERCISES = 100
 
 
-@router.get("/previous", response_model=dict[int, List[PreviousSet]])
+@router.get("/previous", response_model=dict[int, list[PreviousSet]])
 def get_previous_sets(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Annotated[Session, Depends(get_db)],
@@ -59,17 +68,17 @@ def get_previous_sets(
 ):
     try:
         exercise_ids = [int(i) for i in exerciseIds.split(",") if i.strip()]
-    except ValueError:
+    except ValueError as error:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="exerciseIds must be a comma-separated list of integers.",
-        )
+        ) from error
     return workout_service.get_previous_sets_for_exercises(
         db, user.id, exercise_ids[:MAX_PREVIOUS_EXERCISES]
     )
 
 
-@router.get("/previous/{exercise_id}", response_model=List[WorkoutSet])
+@router.get("/previous/{exercise_id}", response_model=list[WorkoutSet])
 def get_previous_workout(
     user: Annotated[User, Depends(user_service.get_current_user)],
     db: Annotated[Session, Depends(get_db)],
@@ -112,10 +121,11 @@ def create_workout(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Routine not found."
             )
 
-    exercise_service.ensure_exercises_exist(db, (s.exercise_id for s in workout_in.sets))
+    exercise_service.ensure_exercises_exist(
+        db, (s.exercise_id for s in workout_in.sets)
+    )
 
-    workout = workout_service.create_workout(db, user.id, workout_in)
-    return workout
+    return workout_service.create_workout(db, user.id, workout_in)
 
 
 @router.patch("/{workout_id}", response_model=Workout)

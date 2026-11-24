@@ -3,7 +3,10 @@ from datetime import date
 from app.services.demo import reset_demo_user
 
 PASSWORD = "Password1"
-REPS_WEIGHT_EXERCISE_ID = 577
+REPS_WEIGHT_EXERCISE_ID = 577  # lever chest press
+REPS_EXERCISE_ID = 1  # 3/4 sit-up
+DURATION_EXERCISE_ID = 1512  # all fours squad stretch
+DURATION_DISTANCE_EXERCISE_ID = 685  # run
 
 
 def run_reset(db, fixture, freeze, day=date(2026, 10, 21), **kwargs):

@@ -1,6 +1,7 @@
 import csv
 import io
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session

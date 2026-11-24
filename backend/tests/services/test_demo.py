@@ -3,6 +3,8 @@ import re
 from datetime import date
 
 import pytest
+from sqlalchemy import event, func, select
+
 from app.models import (
     Exercise,
     Notification,
@@ -19,11 +21,40 @@ from app.services import workout as workout_service
 from app.services.achievement import backfill_user_achievements
 from app.services.demo import DemoSeedError
 from tests.helpers import run_reset
-from sqlalchemy import event, func, select
 
 REQUESTED_IDS = {
-    1350, 596, 1723, 572, 1761, 1347, 32, 334, 9, 2963, 171, 968, 2311, 3666, 285,
-    1452, 491, 50, 577, 2406, 2318, 43, 30, 2611, 294, 58, 2330, 11, 586, 597, 602, 312,
+    1350,
+    596,
+    1723,
+    572,
+    1761,
+    1347,
+    32,
+    334,
+    9,
+    2963,
+    171,
+    968,
+    2311,
+    3666,
+    285,
+    1452,
+    491,
+    50,
+    577,
+    2406,
+    2318,
+    43,
+    30,
+    2611,
+    294,
+    58,
+    2330,
+    11,
+    586,
+    597,
+    602,
+    312,
 }
 
 
@@ -39,18 +70,26 @@ def make_other_user(db):
     db.add(user)
     db.flush()
     routine = Routine(
-        name="Mine", user_id=user.id, day=1,
-        routine_items=[RoutineItem(exercise_id=577, target_sets=3, target_reps=10, order=1)],
+        name="Mine",
+        user_id=user.id,
+        day=1,
+        routine_items=[
+            RoutineItem(exercise_id=577, target_sets=3, target_reps=10, order=1)
+        ],
     )
     from datetime import datetime
 
     workout = Workout(
-        user_id=user.id, completed_at=datetime.now(), duration=100,
+        user_id=user.id,
+        completed_at=datetime.now(),
+        duration=100,
         sets=[WorkoutSet(exercise_id=577, set_index=1, reps=5, weight=20)],
     )
     db.add_all([routine, workout])
     db.add(Notification(user_id=user.id, title="t", message="m"))
-    db.add(NotificationSubscription(user_id=user.id, endpoint="e", p256dh="p", auth="a"))
+    db.add(
+        NotificationSubscription(user_id=user.id, endpoint="e", p256dh="p", auth="a")
+    )
     db.flush()
     backfill_user_achievements(db, user.id)
     db.commit()
@@ -59,36 +98,69 @@ def make_other_user(db):
 
 def snapshot(db, user_id):
     out = {}
-    for model in (User, Routine, Workout, UserAchievement, Notification, NotificationSubscription):
+    for model in (
+        User,
+        Routine,
+        Workout,
+        UserAchievement,
+        Notification,
+        NotificationSubscription,
+    ):
         col = model.id if model is User else model.user_id
         rows = db.execute(select(model).where(col == user_id)).scalars().all()
         out[model.__tablename__] = sorted(
-            tuple((c.name, getattr(r, c.name)) for c in model.__table__.columns) for r in rows
+            tuple((c.name, getattr(r, c.name)) for c in model.__table__.columns)
+            for r in rows
         )
-    routine_ids = db.execute(select(Routine.id).where(Routine.user_id == user_id)).scalars().all()
-    workout_ids = db.execute(select(Workout.id).where(Workout.user_id == user_id)).scalars().all()
-    out["items"] = db.execute(select(RoutineItem.exercise_id).where(RoutineItem.routine_id.in_(routine_ids))).all()
-    out["sets"] = db.execute(select(WorkoutSet.id, WorkoutSet.reps).where(WorkoutSet.workout_id.in_(workout_ids))).all()
+    routine_ids = (
+        db.execute(select(Routine.id).where(Routine.user_id == user_id)).scalars().all()
+    )
+    workout_ids = (
+        db.execute(select(Workout.id).where(Workout.user_id == user_id)).scalars().all()
+    )
+    out["items"] = db.execute(
+        select(RoutineItem.exercise_id).where(RoutineItem.routine_id.in_(routine_ids))
+    ).all()
+    out["sets"] = db.execute(
+        select(WorkoutSet.id, WorkoutSet.reps).where(
+            WorkoutSet.workout_id.in_(workout_ids)
+        )
+    ).all()
     return out
 
 
 def normalised(db, user_id):
-    wanted = lambda rows: sorted(rows)
+    def wanted(rows):
+        return sorted(rows)
+
     workouts = db.execute(
-        select(Workout.completed_at, Workout.duration, Workout.routine_id.is_(None)).where(Workout.user_id == user_id)
+        select(
+            Workout.completed_at, Workout.duration, Workout.routine_id.is_(None)
+        ).where(Workout.user_id == user_id)
     ).all()
     sets = db.execute(
-        select(WorkoutSet.exercise_id, WorkoutSet.set_index, WorkoutSet.reps, WorkoutSet.weight)
-        .join(Workout).where(Workout.user_id == user_id)
+        select(
+            WorkoutSet.exercise_id,
+            WorkoutSet.set_index,
+            WorkoutSet.reps,
+            WorkoutSet.weight,
+        )
+        .join(Workout)
+        .where(Workout.user_id == user_id)
     ).all()
     achievements = db.execute(
-        select(UserAchievement.achievement_id, UserAchievement.exercise_id, UserAchievement.value, UserAchievement.unlocked_at)
-        .where(UserAchievement.user_id == user_id)
+        select(
+            UserAchievement.achievement_id,
+            UserAchievement.exercise_id,
+            UserAchievement.value,
+            UserAchievement.unlocked_at,
+        ).where(UserAchievement.user_id == user_id)
     ).all()
     return wanted(workouts), wanted(sets), wanted(achievements)
 
 
 # 1 fixture validity -----------------------------------------------------------
+
 
 def test_fixture_is_valid_and_covers_requested_exercises(db, fixture, freeze):
     now = freeze(date(2026, 10, 21))
@@ -129,7 +201,10 @@ def test_invalid_fixtures_are_rejected(db, fixture, freeze, name):
 
 # 2 derived state --------------------------------------------------------------
 
-@pytest.mark.parametrize("day", [date(2026, 10, 19), date(2026, 10, 21), date(2026, 10, 25)])
+
+@pytest.mark.parametrize(
+    "day", [date(2026, 10, 19), date(2026, 10, 21), date(2026, 10, 25)]
+)
 def test_streaks_hold_throughout_the_current_week(db, fixture, freeze, day):
     summary = run_reset(db, fixture, freeze, day)
     assert workout_service.get_stats(db, summary.user_id)["weeklyStreak"] == 5
@@ -144,6 +219,7 @@ def test_streaks_hold_throughout_the_current_week(db, fixture, freeze, day):
 
 # 3 idempotency ----------------------------------------------------------------
 
+
 def test_reset_is_idempotent(db, fixture, freeze):
     first = run_reset(db, fixture, freeze)
     before = normalised(db, first.user_id)
@@ -154,6 +230,7 @@ def test_reset_is_idempotent(db, fixture, freeze):
 
 
 # 4 isolation + 5 statement capture --------------------------------------------
+
 
 def test_reset_never_touches_other_users(db, engine, fixture, freeze):
     other = make_other_user(db)
@@ -173,7 +250,9 @@ def test_reset_never_touches_other_users(db, engine, fixture, freeze):
     assert snapshot(db, other.id) == before
     assert count(db, Exercise) == exercises_before
 
-    writes = [(s, p) for s, p in statements if re.match(r"\s*(INSERT|UPDATE|DELETE)", s)]
+    writes = [
+        (s, p) for s, p in statements if re.match(r"\s*(INSERT|UPDATE|DELETE)", s)
+    ]
     for statement, params in writes:
         assert not re.search(
             r"(INSERT INTO|UPDATE|DELETE FROM)\s+(exercises|muscles|exercise_muscles|achievements)\b",
@@ -192,11 +271,18 @@ def test_reset_refuses_when_foreign_keys_are_off(db, fixture, freeze):
 
 # 6 hijack guard ---------------------------------------------------------------
 
+
 def test_existing_non_demo_user_with_demo_email_is_protected(db, fixture, freeze):
     victim = User(username="Real", email=fixture["user"]["email"], password_hash="x")
     db.add(victim)
     db.flush()
-    db.add(Workout(user_id=victim.id, completed_at=__import__("datetime").datetime.now(), duration=1))
+    db.add(
+        Workout(
+            user_id=victim.id,
+            completed_at=__import__("datetime").datetime.now(),
+            duration=1,
+        )
+    )
     db.commit()
 
     with pytest.raises(DemoSeedError):
@@ -207,9 +293,14 @@ def test_existing_non_demo_user_with_demo_email_is_protected(db, fixture, freeze
 
 # 7 atomicity ------------------------------------------------------------------
 
+
 def test_failure_mid_reset_keeps_previous_data(db, fixture, freeze, monkeypatch):
     summary = run_reset(db, fixture, freeze)
-    ids_before = sorted(db.execute(select(Workout.id).where(Workout.user_id == summary.user_id)).scalars())
+    ids_before = sorted(
+        db.execute(
+            select(Workout.id).where(Workout.user_id == summary.user_id)
+        ).scalars()
+    )
 
     def boom(*args, **kwargs):
         raise RuntimeError("boom")
@@ -218,12 +309,14 @@ def test_failure_mid_reset_keeps_previous_data(db, fixture, freeze, monkeypatch)
     with pytest.raises(RuntimeError):
         run_reset(db, fixture, freeze)
 
-    ids_after = sorted(db.execute(select(Workout.id).where(Workout.user_id == summary.user_id)).scalars())
+    ids_after = sorted(
+        db.execute(
+            select(Workout.id).where(Workout.user_id == summary.user_id)
+        ).scalars()
+    )
     assert ids_after == ids_before
 
 
 def test_dry_run_rolls_back(db, fixture, freeze):
     run_reset(db, fixture, freeze, commit=False)
     assert count(db, User) == 0
-
-

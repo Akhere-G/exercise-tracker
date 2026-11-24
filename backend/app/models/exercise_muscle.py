@@ -1,6 +1,7 @@
-from ..database import Base
+from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Integer, ForeignKey
+
+from ..database import Base
 from .audit_mixin import AuditMixin
 from .muscle import Muscle
 

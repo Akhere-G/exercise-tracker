@@ -1,4 +1,5 @@
 import pytest
+
 from app.constants.programs import PROGRAMS
 from app.services.program import resolve_exercise_ids
 

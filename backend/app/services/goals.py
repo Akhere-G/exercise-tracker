@@ -1,5 +1,4 @@
 from datetime import datetime, time
-from typing import Optional
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -20,9 +19,7 @@ def get_goals(db: Session, user_id: int) -> Goals:
     )
 
 
-def _weekly_goal(
-    db: Session, user_id: int, profile: UserProfile
-) -> Optional[WeeklyGoal]:
+def _weekly_goal(db: Session, user_id: int, profile: UserProfile) -> WeeklyGoal | None:
     if profile.workouts_per_week_target is None:
         return None
     week_start = datetime.combine(
@@ -37,9 +34,7 @@ def _weekly_goal(
     )
 
 
-def _weight_goal(
-    db: Session, user_id: int, profile: UserProfile
-) -> Optional[WeightGoal]:
+def _weight_goal(db: Session, user_id: int, profile: UserProfile) -> WeightGoal | None:
     if profile.target_body_weight_kg is None:
         return None
     latest = body_service.get_latest_body_weight(db, user_id)
@@ -49,7 +44,7 @@ def _weight_goal(
     )
 
 
-def _lift_goal(db: Session, user_id: int, profile: UserProfile) -> Optional[LiftGoal]:
+def _lift_goal(db: Session, user_id: int, profile: UserProfile) -> LiftGoal | None:
     exercise_id = profile.target_lift_exercise_id
     if exercise_id is None or profile.target_lift_kg is None:
         return None

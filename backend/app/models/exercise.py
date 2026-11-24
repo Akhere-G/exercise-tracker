@@ -1,8 +1,8 @@
-from ..database import Base
+from sqlalchemy import Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import String, Integer, Text
+
+from ..database import Base
 from .audit_mixin import AuditMixin
-from typing import List
 from .exercise_muscle import ExerciseMuscle
 
 
@@ -16,6 +16,6 @@ class Exercise(Base, AuditMixin):
     equipment: Mapped[str] = mapped_column(String(100))
     metrics: Mapped[str] = mapped_column(String(100))
     priority: Mapped[int] = mapped_column(Integer, default=0, index=True)
-    muscles: Mapped[List["ExerciseMuscle"]] = relationship(
+    muscles: Mapped[list["ExerciseMuscle"]] = relationship(
         "ExerciseMuscle",
     )

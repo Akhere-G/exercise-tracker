@@ -32,12 +32,17 @@ def build_routine(
     if user.is_demo:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Demo accounts cannot use the AI coach. Create an account to continue.",
+            detail=(
+                "Demo accounts cannot use the AI coach. Create an account to continue."
+            ),
         )
     try:
         return ai_builder.build_routines(db, user.id, build_in)
-    except AIUnavailable:
+    except AIUnavailable as error:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="The coach is unavailable right now. Try again, or pick a prebuilt program.",
-        )
+            detail=(
+                "The coach is unavailable right now. "
+                "Try again, or pick a prebuilt program."
+            ),
+        ) from error

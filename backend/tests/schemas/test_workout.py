@@ -1,6 +1,8 @@
 from datetime import datetime
 
 import pytest
+from pydantic import ValidationError
+
 from app.schemas.workout import (
     MAX_SETS_PER_WORKOUT,
     WorkoutBase,
@@ -8,7 +10,6 @@ from app.schemas.workout import (
     WorkoutSetBase,
     WorkoutUpdate,
 )
-from pydantic import ValidationError
 from tests.helpers import set_payload, workout_payload
 
 
@@ -22,7 +23,11 @@ from tests.helpers import set_payload, workout_payload
         {"sets": [set_payload(durationSecs=100_000)]},
         {"duration": -1},
         {"duration": 2_147_483_648},
-        {"sets": [set_payload(setIndex=i + 1) for i in range(MAX_SETS_PER_WORKOUT + 1)]},
+        {
+            "sets": [
+                set_payload(setIndex=i + 1) for i in range(MAX_SETS_PER_WORKOUT + 1)
+            ]
+        },
     ],
 )
 def test_workout_create_rejects_out_of_range_values(overrides):

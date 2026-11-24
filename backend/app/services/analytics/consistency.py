@@ -2,14 +2,14 @@
 
 from collections import defaultdict
 from datetime import date, datetime
-from typing import Optional
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.models import (
     Workout,
 )
 from app.services import workout as workout_service
-from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 from .common import today
 
@@ -50,7 +50,7 @@ def get_consistency(db: Session, user_id: int, year: int) -> dict:
     )
 
     longest = streak = 0
-    previous: Optional[date] = None
+    previous: date | None = None
     for week in sorted(per_week):
         streak = (
             streak + 1

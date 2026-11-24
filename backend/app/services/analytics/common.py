@@ -2,7 +2,9 @@
 
 from collections import defaultdict
 from datetime import date, datetime
-from typing import Optional
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from app.constants.muscle_groups import (
     group_for_muscle,
@@ -14,8 +16,6 @@ from app.models import (
     WorkoutSet,
 )
 from app.services import workout as workout_service
-from sqlalchemy import select
-from sqlalchemy.orm import Session
 
 PRIMARY_WEIGHT = 1.0
 SECONDARY_WEIGHT = 0.5
@@ -25,9 +25,15 @@ def today() -> date:
     return workout_service.date.today()
 
 
+# Epley is only a fair estimate for low-rep sets. Past this many reps the extra
+# reps stop adding to the estimate, so a 50-rep set cannot inflate a strength level.
+MAX_REPS_FOR_ESTIMATE = 12
+
+
 def estimate_one_rep_max(weight: float, reps: int) -> float:
-    """Epley formula."""
-    return weight * (1 + reps / 30)
+    """Epley formula, counting at most MAX_REPS_FOR_ESTIMATE reps."""
+    counted_reps = min(reps, MAX_REPS_FOR_ESTIMATE)
+    return weight * (1 + counted_reps / 30)
 
 
 def group_weights(muscles: list[tuple[str, str]]) -> dict[str, float]:
@@ -44,7 +50,7 @@ def group_weights(muscles: list[tuple[str, str]]) -> dict[str, float]:
 
 def working_sets_with_groups(
     db: Session, user_id: int, since: datetime
-) -> list[tuple[datetime, Optional[int], Optional[float], dict[str, float]]]:
+) -> list[tuple[datetime, int | None, float | None, dict[str, float]]]:
     """Each working set's time, reps, weight and muscle group weights."""
     sets_stmt = (
         select(

@@ -11,14 +11,15 @@ from datetime import date, datetime, time
 from pathlib import Path
 
 import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
+
 from app.database import Base, enable_sqlite_foreign_keys
 from app.services import demo as demo_service
 from app.services import workout as workout_service
 from app.services.achievement import seed_achievements
 from seed import seed_all_muscles, seed_exercises_and_junctions
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
 
 ROOT = Path(__file__).resolve().parents[1]
 WEDNESDAY = date(2026, 10, 21)
@@ -90,16 +91,17 @@ def reset_rate_limits():
 
 @pytest.fixture
 def client(engine, monkeypatch):
-    from app.database import get_db
-    from app.main import create_app
     from fastapi.testclient import TestClient
     from sqlalchemy.orm import sessionmaker
 
+    from app.database import get_db
+    from app.main import create_app
+
     app = create_app()
-    Session = sessionmaker(bind=engine, autoflush=False)
+    make_session = sessionmaker(bind=engine, autoflush=False)
 
     def override():
-        session = Session()
+        session = make_session()
         try:
             yield session
         finally:

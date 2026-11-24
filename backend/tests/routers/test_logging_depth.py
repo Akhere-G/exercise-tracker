@@ -33,9 +33,7 @@ def test_set_metadata_round_trips(client, auth_headers):
 
 
 def test_an_invalid_set_type_or_rpe_is_a_422(client, auth_headers):
-    bad_type = _post_workout(
-        client, auth_headers, sets=[set_payload(setType="bogus")]
-    )
+    bad_type = _post_workout(client, auth_headers, sets=[set_payload(setType="bogus")])
     bad_rpe = _post_workout(client, auth_headers, sets=[set_payload(rpe=8.3)])
 
     assert bad_type.status_code == 422
@@ -46,14 +44,21 @@ def test_warmups_do_not_set_weight_records(client, auth_headers):
     _post_workout(
         client,
         auth_headers,
-        sets=[set_payload(weight=200, setType="warmup"), set_payload(weight=50, setIndex=2)],
+        sets=[
+            set_payload(weight=200, setType="warmup"),
+            set_payload(weight=50, setIndex=2),
+        ],
     )
 
     records = client.get(
         f"/api/achievements/exercise/{REPS_WEIGHT_EXERCISE_ID}", headers=auth_headers
     ).json()
 
-    weights = [r["value"] for r in records if r.get("achievement", {}).get("type") == "pr_weight"]
+    weights = [
+        r["value"]
+        for r in records
+        if r.get("achievement", {}).get("type") == "pr_weight"
+    ]
     assert weights == [50]
 
 
@@ -104,15 +109,15 @@ def test_previous_sets_come_back_per_exercise_from_the_latest_workout(
 
 
 def test_previous_sets_rejects_a_malformed_id_list(client, auth_headers):
-    response = client.get("/api/workouts/previous?exerciseIds=1,abc", headers=auth_headers)
+    response = client.get(
+        "/api/workouts/previous?exerciseIds=1,abc", headers=auth_headers
+    )
 
     assert response.status_code == 422
 
 
 def test_routine_items_keep_rest_and_superset_group(client, auth_headers):
-    payload = routine_payload(
-        routineItems=[item_payload(restSecs=90, supersetGroup=2)]
-    )
+    payload = routine_payload(routineItems=[item_payload(restSecs=90, supersetGroup=2)])
 
     created = client.post("/api/routines", json=payload, headers=auth_headers).json()
     item = created["routineItems"][0]
@@ -143,7 +148,9 @@ def test_profile_defaults_and_updates(client, auth_headers):
 
     assert updated.status_code == 200
     assert updated.json()["weightUnit"] == "lb"
-    assert client.get("/api/profile", headers=auth_headers).json()["effortMetric"] == "rpe"
+    assert (
+        client.get("/api/profile", headers=auth_headers).json()["effortMetric"] == "rpe"
+    )
 
 
 def test_profile_rejects_bad_values(client, auth_headers):
@@ -161,7 +168,11 @@ def test_profile_rejects_bad_values(client, auth_headers):
 
 
 def test_profile_fields_that_may_be_empty_can_be_cleared(client, auth_headers):
-    client.patch("/api/profile", json={"sex": "male", "timezone": "Europe/London"}, headers=auth_headers)
+    client.patch(
+        "/api/profile",
+        json={"sex": "male", "timezone": "Europe/London"},
+        headers=auth_headers,
+    )
 
     response = client.patch(
         "/api/profile", json={"sex": None, "timezone": None}, headers=auth_headers

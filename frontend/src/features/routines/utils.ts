@@ -1,4 +1,5 @@
 import { moveItem } from "@/src/lib/reorder";
+import { formatWeight, WeightUnit } from "@/src/lib/units";
 
 export const getDayStr = (day: number) => {
   switch (day) {
@@ -158,4 +159,53 @@ export function reorderRoutineItems<T extends { supersetGroup?: number | null }>
     ...item,
     supersetGroup: groups[index],
   }));
+}
+
+
+export interface TargetSummary {
+  targetSets: number;
+  targetReps: number | null;
+  targetWeight: number | null;
+  targetDurationSecs: number | null;
+  targetDistanceMeters: number | null;
+}
+
+const METERS_PER_KM = 1000;
+const SECS_PER_MINUTE = 60;
+
+const formatClock = (totalSecs: number) => {
+  const mins = Math.floor(totalSecs / SECS_PER_MINUTE);
+  const secs = Math.round(totalSecs % SECS_PER_MINUTE);
+  return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+};
+
+const formatMeters = (meters: number) =>
+  meters >= METERS_PER_KM
+    ? `${Number((meters / METERS_PER_KM).toFixed(2))} km`
+    : `${Math.round(meters)} m`;
+
+/**
+ * A routine item's target in words: `3 x 10 @ 40 kg` for strength work,
+ * `3 x 00:45` for a timed hold and `2 km in 12:00` for distance work.
+ */
+export function formatTarget(target: TargetSummary, unit: WeightUnit): string {
+  const {
+    targetSets,
+    targetReps,
+    targetWeight,
+    targetDurationSecs,
+    targetDistanceMeters,
+  } = target;
+
+  if (targetDurationSecs && targetDistanceMeters) {
+    return `${formatMeters(targetDistanceMeters)} in ${formatClock(targetDurationSecs)}`;
+  }
+  if (targetReps) {
+    const reps = `${targetSets} x ${targetReps}`;
+    return targetWeight ? `${reps} @ ${formatWeight(targetWeight, unit)}` : reps;
+  }
+  if (targetDurationSecs) {
+    return `${targetSets} x ${formatClock(targetDurationSecs)}`;
+  }
+  return `${targetSets} sets`;
 }
