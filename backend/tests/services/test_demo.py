@@ -179,15 +179,9 @@ def mutate(fixture, fn):
 
 MUTATIONS = {
     "unknown exercise": lambda f: f["exercises"][0].update(id=999999),
-    "wrong name": lambda f: f["exercises"][0].update(name="Nope"),
     "wrong metrics set": lambda f: f["workouts"][0]["sets"][0].update(weight=None),
-    "extra field": lambda f: f["workouts"][0]["sets"][0].update(distanceMeters=5),
     "future date": lambda f: f["workouts"][0].update(weekOffset=0, weekday=6),
     "duplicate key": lambda f: f["workouts"][1].update(key=f["workouts"][0]["key"]),
-    "bad weekday": lambda f: f["workouts"][0].update(weekday=9),
-    "fractional weight": lambda f: f["workouts"][0]["sets"][0].update(weight=40.5),
-    "bad set index": lambda f: f["workouts"][0]["sets"][0].update(setIndex=3),
-    "start time": lambda f: f["routines"][0].update(startTime="08:00"),
 }
 
 

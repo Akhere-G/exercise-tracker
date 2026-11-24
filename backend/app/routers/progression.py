@@ -1,10 +1,11 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User
+from app.routers.params import parse_id_list
 from app.schemas.progression import DeloadAssessment, ProgressionSuggestion
 from app.services import deload as deload_service
 from app.services import progression as progression_service
@@ -19,13 +20,7 @@ def get_progression(
     db: Annotated[Session, Depends(get_db)],
     exerciseIds: Annotated[str, Query(max_length=1000)] = "",  # noqa: N803
 ):
-    try:
-        exercise_ids = [int(i) for i in exerciseIds.split(",") if i.strip()]
-    except ValueError:
-        raise HTTPException(  # noqa: B904
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="exerciseIds must be a comma-separated list of integers.",
-        )
+    exercise_ids = parse_id_list(exerciseIds, "exerciseIds")
     return progression_service.get_suggestions(db, user.id, exercise_ids)
 
 

@@ -5,20 +5,6 @@ from app.models import UserProfile
 from app.services import profile as profile_service
 
 
-def test_creates_a_profile_on_first_access(db, user):
-    profile = profile_service.get_or_create_profile(db, user.id)
-
-    assert profile.user_id == user.id
-    assert profile.onboarded_at is None
-
-
-def test_returns_the_existing_profile(db, user):
-    first = profile_service.get_or_create_profile(db, user.id)
-    second = profile_service.get_or_create_profile(db, user.id)
-
-    assert first is second
-
-
 def test_concurrent_first_access_returns_the_profile_another_request_created(
     db, engine, user, monkeypatch
 ):

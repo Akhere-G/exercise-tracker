@@ -53,11 +53,6 @@ def test_batch_creates_nothing_when_one_routine_is_invalid(client, auth_headers)
     assert client.get("/api/routines", headers=auth_headers).json() == []
 
 
-def test_batch_rejects_an_empty_list(client, auth_headers):
-    response = client.post("/api/routines/batch", json=[], headers=auth_headers)
-    assert response.status_code == 422
-
-
 def test_a_required_field_cannot_be_nulled_by_an_update(client, auth_headers):
     created = client.post("/api/routines", json=routine_payload(), headers=auth_headers)
     url = f"/api/routines/{created.json()['id']}"

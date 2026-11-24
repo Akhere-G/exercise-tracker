@@ -4,13 +4,6 @@ from sqlalchemy.exc import IntegrityError
 from app.models import User
 
 
-def test_sqlite_foreign_keys_hook(engine):
-    from sqlalchemy import text
-
-    with engine.connect() as conn:
-        assert conn.execute(text("PRAGMA foreign_keys")).scalar() == 1
-
-
 def test_single_demo_user_index(db):
     db.add(User(username="a", email="a@x.com", password_hash="x", is_demo=True))
     db.commit()

@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User
+from app.routers.params import parse_id_list
 from app.schemas.stats import (
     Consistency,
     ExerciseSeries,
@@ -95,13 +96,7 @@ def compare_exercises(
     start: date | None = None,
     end: date | None = None,
 ):
-    try:
-        exercise_ids = [int(i) for i in ids.split(",") if i.strip()]
-    except ValueError as error:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="ids must be comma separated numbers.",
-        ) from error
+    exercise_ids = parse_id_list(ids, "ids")
     if not exercise_ids:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,

@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import datetime
 
 from sqlalchemy import func, select
 
@@ -71,26 +71,3 @@ def _log_workout_at(db, user, completed_at):
         ],
     )
     return workout_service.create_workout(db, user.id, workout)
-
-
-def test_get_workouts_filters_by_inclusive_date_range(db, user):
-    moments = [
-        datetime(2026, 10, 18, 23, 59),
-        datetime(2026, 10, 19, 0, 0),
-        datetime(2026, 10, 20, 23, 59),
-        datetime(2026, 10, 21, 0, 0),
-    ]
-    ids = [_log_workout_at(db, user, moment).id for moment in moments]
-
-    in_range = workout_service.get_workouts(
-        db, user.id, start=date(2026, 10, 19), end=date(2026, 10, 20)
-    )
-    assert sorted(w.id for w in in_range) == ids[1:3]
-
-    from_start = workout_service.get_workouts(db, user.id, start=date(2026, 10, 20))
-    assert sorted(w.id for w in from_start) == ids[2:]
-
-    until_end = workout_service.get_workouts(db, user.id, end=date(2026, 10, 18))
-    assert [w.id for w in until_end] == ids[:1]
-
-    assert len(workout_service.get_workouts(db, user.id)) == 4

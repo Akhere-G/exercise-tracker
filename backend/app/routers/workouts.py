@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User
+from app.routers.params import parse_id_list
 from app.schemas.workout import (
     PreviousSet,
     Workout,
@@ -66,13 +67,7 @@ def get_previous_sets(
     db: Annotated[Session, Depends(get_db)],
     exerciseIds: Annotated[str, Query(max_length=1000)] = "",
 ):
-    try:
-        exercise_ids = [int(i) for i in exerciseIds.split(",") if i.strip()]
-    except ValueError as error:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
-            detail="exerciseIds must be a comma-separated list of integers.",
-        ) from error
+    exercise_ids = parse_id_list(exerciseIds, "exerciseIds")
     return workout_service.get_previous_sets_for_exercises(
         db, user.id, exercise_ids[:MAX_PREVIOUS_EXERCISES]
     )

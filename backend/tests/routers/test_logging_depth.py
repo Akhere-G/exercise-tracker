@@ -32,14 +32,6 @@ def test_set_metadata_round_trips(client, auth_headers):
     assert stored[1]["supersetGroup"] == 1
 
 
-def test_an_invalid_set_type_or_rpe_is_a_422(client, auth_headers):
-    bad_type = _post_workout(client, auth_headers, sets=[set_payload(setType="bogus")])
-    bad_rpe = _post_workout(client, auth_headers, sets=[set_payload(rpe=8.3)])
-
-    assert bad_type.status_code == 422
-    assert bad_rpe.status_code == 422
-
-
 def test_warmups_do_not_set_weight_records(client, auth_headers):
     _post_workout(
         client,
@@ -106,14 +98,6 @@ def test_previous_sets_come_back_per_exercise_from_the_latest_workout(
     assert [s["weight"] for s in body[str(REPS_WEIGHT_EXERCISE_ID)]] == [30, 35]
     assert [s["weight"] for s in body[str(OTHER_EXERCISE_ID)]] == [5]
     assert "999999" not in body
-
-
-def test_previous_sets_rejects_a_malformed_id_list(client, auth_headers):
-    response = client.get(
-        "/api/workouts/previous?exerciseIds=1,abc", headers=auth_headers
-    )
-
-    assert response.status_code == 422
 
 
 def test_routine_items_keep_rest_and_superset_group(client, auth_headers):

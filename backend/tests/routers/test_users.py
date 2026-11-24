@@ -46,6 +46,20 @@ def test_register_rejects_the_same_email_in_a_different_case(client, user):
     assert "already exists" in response.json()["detail"]
 
 
+def test_register_rejects_a_username_longer_than_the_column(client, db):
+    response = client.post(
+        "/api/auth/register",
+        json={
+            "username": "x" * 51,
+            "email": "long@example.com",
+            "password": PASSWORD,
+            "termsAccepted": True,
+        },
+    )
+
+    assert response.status_code == 422
+
+
 @pytest.mark.parametrize("terms_accepted", [False, None])
 def test_register_requires_terms_acceptance(client, db, terms_accepted):
     payload = {

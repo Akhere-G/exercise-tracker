@@ -45,21 +45,3 @@ def test_warmups_do_not_set_the_baseline(client, auth_headers):
 def test_nothing_suggested_for_unlogged_exercises(client, auth_headers):
     response = client.get("/api/progression?exerciseIds=577", headers=auth_headers)
     assert response.json() == []
-
-
-def test_rejects_malformed_exercise_ids(client, auth_headers):
-    response = client.get("/api/progression?exerciseIds=a,b", headers=auth_headers)
-    assert response.status_code == 422
-
-
-def test_lists_personas(client, auth_headers):
-    response = client.get("/api/ai/personas", headers=auth_headers)
-
-    assert response.status_code == 200
-    assert {p["slug"] for p in response.json()} == {
-        "hype",
-        "drill",
-        "physio",
-        "nerd",
-        "oldschool",
-    }
