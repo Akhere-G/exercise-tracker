@@ -187,7 +187,14 @@ def load_exercise_names(db: Session, exercise_ids: list[int]) -> dict[int, str]:
     return dict(db.execute(statement).all())
 
 
-def record_recommendation(db: Session, profile: UserProfile, now: datetime) -> None:
+def acknowledge_deload(db: Session, user_id: int, now: datetime | None = None) -> None:
+    """Start the cooldown once the user has seen and dismissed the recommendation.
+
+    Assessing is read-only, so the same recommendation keeps coming back on every
+    page load until the user acknowledges it.
+    """
+    now = now or naive_utc_now()
+    profile = profile_service.get_or_create_profile(db, user_id)
     try:
         profile.last_deload_recommended_at = now
         db.commit()
@@ -226,7 +233,6 @@ def assess_deload(db: Session, user_id: int, now: datetime | None = None) -> dic
     if high_average_rpe is not None:
         reasons.append(explain_high_effort(high_average_rpe))
 
-    record_recommendation(db, profile, now)
     return {
         "should_deload": True,
         "message": get_persona(profile.coach_persona).lines["deload"],

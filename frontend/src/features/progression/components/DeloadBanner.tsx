@@ -2,6 +2,7 @@
 import { useSyncExternalStore } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/src/components/ui/button";
+import { acknowledgeDeload } from "../actions";
 import { weekKey } from "../utils";
 import { DeloadAssessment } from "../types";
 
@@ -22,6 +23,9 @@ const readDismissedWeek = () => {
 };
 
 const dismiss = () => {
+  // Starts the server-side cooldown. Failing is harmless: the banner is still
+  // hidden for the week locally and the server will simply offer it again.
+  void acknowledgeDeload();
   try {
     localStorage.setItem(STORAGE_KEY, weekKey(new Date()));
   } catch {

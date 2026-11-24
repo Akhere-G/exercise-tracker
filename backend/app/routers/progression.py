@@ -35,3 +35,11 @@ def get_deload_assessment(
     db: Annotated[Session, Depends(get_db)],
 ):
     return deload_service.assess_deload(db, user.id)
+
+
+@router.post("/deload/ack", status_code=status.HTTP_204_NO_CONTENT)
+def acknowledge_deload(
+    user: Annotated[User, Depends(user_service.get_current_user)],
+    db: Annotated[Session, Depends(get_db)],
+):
+    deload_service.acknowledge_deload(db, user.id)

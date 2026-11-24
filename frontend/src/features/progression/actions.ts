@@ -17,3 +17,12 @@ export const getProgressionSuggestions = async (
     return handleApiError<ProgressionSuggestion[]>(err);
   }
 };
+
+export const acknowledgeDeload = async (): Promise<ActionResponse<null>> => {
+  try {
+    await api.post("/progression/deload/ack");
+    return { success: true, data: null };
+  } catch (err) {
+    return handleApiError<null>(err);
+  }
+};
