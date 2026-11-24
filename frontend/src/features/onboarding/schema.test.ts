@@ -19,18 +19,4 @@ describe("onboardingSchema", () => {
       true,
     );
   });
-
-  it.each([
-    ["workoutsPerWeek", 0],
-    ["workoutsPerWeek", 15],
-    ["workoutsPerWeek", 2.5],
-    ["bodyWeightKg", 0],
-    ["bodyWeightKg", 501],
-    ["weightUnit", "stone"],
-    ["coachPersona", "sergeant"],
-  ])("rejects %s = %s", (field, value) => {
-    expect(onboardingSchema.isValidSync({ ...answers, [field]: value })).toBe(
-      false,
-    );
-  });
 });

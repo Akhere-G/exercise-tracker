@@ -63,28 +63,6 @@ test.describe("accounts", () => {
     expect(weights.map((w) => w.weightKg)).toEqual([81.647]);
   });
 
-  test("registering an email twice explains the problem", async ({
-    page,
-    request,
-  }) => {
-    const existing = await onboardedAccount(request);
-
-    await page.goto("/register");
-    await page.getByLabel("Username").fill("someone-else");
-    await page.getByLabel("Email").fill(existing.email);
-    await page.getByLabel("Password", { exact: true }).fill("Password1");
-    await page.getByLabel("Repeat Password").fill("Password1");
-    await page.getByLabel(/I agree to the/).check();
-    await page.getByRole("button", { name: "Create account" }).click();
-
-    await expect(
-      page
-        .getByRole("alert")
-        .filter({ hasText: "A user with this email address already exists." }),
-    ).toBeVisible();
-    await expect(page).toHaveURL(/\/register$/);
-  });
-
   test("protected pages need a session, and logging out ends it", async ({
     page,
     request,

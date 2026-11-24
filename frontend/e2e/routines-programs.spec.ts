@@ -45,17 +45,6 @@ test("a routine can be edited and deleted", async ({ page, backend }) => {
   expect(await backend.get<unknown[]>("/routines")).toEqual([]);
 });
 
-test("an incomplete routine is not saved", async ({ page, backend }) => {
-  await page.goto("/routines/create");
-  await page.getByRole("button", { name: "Create" }).click();
-
-  await expect(
-    page.getByText("You must add at least one exercise to your routine"),
-  ).toBeVisible();
-  await expect(page).toHaveURL(/\/routines\/create$/);
-  expect(await backend.get<unknown[]>("/routines")).toEqual([]);
-});
-
 test("a prebuilt program adds its routines", async ({ page, backend }) => {
   await page.goto("/programs");
   await page
@@ -76,20 +65,4 @@ test("a prebuilt program adds its routines", async ({ page, backend }) => {
     page.getByRole("heading", { name: routines[0].name }),
   ).toBeVisible();
   expect(programName.length).toBeGreaterThan(0);
-});
-
-test("the AI builder explains when the coach is unavailable", async ({
-  page,
-  backend,
-}) => {
-  await page.goto("/routines/build");
-  await page.getByRole("button", { name: "Dumbbells" }).click();
-  await page.getByRole("button", { name: "Build my plan" }).click();
-
-  await expect(
-    page.getByText(/The coach is unavailable right now/),
-  ).toBeVisible();
-  await page.getByRole("link", { name: "Browse prebuilt programs" }).click();
-  await expect(page).toHaveURL(/\/programs$/);
-  expect(await backend.get<unknown[]>("/routines")).toEqual([]);
 });

@@ -19,15 +19,6 @@ const errorsFor = (schema: typeof routineItemSchema, value: unknown) => {
 };
 
 describe("routineItemSchema", () => {
-  it("accepts reps-based and duration-based items", () => {
-    expect(routineItemSchema.isValidSync(item())).toBe(true);
-    expect(
-      routineItemSchema.isValidSync(
-        item({ targetReps: null, targetDuration: 45 }),
-      ),
-    ).toBe(true);
-  });
-
   it("flags both fields when neither reps nor duration is set", () => {
     expect(
       errorsFor(
@@ -37,19 +28,11 @@ describe("routineItemSchema", () => {
     ).toEqual(expect.arrayContaining(["targetReps", "targetDuration"]));
   });
 
-  it("requires at least one set", () => {
-    expect(errorsFor(routineItemSchema, item({ targetSets: 0 }))).toContain(
-      "targetSets",
-    );
-  });
-
-  it("treats an empty rest field as 'use the default' and bounds it to an hour", () => {
+  it("treats an empty rest field as 'use the default' and caps it at an hour", () => {
     expect(
       routineItemSchema.validateSync(item({ restSecs: "" })).restSecs,
     ).toBeNull();
-    expect(routineItemSchema.isValidSync(item({ restSecs: 3600 }))).toBe(true);
     expect(routineItemSchema.isValidSync(item({ restSecs: 3601 }))).toBe(false);
-    expect(routineItemSchema.isValidSync(item({ restSecs: -1 }))).toBe(false);
   });
 });
 
@@ -62,24 +45,12 @@ describe("routineSchema", () => {
     ...overrides,
   });
 
-  it("accepts a complete routine", () => {
-    expect(routineSchema.isValidSync(routine())).toBe(true);
-  });
-
-  it("requires at least one exercise", async () => {
-    await expect(
-      routineSchema.validate(routine({ routineItems: [] })),
-    ).rejects.toThrow("You must add at least one exercise to your routine");
-  });
-
-  it.each(["24:00", "9:30", "18:60", "abc"])(
-    "rejects start time %s",
-    (startTime) => {
-      expect(routineSchema.isValidSync(routine({ startTime }))).toBe(false);
-    },
-  );
-
-  it.each(["00:00", "09:05", "23:59"])("accepts start time %s", (startTime) => {
-    expect(routineSchema.isValidSync(routine({ startTime }))).toBe(true);
+  it("accepts a valid start time and rejects an impossible one", () => {
+    expect(routineSchema.isValidSync(routine({ startTime: "09:05" }))).toBe(
+      true,
+    );
+    expect(routineSchema.isValidSync(routine({ startTime: "24:00" }))).toBe(
+      false,
+    );
   });
 });

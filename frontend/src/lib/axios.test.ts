@@ -96,13 +96,22 @@ describe("server-side request interceptor", () => {
     expect(requests[0].forwardedFor).toBe("203.0.113.9");
   });
 
-  it.each(["/auth/login", "/auth/register", "/auth/demo", "/auth/token"])(
-    "never sends a stale token to %s",
-    async (url) => {
-      cookieJar.set("access_token", { value: "stale" });
-      const requests = stubApi();
+  it("never sends a stale token to the sign-in endpoints", async () => {
+    cookieJar.set("access_token", { value: "stale" });
+    const requests = stubApi();
+
+    for (const url of [
+      "/auth/login",
+      "/auth/register",
+      "/auth/demo",
+      "/auth/token",
+    ]) {
       await api.post(url);
-      expect(requests[0].authorization).toBeUndefined();
-    },
-  );
+    }
+
+    expect(requests).toHaveLength(4);
+    for (const request of requests) {
+      expect(request.authorization).toBeUndefined();
+    }
+  });
 });

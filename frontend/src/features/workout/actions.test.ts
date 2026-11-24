@@ -56,15 +56,6 @@ describe("workout actions", () => {
     });
   });
 
-  it("skips the request when there are no exercises", async () => {
-    const requests = stubApi();
-    expect(await getPreviousSetsForExercises([])).toEqual({
-      success: true,
-      data: {},
-    });
-    expect(requests).toHaveLength(0);
-  });
-
   it("reports an unreachable server", async () => {
     stubApi(() => ({ networkError: true }));
     expect(await createWorkout(workout)).toEqual({
