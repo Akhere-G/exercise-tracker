@@ -46,18 +46,37 @@ def _new_engine():
 def seeded_template(exercise_data):
     """One seeded in-memory database, built once and copied for every test."""
     template = _new_engine()
-    Base.metadata.create_all(template)
-    with sessionmaker(bind=template)() as session:
-        muscles = seed_all_muscles(session, exercise_data)
-        seed_exercises_and_junctions(session, exercise_data, muscles)
-        session.commit()
-        seed_achievements(session)
+    _seed(template, exercise_data)
     yield template
     template.dispose()
 
 
+def _seed(engine, exercise_data):
+    Base.metadata.create_all(engine)
+    with sessionmaker(bind=engine)() as session:
+        muscles = seed_all_muscles(session, exercise_data)
+        seed_exercises_and_junctions(session, exercise_data, muscles)
+        session.commit()
+        seed_achievements(session)
+
+
 @pytest.fixture
-def engine(seeded_template):
+def engine(request, exercise_data):
+    """A seeded database: SQLite by default, PostgreSQL if TEST_DATABASE_URL is set.
+
+    The PostgreSQL run exists because SQLite hides bugs (for example DISTINCT
+    with ORDER BY). Its schema is rebuilt for every test, so it is slower and
+    CI only runs the query-heavy test files against it.
+    """
+    url = os.environ.get("TEST_DATABASE_URL")
+    if url:
+        pg_engine = create_engine(url)
+        Base.metadata.drop_all(pg_engine)
+        _seed(pg_engine, exercise_data)
+        yield pg_engine
+        pg_engine.dispose()
+        return
+    seeded_template = request.getfixturevalue("seeded_template")
     engine = _new_engine()
     source = seeded_template.raw_connection()
     target = engine.raw_connection()
