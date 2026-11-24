@@ -347,6 +347,36 @@ describe("resuming and recovering a workout", () => {
     ).toBeInTheDocument();
   });
 
+  it("saves a resumed workout under its own routine, not the one in the link", async () => {
+    localStorage.setItem(
+      workoutStorageKey,
+      JSON.stringify({
+        state: {
+          routineId: 9,
+          routineName: "Pull day",
+          startedAt: new Date().toISOString(),
+          duration: null,
+          currentExerciseId: benchPress.id,
+          exercises: [
+            makeActiveExercise(benchPress, [
+              { reps: 3, weight: 120, isCompleted: true },
+            ]),
+          ],
+        },
+        version: 0,
+      }),
+    );
+
+    const { user } = renderWorkout({ routine: benchFirst });
+    await screen.findByRole("spinbutton", { name: "Set 1 weight" });
+    await user.click(screen.getByRole("button", { name: "Complete Workout" }));
+
+    await waitFor(() => expect(createWorkout).toHaveBeenCalled());
+    expect(savedWorkout().routineId).toBe(9);
+    await waitFor(() => expect(router.push).toHaveBeenCalled());
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
   it("starts fresh from the routine when the saved workout is corrupt", async () => {
     localStorage.setItem(workoutStorageKey, "{not json");
 

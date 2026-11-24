@@ -48,7 +48,17 @@ export default function WorkoutClientProvider({
   exerciseSettings?: ExerciseSetting[];
   initialPreviousSets?: Record<number, PreviousSet[]> | null;
 }) {
-  const { setWorkoutData, exercises, startedAt, resetState } = useWorkout();
+  const {
+    setWorkoutData,
+    exercises,
+    startedAt,
+    resetState,
+    routineId: workoutRoutineId,
+    routineName: workoutRoutineName,
+  } = useWorkout();
+  // A resumed workout belongs to the routine it was started from, which is not
+  // necessarily the one in the URL. Only that routine can be compared against.
+  const workoutRoutine = routine?.id === workoutRoutineId ? routine : null;
   const router = useRouter();
   const hasTrackedStart = useRef(false);
   const isSubmittingRef = useRef(false);
@@ -173,7 +183,7 @@ export default function WorkoutClientProvider({
     const workout: WorkoutSchema = {
       completedAt,
       duration,
-      routineId: routine?.id,
+      routineId: workoutRoutineId ?? undefined,
       sets: exercises.flatMap((e) => {
         const group = getActiveSupersetGroup(exercises, e);
         return e.sets
@@ -192,7 +202,7 @@ export default function WorkoutClientProvider({
           exercise_count: exercises.filter((e) =>
             e.sets.some((s) => s.isCompleted),
           ).length,
-          has_routine: routine !== null,
+          has_routine: workoutRoutineId !== null,
         });
         saved = true;
         if (newWorkout.durationCapped) {
@@ -214,10 +224,14 @@ export default function WorkoutClientProvider({
               ]
             : [];
         });
-        const diff = routine
-          ? diffRoutine(routine.routineItems, performed)
+        const diff = workoutRoutine
+          ? diffRoutine(workoutRoutine.routineItems, performed)
           : null;
-        const offerReuse = !routine || (diff !== null && hasRoutineDiff(diff));
+        // Offer to save a workout that began without a routine, or to update the
+        // routine it began from. With that routine not loaded there is nothing
+        // to compare, so no offer is made.
+        const offerReuse =
+          workoutRoutineId === null || (diff !== null && hasRoutineDiff(diff));
 
         resetState();
         localStorage.removeItem(workoutStorageKey);
@@ -226,9 +240,12 @@ export default function WorkoutClientProvider({
         if (offerReuse) {
           setReuseTarget({
             workoutId: newWorkout.id,
-            routine: routine ? { id: routine.id, name: routine.name } : null,
+            routine:
+              workoutRoutineId !== null
+                ? { id: workoutRoutineId, name: workoutRoutineName ?? "" }
+                : null,
             diff,
-            suggestedName: routine?.name ?? "My workout",
+            suggestedName: workoutRoutineName ?? "My workout",
           });
         } else {
           goToSummary(newWorkout.id);
@@ -261,7 +278,7 @@ export default function WorkoutClientProvider({
             .flatMap((e) => e.sets)
             .some((s) => s.isCompleted)}
         />
-        <SetList routine={routine} />
+        <SetList routine={workoutRoutine} />
       </div>
       <RestTimeTracker />
 

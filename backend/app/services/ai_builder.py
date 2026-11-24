@@ -8,7 +8,13 @@ from app.constants.equipment import EQUIPMENT
 from app.constants.personas import get_persona
 from app.exceptions import AIUnavailable
 from app.models import Exercise, ExerciseMuscle
-from app.schemas.ai import BuildRoutineRequest, RoutinePlan, RoutinePreview
+from app.schemas.ai import (
+    BuildRoutineRequest,
+    PlannedItem,
+    RoutinePlan,
+    RoutinePreview,
+)
+from app.schemas.routine import MAX_ROUTINE_ITEMS
 from app.services import ai as ai_service
 from app.services import profile as profile_service
 from app.services.ai.providers import TextProvider
@@ -17,6 +23,10 @@ MAX_CANDIDATES = 150
 SETS_RANGE = (1, 10)
 REPS_RANGE = (1, 30)
 REST_RANGE = (0, 600)
+# Saving a routine rejects a superset group outside this range.
+SUPERSET_GROUP_RANGE = (0, 1000)
+MAX_ROUTINE_NAME_LENGTH = 255
+DEFAULT_ROUTINE_NAME = "Workout"
 
 OUTPUT_FORMAT = """Reply with JSON only, in this shape:
 {"routines": [{"name": str, "items": [{"exerciseId": int, "sets": int, "reps": int, "restSecs": int, "supersetGroup": int or null}]}], "rationale": str}
@@ -73,26 +83,51 @@ def build_prompt(request: BuildRoutineRequest, candidates: Sequence[Exercise]) -
     return "\n".join(lines)
 
 
+def _to_preview_item(item: PlannedItem, catalogue: dict[int, Exercise]) -> dict:
+    superset_group = item.superset_group
+    if superset_group is not None:
+        superset_group = _clamp(superset_group, SUPERSET_GROUP_RANGE)
+    return {
+        **item.model_dump(),
+        "sets": _clamp(item.sets, SETS_RANGE),
+        "reps": _clamp(item.reps, REPS_RANGE),
+        "rest_secs": _clamp(item.rest_secs, REST_RANGE),
+        "superset_group": superset_group,
+        "name": catalogue[item.exercise_id].name,
+    }
+
+
+def _to_preview_items(
+    planned_items: Sequence[PlannedItem],
+    catalogue: dict[int, Exercise],
+) -> list[dict]:
+    """Known exercises only, each once, so the plan can be saved as a routine."""
+    items = []
+    seen_exercise_ids = set()
+    for planned_item in planned_items:
+        if planned_item.exercise_id not in catalogue:
+            continue
+        if planned_item.exercise_id in seen_exercise_ids:
+            continue
+        seen_exercise_ids.add(planned_item.exercise_id)
+        items.append(_to_preview_item(planned_item, catalogue))
+        if len(items) == MAX_ROUTINE_ITEMS:
+            break
+    return items
+
+
 def _to_preview(plan: RoutinePlan, catalogue: dict[int, Exercise]) -> RoutinePreview:
     routines = []
     for routine in plan.routines:
-        items = [
-            {
-                **item.model_dump(),
-                "sets": _clamp(item.sets, SETS_RANGE),
-                "reps": _clamp(item.reps, REPS_RANGE),
-                "rest_secs": _clamp(item.rest_secs, REST_RANGE),
-                "name": catalogue[item.exercise_id].name,
-            }
-            for item in routine.items
-            if item.exercise_id in catalogue
-        ]
+        items = _to_preview_items(routine.items, catalogue)
         if items:
-            routines.append({"name": routine.name, "items": items})
+            name = routine.name.strip()[:MAX_ROUTINE_NAME_LENGTH]
+            name = name or DEFAULT_ROUTINE_NAME
+            routines.append({"name": name, "items": items})
 
     if not routines:
         raise AIUnavailable("The plan used no known exercises.")
-    for routine, day in zip(routines, _spread_days(len(routines))):
+    for routine, day in zip(routines, _spread_days(len(routines)), strict=True):
         routine["day"] = day
     return RoutinePreview.model_validate(
         {"routines": routines, "rationale": plan.rationale}
@@ -113,8 +148,6 @@ def build_routines(
         get_persona(profile.coach_persona).system_prompt,
         providers,
     )
-    print("AI text= ", end="")
-    print(raw)
     try:
         plan = RoutinePlan.model_validate(ai_service.extract_json(raw))
     except (ValueError, ValidationError) as exc:

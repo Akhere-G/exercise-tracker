@@ -4,6 +4,9 @@ from sqlalchemy import select, func, case
 from app.models import Exercise, Muscle, ExerciseMuscle, Workout, Routine, WorkoutSet
 from typing import Optional
 
+# The most sets of one exercise sent back as history, newest kept.
+MAX_HISTORY_SETS = 1000
+
 
 def _escape_like(term: str) -> str:
     return (
@@ -119,6 +122,7 @@ def get_exercise(db: Session, exercise_id: int):
 
 
 def get_workouts(db: Session, user_id: int, exercise_id: int):
+    """The user's most recent sets of an exercise, oldest first."""
     stmt = (
         select(WorkoutSet, Workout.completed_at)
         .options(
@@ -129,8 +133,18 @@ def get_workouts(db: Session, user_id: int, exercise_id: int):
         .join(Workout)
         .where(Workout.user_id == user_id)
         .where(WorkoutSet.exercise_id == exercise_id)
+        .order_by(
+            Workout.completed_at.desc(),
+            Workout.id.desc(),
+            WorkoutSet.position.desc(),
+            WorkoutSet.id.desc(),
+        )
+        .limit(MAX_HISTORY_SETS)
     )
-    rows = db.execute(stmt).all()
+    newest_first = db.execute(stmt).all()
+
+    # The history page and its charts read the sets oldest to newest.
+    rows = reversed(newest_first)
 
     workouts = []
     for workout_set, completed_at in rows:

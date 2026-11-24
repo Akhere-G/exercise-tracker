@@ -147,3 +147,56 @@ def test_requires_at_least_one_equipment_choice(client, auth_headers):
         headers=auth_headers,
     )
     assert response.status_code == 422
+
+
+def test_a_repeated_exercise_is_kept_once_so_the_plan_can_be_saved(
+    client, auth_headers, reply, known_id
+):
+    reply(plan(routine("Day A", item(known_id), item(known_id, sets=5))))
+
+    [only] = build(client, auth_headers).json()["routines"]
+
+    assert [i["exerciseId"] for i in only["items"]] == [known_id]
+    assert only["items"][0]["sets"] == 3
+
+
+def test_a_superset_group_is_kept_within_what_a_routine_accepts(
+    client, auth_headers, reply, known_id
+):
+    reply(plan(routine("Day A", item(known_id, supersetGroup=5_000_000))))
+
+    [only] = build(client, auth_headers).json()["routines"]
+
+    assert only["items"][0]["supersetGroup"] == 1000
+
+
+def test_a_preview_can_be_saved_as_routines(client, auth_headers, reply, known_id):
+    reply(
+        plan(
+            routine("  ", item(known_id), item(known_id), item(999_999)),
+            routine("Day B", item(known_id, supersetGroup=-3)),
+        )
+    )
+    preview = build(client, auth_headers).json()
+
+    batch = [
+        {
+            "name": routine["name"],
+            "day": routine["day"],
+            "routineItems": [
+                {
+                    "exerciseId": i["exerciseId"],
+                    "targetSets": i["sets"],
+                    "targetReps": i["reps"],
+                    "restSecs": i["restSecs"],
+                    "supersetGroup": i["supersetGroup"],
+                    "order": order,
+                }
+                for order, i in enumerate(routine["items"])
+            ],
+        }
+        for routine in preview["routines"]
+    ]
+    saved = client.post("/api/routines/batch", json=batch, headers=auth_headers)
+
+    assert saved.status_code == 201

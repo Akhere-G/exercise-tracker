@@ -165,3 +165,9 @@ def test_me_never_exposes_the_password_hash(client, user, auth_headers):
         "email": "test@example.com",
         "isDemo": False,
     }
+
+
+def test_the_tests_do_not_read_the_developers_env_file():
+    assert settings.redis_url is None
+    assert settings.trusted_proxy_count is None
+    assert settings.vapid_private_key is None

@@ -1,6 +1,7 @@
 import os
 
 # Must be set before app modules import: never let tests reach a real database.
+os.environ["GAINS_SKIP_ENV_FILE"] = "1"
 os.environ["DATABASE_URL"] = "sqlite://"
 os.environ["SECRET_KEY"] = "test-secret-key-that-is-at-least-32-chars"
 os.environ["ALGORITHM"] = "HS256"

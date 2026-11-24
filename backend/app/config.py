@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Literal
 
@@ -5,9 +6,16 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+# The test suite sets this so a developer's own backend/.env (a real Redis, AI
+# keys, proxy settings) never leaks into tests.
+SKIP_ENV_FILE_VARIABLE = "GAINS_SKIP_ENV_FILE"
+ENV_FILE = Path(__file__).resolve().parents[1] / ".env"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=Path(__file__).resolve().parents[1] / ".env", extra="ignore"
+        env_file=None if os.environ.get(SKIP_ENV_FILE_VARIABLE) else ENV_FILE,
+        extra="ignore",
     )
 
     secret_key: str = Field(min_length=32)
