@@ -17,6 +17,8 @@ const eslintConfig = defineConfig([
     "playwright-report/**",
     "blob-report/**",
     "e2e/.tmp/**",
+    // Local Playwright build output
+    ".next-e2e/**",
   ]),
   {
     files: ["src/components/SortableList.tsx"],

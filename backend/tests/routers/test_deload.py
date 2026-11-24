@@ -68,7 +68,7 @@ def test_progressing_lifter_is_left_alone(client, auth_headers):
     assert body["shouldDeload"] is False
 
 
-def test_does_not_repeat_the_recommendation_during_the_cooldown(client, auth_headers):
+def test_the_recommendation_stays_until_it_is_acknowledged(client, auth_headers):
     for days_ago in (21, 14, 7, 1):
         log(client, auth_headers, days_ago, weight=50)
 
@@ -76,4 +76,21 @@ def test_does_not_repeat_the_recommendation_during_the_cooldown(client, auth_hea
     second = client.get("/api/progression/deload", headers=auth_headers).json()
 
     assert first["shouldDeload"] is True
-    assert second["shouldDeload"] is False
+    assert second["shouldDeload"] is True
+
+
+def test_does_not_repeat_the_recommendation_once_acknowledged(client, auth_headers):
+    for days_ago in (21, 14, 7, 1):
+        log(client, auth_headers, days_ago, weight=50)
+
+    ack = client.post("/api/progression/deload/ack", headers=auth_headers)
+    after = client.get("/api/progression/deload", headers=auth_headers).json()
+
+    assert ack.status_code == 204
+    assert after["shouldDeload"] is False
+
+
+def test_acknowledging_requires_login(client):
+    response = client.post("/api/progression/deload/ack")
+
+    assert response.status_code == 401

@@ -1,7 +1,13 @@
 from datetime import date, datetime, timedelta, timezone
 
 from app.constants.milestones import MILESTONES
-from app.models import Achievement, Exercise, UserAchievement, Workout
+from app.models import (
+    Achievement,
+    Exercise,
+    UserAchievement,
+    Workout,
+    WorkoutSet,
+)
 from app.schemas.achievement import UserAchievementResponse
 from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session, selectinload
@@ -104,7 +110,13 @@ def seed_achievements(db: Session) -> None:
 
 
 def check_and_award_prs(
-    db: Session, user_id: int, workout_id: int, workout: Workout, commit: bool = True
+    db: Session,
+    user_id: int,
+    workout_id: int,
+    workout: Workout,
+    *,
+    commit: bool = True,
+    awarded_at: datetime | None = None,
 ) -> list[UserAchievementResponse]:
     """Award or update personal-record achievements for the sets in a workout."""
     sets_by_exercise = {}
@@ -156,7 +168,7 @@ def check_and_award_prs(
         key = (user_achievement.achievement_id, user_achievement.exercise_id)
         existing_prs[key] = user_achievement
 
-    now = datetime.now(timezone.utc)
+    now = awarded_at or datetime.now(timezone.utc)
     changed: list[UserAchievement] = []
 
     for exercise_id, sets in sets_by_exercise.items():
@@ -319,6 +331,58 @@ def backfill_user_achievements(
         db.flush()
 
     return created
+
+
+def rebuild_exercise_prs(db: Session, user_id: int, exercise_ids: set[int]) -> None:
+    """Recompute personal records for some exercises from the workouts that remain.
+
+    Records are only ever added as workouts are saved, so after a workout is edited
+    or deleted a record it held would stay on the books. Only these exercises are
+    touched, so streaks, milestones and other records keep their unlock dates.
+    The caller commits.
+    """
+    if not exercise_ids:
+        return
+
+    pr_achievement_ids = select(Achievement.id).where(Achievement.type.in_(PR_TYPES))
+    db.execute(
+        delete(UserAchievement).where(
+            UserAchievement.user_id == user_id,
+            UserAchievement.exercise_id.in_(exercise_ids),
+            UserAchievement.achievement_id.in_(pr_achievement_ids),
+        )
+    )
+    db.flush()
+
+    workouts_with_these_exercises = (
+        select(WorkoutSet.workout_id)
+        .where(WorkoutSet.exercise_id.in_(exercise_ids))
+        .scalar_subquery()
+    )
+    workouts = (
+        db.execute(
+            select(Workout)
+            .options(selectinload(Workout.sets))
+            .where(
+                Workout.user_id == user_id,
+                Workout.id.in_(workouts_with_these_exercises),
+            )
+            .order_by(Workout.completed_at.asc(), Workout.id.asc())
+        )
+        .scalars()
+        .all()
+    )
+
+    for workout in workouts:
+        check_and_award_prs(
+            db,
+            user_id=user_id,
+            workout_id=workout.id,
+            workout=workout,
+            commit=False,
+            awarded_at=workout.completed_at,
+        )
+        db.flush()
 
 
 def get_user_achievements(db: Session, user_id: int) -> list[UserAchievementResponse]:

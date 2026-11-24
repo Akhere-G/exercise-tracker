@@ -1,10 +1,9 @@
-from datetime import datetime
 from typing import Literal, Optional
 from zoneinfo import available_timezones
 
 from pydantic import Field, field_validator
 
-from .base import BaseModel
+from .base import BaseModel, UtcDatetime, not_nullable
 
 WeightUnit = Literal["kg", "lb"]
 EffortMetric = Literal["off", "rpe", "rir"]
@@ -28,7 +27,7 @@ class Profile(BaseModel):
     coach_persona: CoachPersona = "hype"
     wrapped_theme: Optional[WrappedTheme] = None
     timezone: Optional[str] = None
-    onboarded_at: Optional[datetime] = None
+    onboarded_at: Optional[UtcDatetime] = None
 
 
 class ProfileUpdate(BaseModel):
@@ -48,7 +47,9 @@ class ProfileUpdate(BaseModel):
     coach_persona: Optional[CoachPersona] = None
     wrapped_theme: Optional[WrappedTheme] = None
     timezone: Optional[str] = Field(default=None, max_length=64)
-    onboarded_at: Optional[datetime] = None
+    onboarded_at: Optional[UtcDatetime] = None
+
+    _no_nulls = not_nullable("weight_unit", "effort_metric", "coach_persona")
 
     @field_validator("timezone")
     @classmethod

@@ -174,6 +174,8 @@ def update_workout(
         if not workout:
             return None
 
+        exercises_before_edit = _exercise_ids(workout)
+
         for field, value in workout_in.model_dump(
             exclude_unset=True, exclude={"sets"}
         ).items():
@@ -192,6 +194,7 @@ def update_workout(
         db.rollback()
         raise
 
+    _rebuild_prs_safely(db, user_id, exercises_before_edit | _exercise_ids(workout))
     _award_achievements_safely(db, user_id, workout)
     return workout
 
@@ -202,12 +205,15 @@ def delete_workout(db: Session, user_id: int, workout_id: int):
         if not workout:
             return None
 
+        exercises_in_workout = _exercise_ids(workout)
         db.delete(workout)
         db.commit()
-        return workout_id
     except Exception:
         db.rollback()
         raise
+
+    _rebuild_prs_safely(db, user_id, exercises_in_workout)
+    return workout_id
 
 
 def _workout_query():
@@ -240,6 +246,27 @@ def _build_set(set_data, position: int) -> WorkoutSet:
         rir=set_data.rir,
         superset_group=set_data.superset_group,
     )
+
+
+def _exercise_ids(workout: Workout) -> set[int]:
+    return {workout_set.exercise_id for workout_set in workout.sets}
+
+
+def _rebuild_prs_safely(db: Session, user_id: int, exercise_ids: set[int]) -> None:
+    """Drop records that no longer hold now that a workout changed or went away.
+
+    The workout is already saved, so a failure here is logged, not raised.
+    """
+    try:
+        achievement_service.rebuild_exercise_prs(db, user_id, exercise_ids)
+        db.commit()
+    except Exception:
+        db.rollback()
+        logger.exception(
+            "Could not rebuild personal records for user %s (exercises %s)",
+            user_id,
+            sorted(exercise_ids),
+        )
 
 
 def _award_achievements(db: Session, user_id: int, workout: Workout) -> None:

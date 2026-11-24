@@ -118,7 +118,10 @@ def test_demo_endpoint(client, db, fixture, freeze, monkeypatch):
 
     subscribe = client.post(
         "/api/notifications/subscribe",
-        json={"endpoint": "e", "keys": {"p256dh": "p", "auth": "a"}},
+        json={
+            "endpoint": "https://fcm.googleapis.com/fcm/send/abc",
+            "keys": {"p256dh": "p", "auth": "a"},
+        },
         headers=headers,
     )
     assert subscribe.status_code == 403
@@ -150,3 +153,21 @@ def test_demo_quotas(client, db, fixture, freeze, monkeypatch):
     assert (
         client.post("/api/routines", json=routine, headers=headers).status_code == 403
     )
+
+
+def test_me_never_exposes_the_password_hash(client, user, auth_headers):
+    response = client.get("/api/auth/me", headers=auth_headers)
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": user.id,
+        "username": "Test",
+        "email": "test@example.com",
+        "isDemo": False,
+    }
+
+
+def test_the_tests_do_not_read_the_developers_env_file():
+    assert settings.redis_url is None
+    assert settings.trusted_proxy_count is None
+    assert settings.vapid_private_key is None

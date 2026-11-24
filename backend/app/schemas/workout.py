@@ -1,8 +1,7 @@
 from pydantic import Field, model_validator
 from typing import Literal, Optional, List
-from datetime import datetime
 from .exercise import Exercise
-from .base import BaseModel
+from .base import BaseModel, UtcDatetime, not_nullable
 
 SetType = Literal["warmup", "normal", "drop", "failure"]
 
@@ -59,7 +58,7 @@ class WorkoutSet(WorkoutSetBase):
 
 
 class WorkoutSetWithDate(WorkoutSet):
-    completed_at: datetime
+    completed_at: UtcDatetime
 
 
 class PreviousSet(BaseModel):
@@ -76,7 +75,7 @@ class PreviousSet(BaseModel):
 
 class WorkoutBase(BaseModel):
     routine_id: Optional[int] = None
-    completed_at: datetime
+    completed_at: UtcDatetime
     duration: int
 
 
@@ -87,11 +86,13 @@ class WorkoutCreate(WorkoutBase):
 
 
 class WorkoutUpdate(BaseModel):
-    completed_at: Optional[datetime] = None
+    completed_at: Optional[UtcDatetime] = None
     duration: Optional[int] = Field(default=None, ge=0, le=MAX_WORKOUT_SECS)
     sets: Optional[List[WorkoutSetCreate]] = Field(
         default=None, max_length=MAX_SETS_PER_WORKOUT
     )
+
+    _no_nulls = not_nullable("completed_at", "duration")
 
 
 class Workout(WorkoutBase):

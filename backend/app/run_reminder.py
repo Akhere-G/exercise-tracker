@@ -1,18 +1,16 @@
-import os
-import sys
-
-sys.path.append(os.getcwd())
+import logging
 
 from app.workers.scheduler import check_routine_reminders
 
-if __name__ == "__main__":
-    try:
-        print("Starting routine reminder check job...")
-        check_routine_reminders()
-        print("Job completed successfully.")
-    except Exception as e:
-        import traceback
+logger = logging.getLogger(__name__)
 
-        print("CRITICAL ERROR IN RUN_REMINDER:")
-        print(traceback.format_exc())
-        raise e
+
+def main() -> None:
+    logging.basicConfig(level=logging.INFO)
+    logger.info("Starting routine reminder check job...")
+    check_routine_reminders()
+    logger.info("Job completed successfully.")
+
+
+if __name__ == "__main__":
+    main()

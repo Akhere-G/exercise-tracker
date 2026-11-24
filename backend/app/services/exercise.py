@@ -4,6 +4,9 @@ from sqlalchemy import select, func, case
 from app.models import Exercise, Muscle, ExerciseMuscle, Workout, Routine, WorkoutSet
 from typing import Optional
 
+# The most sets of one exercise sent back as history, newest kept.
+MAX_HISTORY_SETS = 1000
+
 
 def _escape_like(term: str) -> str:
     return (
@@ -71,13 +74,15 @@ def get_exercises(
         stmt = stmt.where(Exercise.equipment.ilike(_like_pattern(equipment), escape="\\"))
 
     if muscle and muscle != "all":
-        stmt = (
-            stmt.join(ExerciseMuscle)
-            .join(Muscle)
+        # A subquery rather than a join plus DISTINCT: PostgreSQL rejects DISTINCT
+        # when ORDER BY uses expressions that are not selected, as the search
+        # ranking below does.
+        matching_exercise_ids = (
+            select(ExerciseMuscle.exercise_id)
+            .join(Muscle, Muscle.id == ExerciseMuscle.muscle_id)
             .where(Muscle.name.ilike(_like_pattern(muscle), escape="\\"))
         )
-
-        stmt = stmt.distinct()
+        stmt = stmt.where(Exercise.id.in_(matching_exercise_ids))
 
     if search:
         stmt = stmt.where(Exercise.name.ilike(_like_pattern(search), escape="\\"))
@@ -117,6 +122,7 @@ def get_exercise(db: Session, exercise_id: int):
 
 
 def get_workouts(db: Session, user_id: int, exercise_id: int):
+    """The user's most recent sets of an exercise, oldest first."""
     stmt = (
         select(WorkoutSet, Workout.completed_at)
         .options(
@@ -127,8 +133,18 @@ def get_workouts(db: Session, user_id: int, exercise_id: int):
         .join(Workout)
         .where(Workout.user_id == user_id)
         .where(WorkoutSet.exercise_id == exercise_id)
+        .order_by(
+            Workout.completed_at.desc(),
+            Workout.id.desc(),
+            WorkoutSet.position.desc(),
+            WorkoutSet.id.desc(),
+        )
+        .limit(MAX_HISTORY_SETS)
     )
-    rows = db.execute(stmt).all()
+    newest_first = db.execute(stmt).all()
+
+    # The history page and its charts read the sets oldest to newest.
+    rows = reversed(newest_first)
 
     workouts = []
     for workout_set, completed_at in rows:

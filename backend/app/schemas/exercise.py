@@ -1,9 +1,7 @@
-from datetime import datetime
-
 from pydantic import field_validator, model_validator
 from sqlalchemy import Row
 
-from .base import BaseModel
+from .base import BaseModel, UtcDatetime
 
 
 class Muscle(BaseModel):
@@ -42,7 +40,7 @@ class RankedExercise(ExerciseBase):
     id: int
     set_count: int
     workout_count: int
-    last_used: datetime | None = None
+    last_used: UtcDatetime | None = None
 
     @model_validator(mode="before")
     @classmethod

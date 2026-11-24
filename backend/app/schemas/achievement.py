@@ -1,7 +1,7 @@
-from datetime import datetime
-
 from app.schemas.exercise import ExerciseResponseSimple
 from pydantic import BaseModel
+
+from .base import UtcDatetime
 
 
 class AchievementBase(BaseModel):
@@ -18,8 +18,8 @@ class AchievementCreate(AchievementBase):
 
 class AchievementResponse(AchievementBase):
     id: int
-    created_at: datetime
-    updated_at: datetime
+    created_at: UtcDatetime
+    updated_at: UtcDatetime
 
     class Config:
         from_attributes = True
@@ -32,7 +32,7 @@ class UserAchievementResponse(BaseModel):
     value: float | None = None
     exercise_id: int | None = None
     workout_id: int | None = None
-    unlocked_at: datetime
+    unlocked_at: UtcDatetime
     achievement: AchievementResponse
     exercise: ExerciseResponseSimple | None = None
 

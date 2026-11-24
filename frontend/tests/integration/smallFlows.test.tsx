@@ -6,6 +6,7 @@ import WorkoutsCalendar from "@/src/app/(dashboard)/components/WorkoutCalendar";
 import DeloadBanner from "@/src/features/progression/components/DeloadBanner";
 import { useWorkout, workoutStorageKey } from "@/src/features/workout/store";
 import { getWorkoutsInRange } from "@/src/features/workout/actions";
+import { acknowledgeDeload } from "@/src/features/progression/actions";
 import { router } from "@/tests/navigation";
 import { benchPress, makeActiveExercise, makeWorkout } from "@/tests/factories";
 import { renderWithProviders } from "@/tests/render";
@@ -15,6 +16,9 @@ vi.mock("next/navigation", () => import("@/tests/navigation"));
 vi.mock("sonner", () => ({ toast: { error: vi.fn() } }));
 vi.mock("@/src/features/workout/actions", () => ({
   getWorkoutsInRange: vi.fn(),
+}));
+vi.mock("@/src/features/progression/actions", () => ({
+  acknowledgeDeload: vi.fn().mockResolvedValue({ success: true, data: null }),
 }));
 
 afterEach(() => {
@@ -190,6 +194,7 @@ describe("deload banner", () => {
 
     await user.click(screen.getByRole("button", { name: "Dismiss" }));
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(acknowledgeDeload).toHaveBeenCalledTimes(1);
 
     unmount();
     renderWithProviders(<DeloadBanner assessment={assessment} />);

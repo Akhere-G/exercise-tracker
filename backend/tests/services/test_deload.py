@@ -173,18 +173,30 @@ class TestAssessDeload:
         ]
         assert result["stalled_exercises"] == []
 
-    def test_is_not_repeated_during_the_cooldown(self, db, user):
+    def test_is_repeated_until_it_is_acknowledged(self, db, user):
         log_flat_history(db, user.id)
 
         first = deload.assess_deload(db, user.id, now=NOW)
-        soon_after = deload.assess_deload(db, user.id, now=NOW + timedelta(days=3))
+        again = deload.assess_deload(db, user.id, now=NOW + timedelta(days=3))
 
         assert first["should_deload"] is True
+        assert again["should_deload"] is True
+
+    def test_is_not_repeated_during_the_cooldown_after_it_is_acknowledged(
+        self,
+        db,
+        user,
+    ):
+        log_flat_history(db, user.id)
+        deload.acknowledge_deload(db, user.id, now=NOW)
+
+        soon_after = deload.assess_deload(db, user.id, now=NOW + timedelta(days=3))
+
         assert soon_after == {"should_deload": False}
 
     def test_is_recommended_again_after_the_cooldown(self, db, user):
         log_flat_history(db, user.id)
-        deload.assess_deload(db, user.id, now=NOW)
+        deload.acknowledge_deload(db, user.id, now=NOW)
 
         after_cooldown = NOW + timedelta(days=deload.COOLDOWN_DAYS)
         log_workout(
