@@ -97,6 +97,8 @@ def get_exercises(
             func.coalesce(usage.c.set_count, 0).desc(),
             usage.c.last_used.desc().nulls_last(),
             Exercise.priority.asc(),
+            # Final tie-breaker: without it pages can overlap or skip rows.
+            Exercise.id.asc(),
         )
     else:
         stmt = stmt.order_by(
@@ -104,6 +106,8 @@ def get_exercises(
             func.coalesce(usage.c.set_count, 0).desc(),
             usage.c.last_used.desc().nulls_last(),
             Exercise.priority.asc(),
+            # Final tie-breaker: without it pages can overlap or skip rows.
+            Exercise.id.asc(),
         )
     offset = limit * (page - 1)
     stmt = stmt.limit(limit).offset(offset)

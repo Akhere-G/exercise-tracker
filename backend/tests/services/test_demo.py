@@ -3,7 +3,7 @@ import re
 from datetime import date
 
 import pytest
-from sqlalchemy import event, func, select
+from sqlalchemy import event, func, select, text
 
 from app.models import (
     Exercise,
@@ -179,7 +179,7 @@ def mutate(fixture, fn):
 
 MUTATIONS = {
     "unknown exercise": lambda f: f["exercises"][0].update(id=999999),
-    "wrong metrics set": lambda f: f["workouts"][0]["sets"][0].update(weight=None),
+    "fractional weight": lambda f: f["workouts"][0]["sets"][0].update(weight=40.5),
     "future date": lambda f: f["workouts"][0].update(weekOffset=0, weekday=6),
     "duplicate key": lambda f: f["workouts"][1].update(key=f["workouts"][0]["key"]),
 }
@@ -254,11 +254,14 @@ def test_reset_never_touches_other_users(db, engine, fixture, freeze):
         ), statement
         if statement.lstrip().startswith("DELETE"):
             assert "user_id" in statement, statement
-            assert summary.user_id in tuple(params), (statement, params)
+            values = params.values() if isinstance(params, dict) else params
+            assert summary.user_id in tuple(values), (statement, params)
 
 
 def test_reset_refuses_when_foreign_keys_are_off(db, fixture, freeze):
-    db.execute(__import__("sqlalchemy").text("PRAGMA foreign_keys=OFF"))
+    if db.get_bind().dialect.name != "sqlite":
+        pytest.skip("foreign keys are always enforced outside SQLite")
+    db.execute(text("PRAGMA foreign_keys=OFF"))
     with pytest.raises(DemoSeedError):
         run_reset(db, fixture, freeze)
 

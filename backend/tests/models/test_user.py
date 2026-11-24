@@ -13,6 +13,7 @@ def test_single_demo_user_index(db):
     db.rollback()
 
 
+@pytest.mark.slow
 def test_migration_downgrade_and_upgrade(tmp_path):
     """The initial chain does not build from empty, so start from the model schema."""
     import os

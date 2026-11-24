@@ -1,14 +1,13 @@
-import pytest
-
 from app.constants.programs import PROGRAMS
 from app.services.program import resolve_exercise_ids
 
 
-@pytest.mark.parametrize("program", PROGRAMS.values(), ids=lambda p: p.slug)
-def test_every_program_exercise_exists_in_the_catalogue(db, program):
-    ids = resolve_exercise_ids(db, program)
+def test_every_program_exercise_exists_in_the_catalogue(db):
+    for program in PROGRAMS.values():
+        ids = resolve_exercise_ids(db, program)
+        names = {e.name for day in program.days for e in day.exercises}
 
-    assert len(ids) == len({e.name for d in program.days for e in d.exercises})
+        assert len(ids) == len(names), program.slug
 
 
 def test_applying_a_program_creates_a_routine_per_day(client, auth_headers):
