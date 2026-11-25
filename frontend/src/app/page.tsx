@@ -74,6 +74,12 @@ export default function HomePage() {
           </div>
           <nav className="flex items-center gap-4">
             <Link
+              href="/about"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              About
+            </Link>
+            <Link
               href="/login"
               className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
@@ -98,8 +104,8 @@ export default function HomePage() {
           <p className="text-muted-foreground md:text-lg">
             Gains is the fitness tracker that tells you what to do next. It
             guides your progression, protects you from burnout and turns every
-            workout into visible progress, so you keep getting stronger for
-            the long run.
+            workout into visible progress, so you keep getting stronger for the
+            long run.
           </p>
         </section>
 
@@ -204,6 +210,9 @@ export default function HomePage() {
             </Link>
             <Link href="/exercises" className="hover:underline">
               Exercises
+            </Link>
+            <Link href="/about" className="hover:underline">
+              About
             </Link>
             <Link href="/terms" className="hover:underline">
               Terms
